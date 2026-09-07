@@ -1,0 +1,232 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description" content="刘聿宸的个人主页 - 梦想及力量" />
+  <title>刘聿宸 · 个人主页</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@700;900&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="styles/style.css" />
+</head>
+<body>
+  <!-- 顶部滚动进度条 -->
+  <div class="scroll-progress" id="scrollProgress"></div>
+
+  <!-- 顶部导航（玻璃拟态） -->
+  <header class="navbar" id="navbar">
+    <div class="container navbar-inner">
+      <a class="brand" href="#hero">刘聿宸<span class="brand-dot">.</span></a>
+      <nav class="nav-links" id="navLinks">
+        <a href="#about">关于我</a>
+        <a href="#skills">技能</a>
+        <a href="#projects">项目</a>
+        <a href="#contact">联系</a>
+        <a href="#twin">数字孪生</a>
+      </nav>
+      <button class="nav-toggle" id="navToggle" aria-label="打开菜单">
+        <span></span><span></span><span></span>
+      </button>
+    </div>
+  </header>
+
+  <main>
+    <!-- 1. Hero -->
+    <section id="hero" class="hero">
+      <div class="hero-bg" aria-hidden="true">
+        <span class="orb orb-1"></span>
+        <span class="orb orb-2"></span>
+        <span class="orb orb-3"></span>
+        <span class="hero-wave w1"></span>
+        <span class="hero-wave w2"></span>
+        <!-- 校徽占位（背景装饰）。如要替换为官方校徽，把图片放入 assets/ 并换成 <img> -->
+        <div class="school-logo tju" title="天津大学 Tianjin University">
+          <div class="school-badge">
+            <span class="school-abbr">TJU</span>
+            <span class="school-name">天津大学</span>
+          </div>
+        </div>
+        <div class="school-logo polyu" title="香港理工大学 The Hong Kong Polytechnic University">
+          <div class="school-badge">
+            <span class="school-abbr">PolyU</span>
+            <span class="school-name">香港理工大学</span>
+          </div>
+        </div>
+        <div class="grid-overlay"></div>
+      </div>
+      <div class="container hero-inner">
+        <div class="hero-avatar-wrap">
+          <div class="hero-avatar-ring"></div>
+          <div class="hero-avatar">刘</div>
+        </div>
+        <p class="hero-name">你好，我是 <strong>刘聿宸</strong> · 18 岁</p>
+        <h1 class="hero-slogan"><span class="typewriter" id="typewriter">梦想及力量</span><span class="caret"></span></h1>
+        <p class="hero-sub">大一新生 · 编程与人工智能初学者 · 正在用 AI 辅助开发记录我的成长</p>
+        <div class="hero-actions">
+          <a class="btn btn-primary" href="#contact">联系我</a>
+          <a class="btn btn-ghost" href="#about">了解我</a>
+        </div>
+      </div>
+      <a class="scroll-hint" href="#about" aria-label="向下滚动">
+        <span class="mouse"><span class="wheel"></span></span>
+      </a>
+    </section>
+
+    <!-- 2. About -->
+    <section id="about" class="section">
+      <div class="container">
+        <h2 class="section-title reveal glitch" data-text="关于我">关于我</h2>
+        <p class="section-sub reveal">一点关于我的介绍</p>
+        <div class="about-card reveal">
+          <p>
+            我是刘聿宸，今年 18 岁，目前就读于<strong>天津大学香港理工大学深圳未来技术学院</strong>，
+            主攻<strong>计算机科学与技术</strong>专业，是一名刚刚踏入大学生活的大一新生。
+            我的 slogan 是「<strong>梦想及力量</strong>」——我相信，怀揣梦想的人，脚下最有力量。
+          </p>
+          <p>
+            作为一名编程与人工智能的初学者，我对「把想法变成真正能跑起来的作品」充满好奇，
+            也愿意一步一个脚印地动手实践。我正在学习用 AI 辅助开发（Vibe Coding），
+            学着把模糊的想法拆解成清晰的需求，再逐步搭建、验证和迭代。
+          </p>
+          <p>
+            课余时间我喜欢<strong>听音乐</strong>和<strong>玩音游</strong>，在节奏与旋律里放松和专注；
+            也享受把时间投入到学习与创作中的充实感。这里是我记录学习、项目与成长的地方，
+            期待与你相识、交流。页面内容会随着我的成长持续更新。
+          </p>
+        </div>
+      </div>
+    </section>
+
+    <!-- 3. Skills -->
+    <section id="skills" class="section section-alt">
+      <div class="container">
+        <h2 class="section-title reveal glitch" data-text="技能">技能</h2>
+        <p class="section-sub reveal">我掌握与正在学习的内容</p>
+        <div class="skills-grid">
+          <!-- AI-generated: 技能条目，进度为占位，请按实际情况调整 -->
+          <div class="skill-item reveal">
+            <div class="skill-head"><span>前端基础 HTML / CSS / JS</span><span class="skill-value">70%</span></div>
+            <div class="skill-bar"><span data-target="70"></span></div>
+          </div>
+          <div class="skill-item reveal">
+            <div class="skill-head"><span>Python 编程</span><span class="skill-value">60%</span></div>
+            <div class="skill-bar"><span data-target="60"></span></div>
+          </div>
+          <div class="skill-item reveal">
+            <div class="skill-head"><span>AI 辅助开发（Vibe Coding）</span><span class="skill-value">学习中</span></div>
+            <div class="skill-bar"><span data-target="45"></span></div>
+          </div>
+          <div class="skill-item reveal">
+            <div class="skill-head"><span>Git 版本控制</span><span class="skill-value">学习中</span></div>
+            <div class="skill-bar"><span data-target="40"></span></div>
+          </div>
+        </div>
+        <p class="hint reveal">以上为占位值，请根据我的实际情况调整。</p>
+      </div>
+    </section>
+
+    <!-- 4. Projects -->
+    <section id="projects" class="section">
+      <div class="container">
+        <h2 class="section-title reveal glitch" data-text="项目">项目</h2>
+        <p class="section-sub reveal">正在完成与计划中的作品（占位，待填充）</p>
+        <div class="projects-grid">
+          <article class="project-card reveal" data-delay="0">
+            <div class="project-icon">🚀</div>
+            <h3>本个人主页</h3>
+            <p>个人主页 MVP，纯 HTML/CSS/JS，包含我的介绍、技能与联系方式。</p>
+            <span class="tag">进行中</span>
+          </article>
+          <article class="project-card reveal" data-delay="100">
+            <div class="project-icon">💡</div>
+            <h3>课程项目（占位）</h3>
+            <p>课程里的 AI 辅助真实项目，将在这里记录内容与进度。</p>
+            <span class="tag">占位</span>
+          </article>
+          <article class="project-card reveal" data-delay="200">
+            <div class="project-icon">✨</div>
+            <h3>我的下一个想法（占位）</h3>
+            <p>正在酝酿中的小点子，等它成型后我会写在这里。</p>
+            <span class="tag">占位</span>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <!-- 5. Contact -->
+    <section id="contact" class="section section-alt">
+      <div class="container">
+        <h2 class="section-title reveal glitch" data-text="联系我">联系我</h2>
+        <p class="section-sub reveal">欢迎交流，期待认识你</p>
+        <div class="contact-grid">
+          <a class="contact-card reveal" href="mailto:319008328@qq.com">
+            <div class="contact-icon">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="m3 7 9 6 9-6"/></svg>
+            </div>
+            <div class="contact-label">邮箱</div>
+            <div class="contact-value">319008328@qq.com</div>
+          </a>
+          <a class="contact-card reveal is-placeholder" data-delay="100" href="#" title="GitHub 即将上线">
+            <div class="contact-icon">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.9c0-1.7-.6-2.8-1.3-3.3 4.3-.5 8.8-2.1 8.8-9.5a3.7 3.7 0 0 0-1-2.6 3.5 3.5 0 0 0-.1-2.6s-.8-.3-2.7 1a9.4 9.4 0 0 0-5 0c-1.9-1.3-2.7-1-2.7-1a3.5 3.5 0 0 0-.1 2.6A3.7 3.7 0 0 0 2 6.4c0 7.4 4.5 9 8.8 9.5-.7.6-1.2 1.6-1.3 3.3V22"/></svg>
+            </div>
+            <div class="contact-label">GitHub</div>
+            <div class="contact-value">即将上线</div>
+          </a>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <!-- 6. 数字孪生（虚拟的我 · 基于个人简介问答） -->
+  <section id="twin" class="section twin-section">
+    <div class="container">
+      <h2 class="section-title reveal glitch" data-text="数字孪生">数字孪生</h2>
+      <p class="section-sub reveal">虚拟的我 · 基于个人简介与你对话，认识一个「程序化的刘聿宸」</p>
+
+      <div class="twin-card reveal">
+        <!-- 头部：数字孪生身份 -->
+        <div class="twin-head">
+          <div class="twin-avatar">刘</div>
+          <div class="twin-meta">
+            <span class="twin-name">AI · 刘聿宸</span>
+            <span class="twin-status"><span class="twin-dot"></span>在线 · 数字孪生</span>
+          </div>
+          <span class="twin-badge">BETA</span>
+        </div>
+
+        <!-- 对话区 -->
+        <div class="twin-body" id="twinBody" role="log" aria-live="polite"></div>
+
+        <!-- 快捷问题 -->
+        <div class="twin-suggests" id="twinSuggests">
+          <button type="button" data-q="你是谁？">你是谁？</button>
+          <button type="button" data-q="你的 slogan 是什么？">你的 slogan？</button>
+          <button type="button" data-q="你在哪个学校？">你在哪个学校？</button>
+          <button type="button" data-q="你有什么爱好？">你有什么爱好？</button>
+        </div>
+
+        <!-- 输入区 -->
+        <form class="twin-input" id="twinForm" autocomplete="off">
+          <input id="twinInput" type="text" placeholder="向我提问，比如：你会什么技能？" maxlength="80" />
+          <button type="submit" aria-label="发送"><span></span></button>
+        </form>
+      </div>
+    </div>
+  </section>
+
+  <!-- 7. Footer -->
+
+  <footer class="footer">
+    <div class="container">
+      <p>© <span id="year"></span> 刘聿宸 · 梦想及力量</p>
+      <p class="footer-note">Powered by Vibe Coding</p>
+    </div>
+  </footer>
+
+  <!-- 返回顶部 -->
+  <button class="back-top" id="backTop" aria-label="返回顶部">↑</button>
+
+  <script src="scripts/main.js"></script>
+</body>
+</html>
