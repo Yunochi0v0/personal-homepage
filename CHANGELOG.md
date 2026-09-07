@@ -10,7 +10,35 @@
 
 ---
 
-## [v1.2] 使用动漫头像（当前）
+## [v1.3] 替换官方校徽为图片（当前）
+
+- **日期**：2026-09-07
+- **作者**：katzegott
+
+### 修改
+- 将 Hero 背景中天津大学 / 香港理工大学的**文字占位校徽**（TJU / PolyU）替换为**官方校徽图片**。
+
+### 涉及文件
+| 文件 | 类型 | 说明 |
+| --- | --- | --- |
+| `assets/logo-tju.jpg` | 新增 | 天津大学校徽（115KB 原始 → 440×440 缩放） |
+| `assets/logo-polyu.jpg` | 新增 | 香港理工大学校徽（34KB 原始 → 440×440 缩放） |
+| `index.html` | 修改 | 校徽占位由 `.school-badge` 文字改为 `<img class="school-badge-img">` |
+| `styles/style.css` | 修改 | 新增 `.school-badge-img` 圆形 `object-fit:contain` 样式，移除旧的文字样式 |
+
+### 说明
+- 原始文件位于 `uploads/ses_f992d3cf9ffemeP24yq3orELqt/`：
+  - `6c52a7306aa4c0f038568366a4f52eda.jpeg`（34KB）= 香港理工大学校徽
+  - `82523358d924fc61bc8dd7c110ba4bd4.jpeg`（116KB）= 天津大学校徽
+- 校徽以半透明（`opacity: 0.55`）+ 悬浮动画作为 Hero 背景装饰，不影响主体内容可读性。
+
+### 验证方式
+- 本地服务器 `http://127.0.0.1:8123/assets/logo-tju.jpg` 与 `logo-polyu.jpg` 均返回 HTTP 200。
+- HTML 标签配对、资源引用检查通过；旧文字占位已无残留。
+
+---
+
+## [v1.2] 使用动漫头像
 
 - **日期**：2026-09-07
 - **作者**：katzegott
