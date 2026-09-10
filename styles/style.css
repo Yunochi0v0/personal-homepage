@@ -1574,7 +1574,9 @@ body::after {
   position: fixed;
   left: 0;
   top: 0;
-  z-index: 500; /* 高于扫描线(320)与悬浮 Dock(200) */
+  /* AI-generated: 无条件置于最顶层——高于彩蛋浮层(9998)与开启动画(9999)，
+     否则浮层/动画铺满全屏时，自定义光标会被遮罩盖住而“凭空消失” */
+  z-index: 10002;
   pointer-events: none;
   border-radius: 50%;
   will-change: transform;
@@ -1680,7 +1682,8 @@ body::after {
   position: fixed;
   left: 0;
   top: 0;
-  z-index: 490;
+  /* 紧随光标之下，但仍高于所有遮罩层（彩蛋浮层 9998 / 开启动画 9999） */
+  z-index: 10001;
   width: 6px;
   height: 6px;
   margin: -3px 0 0 -3px;
