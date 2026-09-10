@@ -4,22 +4,54 @@
 /* ---------- 1. 页脚年份 ---------- */
 document.getElementById("year").textContent = new Date().getFullYear();
 
-/* ---------- 2. 移动端导航菜单 ---------- */
-const navToggle = document.getElementById("navToggle");
-const navLinks = document.getElementById("navLinks");
-const navbar = document.getElementById("navbar");
+/* ---------- 2. macOS 风格 Dock：图标邻近放大 ---------- */
+const dock = document.getElementById("dock");
+const dockIcons = dock ? Array.from(dock.querySelectorAll(".dock-icon")) : [];
 
-navToggle.addEventListener("click", () => {
-  navToggle.classList.toggle("active");
-  navLinks.classList.toggle("open");
-});
+(function initDockMagnify() {
+  if (!dock || !dockIcons.length) return;
+  const MAX_SCALE = 1.75; // 最近处放大倍数
+  const RANGE = 130; // 影响半径(px)
+  const LIFT = 26; // 放大时上浮位移(px)
+  let centers = [];
 
-navLinks.querySelectorAll("a").forEach((a) => {
-  a.addEventListener("click", () => {
-    navToggle.classList.remove("active");
-    navLinks.classList.remove("open");
+  // 缓存每个图标中心 x（在未放大时读取，避免 transform 反馈抖动）
+  function cacheCenters() {
+    centers = dockIcons.map((icon) => {
+      const r = icon.getBoundingClientRect();
+      return r.left + r.width / 2;
+    });
+  }
+
+  function reset() {
+    dockIcons.forEach((icon) => {
+      icon.style.transition = "";
+      icon.style.transform = "";
+    });
+  }
+
+  dock.addEventListener("mouseenter", () => {
+    cacheCenters();
+    // 跟随鼠标时即时响应，避免过渡延迟
+    dockIcons.forEach((icon) => (icon.style.transition = "none"));
   });
-});
+
+  dock.addEventListener("mousemove", (e) => {
+    if (!centers.length) cacheCenters();
+    dockIcons.forEach((icon, i) => {
+      const dist = Math.abs(e.clientX - centers[i]);
+      const scale =
+        dist < RANGE ? 1 + (MAX_SCALE - 1) * Math.cos((dist / RANGE) * Math.PI * 0.5) : 1;
+      const lift = (scale - 1) * LIFT;
+      icon.style.transform = `translateY(${-lift}px) scale(${scale})`;
+    });
+  });
+
+  dock.addEventListener("mouseleave", reset);
+  window.addEventListener("resize", () => {
+    centers = [];
+  });
+})();
 
 /* ---------- 3. 顶部滚动进度条 + 导航背景 + 返回顶部 ---------- */
 const scrollProgress = document.getElementById("scrollProgress");
@@ -31,7 +63,7 @@ function onScroll() {
   const percent = docHeight > 0 ? (scrollTop / docHeight) * 100 : 0;
   scrollProgress.style.width = percent + "%";
 
-  navbar.classList.toggle("scrolled", scrollTop > 40);
+  if (dock) dock.classList.toggle("scrolled", scrollTop > 40);
   backTop.classList.toggle("show", scrollTop > 500);
 }
 
@@ -73,7 +105,7 @@ typeWriter();
 
 /* ---------- 5. 导航栏 active 高亮 ---------- */
 const sections = document.querySelectorAll("section[id]");
-const navAnchors = document.querySelectorAll(".nav-links a");
+const navAnchors = document.querySelectorAll(".dock-link");
 const hero = document.getElementById("hero");
 
 const spy = new IntersectionObserver(
@@ -92,11 +124,15 @@ const spy = new IntersectionObserver(
 
 sections.forEach((s) => spy.observe(s));
 
-// 滚动到最顶部（Hero 区）时取消所有高亮
+// 滚动到最顶部（Hero 区）时高亮「首页」项
 const heroSpy = new IntersectionObserver(
   (entries) => {
     entries.forEach((entry) => {
-      if (entry.isIntersecting) navAnchors.forEach((a) => a.classList.remove("active"));
+      if (entry.isIntersecting) {
+        navAnchors.forEach((a) => {
+          a.classList.toggle("active", a.getAttribute("href") === "#hero");
+        });
+      }
     });
   },
   { rootMargin: "0px 0px -90% 0px" }

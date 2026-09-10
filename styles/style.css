@@ -35,6 +35,7 @@ body {
   color: var(--text);
   line-height: 1.75;
   overflow-x: hidden;
+  padding-bottom: 108px; /* 为底部悬浮 Dock 预留空间 */
 }
 
 ::selection {
@@ -95,143 +96,136 @@ body::after {
   box-shadow: var(--neon);
 }
 
-/* ---------- 顶部导航 ---------- */
-.navbar {
+/* ---------- macOS 风格悬浮 Dock 导航 ---------- */
+/* AI-generated: 底部居中悬浮毛玻璃 Dock，图标邻近放大 */
+.dock {
   position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
+  left: 50%;
+  bottom: 18px;
+  transform: translateX(-50%);
   z-index: 200;
+  padding: 9px 12px;
+  border-radius: 24px;
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.1), rgba(255, 255, 255, 0.02)),
+    rgba(16, 16, 16, 0.55);
+  backdrop-filter: blur(22px) saturate(190%);
+  -webkit-backdrop-filter: blur(22px) saturate(190%);
+  box-shadow:
+    0 12px 40px rgba(0, 0, 0, 0.55),
+    inset 0 1px 0 rgba(255, 255, 255, 0.22);
   transition: background 0.3s, box-shadow 0.3s;
 }
 
-.navbar.scrolled {
-  background: rgba(5, 5, 5, 0.8);
-  backdrop-filter: blur(12px);
-  border-bottom: 1px solid var(--card-border);
+.dock.scrolled {
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.12), rgba(255, 255, 255, 0.03)),
+    rgba(8, 8, 8, 0.72);
+  box-shadow:
+    0 14px 44px rgba(0, 0, 0, 0.65),
+    inset 0 1px 0 rgba(255, 255, 255, 0.24);
 }
 
-.navbar-inner {
+.dock-list {
   display: flex;
-  align-items: center;
-  justify-content: space-between;
-  height: 66px;
-  position: relative;
+  align-items: flex-end;
+  gap: 6px;
+  list-style: none;
+  margin: 0;
+  padding: 0;
 }
 
-.navbar-inner::after {
+.dock-sep {
+  width: 1px;
+  align-self: stretch;
+  margin: 4px 5px;
+  background: linear-gradient(180deg, transparent, rgba(255, 255, 255, 0.22), transparent);
+}
+
+.dock-item {
+  display: flex;
+}
+
+.dock-link {
+  position: relative;
+  display: block;
+  text-decoration: none;
+}
+
+.dock-icon {
+  display: grid;
+  place-items: center;
+  width: 46px;
+  height: 46px;
+  border-radius: 13px;
+  font-size: 1.35rem;
+  line-height: 1;
+  color: var(--primary);
+  background:
+    linear-gradient(160deg, rgba(255, 255, 255, 0.16), rgba(255, 255, 255, 0.02) 60%),
+    linear-gradient(145deg, #242424, #101010);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.25),
+    0 4px 10px rgba(0, 0, 0, 0.45);
+  transform-origin: center bottom;
+  transition: transform 0.18s ease-out, box-shadow 0.25s, border-color 0.25s;
+  will-change: transform;
+}
+
+.dock-link:hover .dock-icon,
+.dock-link.active .dock-icon {
+  border-color: rgba(255, 232, 26, 0.55);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.35),
+    0 0 18px rgba(255, 232, 26, 0.45);
+}
+
+/* 当前分区指示点 */
+.dock-link::after {
   content: "";
   position: absolute;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  height: 2px;
-  background: linear-gradient(90deg, transparent, var(--primary), var(--accent), transparent);
-  opacity: 0;
-  transition: opacity 0.3s;
-}
-
-.navbar.scrolled .navbar-inner::after {
-  opacity: 1;
-}
-
-.brand {
-  font-size: 1.3rem;
-  font-weight: 900;
-  color: var(--text);
-  text-decoration: none;
-  letter-spacing: 2px;
-  text-transform: uppercase;
-}
-
-.brand-dot {
-  color: var(--primary);
-  text-shadow: var(--neon);
-}
-
-.nav-links {
-  display: flex;
-  gap: 30px;
-}
-
-.nav-links a {
-  position: relative;
-  color: var(--text-muted);
-  text-decoration: none;
-  font-size: 0.95rem;
-  letter-spacing: 1px;
-  transition: color 0.2s;
-}
-
-.nav-links a::before,
-.nav-links a::after {
-  content: "";
-  position: absolute;
-  width: 8px;
-  height: 8px;
-  border: 2px solid var(--primary);
-  opacity: 0;
-  transition: opacity 0.2s;
-}
-
-.nav-links a::before { top: -6px; left: -8px; border-right: 0; border-bottom: 0; }
-.nav-links a::after { bottom: -6px; right: -8px; border-left: 0; border-top: 0; }
-
-.nav-links a:hover,
-.nav-links a.active {
-  color: var(--primary);
-  text-shadow: 0 0 8px rgba(255, 232, 26, 0.6);
-}
-
-.nav-links a:hover::before,
-.nav-links a.active::before,
-.nav-links a:hover::after,
-.nav-links a.active::after {
-  opacity: 1;
-}
-
-.nav-toggle {
-  display: none;
-  cursor: pointer;
-  width: 38px;
-  height: 38px;
-  position: relative;
-  border-radius: 9px;
-  border: 1px solid rgba(255, 255, 255, 0.18);
-  background:
-    linear-gradient(160deg, rgba(255, 255, 255, 0.26) 0%, rgba(255, 255, 255, 0.05) 40%, rgba(255, 255, 255, 0) 62%),
-    rgba(255, 232, 26, 0.08);
-  backdrop-filter: blur(12px) saturate(170%);
-  -webkit-backdrop-filter: blur(12px) saturate(170%);
-  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.35);
-  transition: background 0.25s, box-shadow 0.25s;
-}
-
-.nav-toggle:hover {
-  background:
-    linear-gradient(160deg, rgba(255, 255, 255, 0.34) 0%, rgba(255, 255, 255, 0.08) 40%, rgba(255, 255, 255, 0) 62%),
-    rgba(255, 232, 26, 0.16);
-  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.5), 0 0 14px rgba(255, 232, 26, 0.3);
-}
-
-.nav-toggle span {
-  position: absolute;
-  left: 4px;
-  right: 4px;
-  height: 2px;
+  left: 50%;
+  bottom: -7px;
+  width: 4px;
+  height: 4px;
+  border-radius: 50%;
   background: var(--primary);
-  border-radius: 2px;
-  transition: transform 0.3s, opacity 0.3s;
-  box-shadow: 0 0 6px rgba(255, 232, 26, 0.6);
+  box-shadow: 0 0 8px rgba(255, 232, 26, 0.9);
+  transform: translateX(-50%) scale(0);
+  transition: transform 0.25s;
 }
 
-.nav-toggle span:nth-child(1) { top: 12px; }
-.nav-toggle span:nth-child(2) { top: 19px; }
-.nav-toggle span:nth-child(3) { top: 26px; }
+.dock-link.active::after {
+  transform: translateX(-50%) scale(1);
+}
 
-.nav-toggle.active span:nth-child(1) { transform: translateY(7px) rotate(45deg); }
-.nav-toggle.active span:nth-child(2) { opacity: 0; }
-.nav-toggle.active span:nth-child(3) { transform: translateY(-7px) rotate(-45deg); }
+/* 悬停名称气泡 */
+.dock-tip {
+  position: absolute;
+  left: 50%;
+  bottom: calc(100% + 12px);
+  transform: translateX(-50%) translateY(6px);
+  padding: 5px 11px;
+  border-radius: 9px;
+  font-size: 0.72rem;
+  letter-spacing: 1px;
+  white-space: nowrap;
+  color: var(--text);
+  background: rgba(12, 12, 12, 0.85);
+  border: 1px solid rgba(255, 255, 255, 0.16);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.2s, transform 0.2s;
+}
+
+.dock-link:hover .dock-tip {
+  opacity: 1;
+  transform: translateX(-50%) translateY(0);
+}
 
 /* ---------- Hero ---------- */
 .hero {
@@ -241,7 +235,7 @@ body::after {
   place-items: center;
   text-align: center;
   overflow: hidden;
-  padding: 100px 0 60px;
+  padding: 60px 0 120px;
 }
 
 .hero-bg {
@@ -1440,33 +1434,39 @@ body::after {
 
 /* ---------- 响应式 ---------- */
 @media (max-width: 640px) {
-  .nav-toggle {
-    display: block;
+  /* 移动端 Dock 收紧，避免过宽并保持可点按 */
+  .dock {
+    bottom: 12px;
+    padding: 7px 9px;
+    border-radius: 20px;
   }
 
-  .nav-links {
-    position: fixed;
-    top: 0;
-    right: 0;
-    height: 100vh;
-    width: 240px;
-    flex-direction: column;
-    gap: 0;
-    padding: 90px 20px 20px;
-    background: var(--bg-alt);
-    transform: translateX(100%);
-    transition: transform 0.35s ease;
-    box-shadow: -10px 0 40px rgba(0, 0, 0, 0.5);
-    border-left: 1px solid var(--card-border);
+  .dock-list {
+    gap: 4px;
   }
 
-  .nav-links.open {
-    transform: translateX(0);
+  .dock-icon {
+    width: 38px;
+    height: 38px;
+    border-radius: 11px;
+    font-size: 1.1rem;
   }
 
-  .nav-links a {
-    padding: 14px 8px;
-    border-bottom: 1px solid var(--card-border);
+  .dock-sep {
+    margin: 3px 2px;
+  }
+
+  .dock-tip {
+    font-size: 0.66rem;
+    padding: 4px 9px;
+  }
+
+  /* 返回顶部按钮上移，避免与底部 Dock 重叠 */
+  .back-top {
+    right: 14px;
+    bottom: 92px;
+    width: 44px;
+    height: 44px;
   }
 
   .about-card {
