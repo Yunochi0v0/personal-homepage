@@ -10,7 +10,40 @@
 
 ---
 
-## [v1.6] 更正 slogan 为「梦想即力量」（当前）
+## [v1.7] macOS 风格悬浮 Dock 导航（当前）
+
+- **日期**：2026-09-07
+- **作者**：katzegott
+
+### 修改
+- 移除顶部固定导航栏与移动端汉堡抽屉菜单，改用 **macOS 风格悬浮 Dock** 作为全站导航。
+- Dock 特性：
+  - 底部**居中悬浮**，深色**毛玻璃**（`backdrop-filter`）+ 大圆角 + 高光内阴影。
+  - 6 个图标项：🏠 首页 / 👤 关于我 / ⚡ 技能 / 🚀 项目 / ✉️ 联系 / 🤖 数字孪生，首页与其余项之间带分隔线。
+  - **鼠标邻近放大**：图标按鼠标横向距离以余弦衰减方式放大并上浮（最大 1.75×），移出后平滑回落，模仿 macOS Dock 的 magnification。
+  - **悬停名称气泡**：鼠标移入图标时，上方浮出该分区名称。
+  - **当前分区指示点**：滚动时对应图标下方出现发光小圆点（沿用 `IntersectionObserver` 滚动监听）。
+  - 页面滚动后 Dock 背景加深（`.scrolled`），与页面层次更分明。
+
+### 涉及文件
+| 文件 | 类型 | 说明 |
+| --- | --- | --- |
+| `index.html` | 修改 | 顶部 `header.navbar` → 底部 `nav.dock` 结构 |
+| `styles/style.css` | 修改 | 删除 `.navbar/.nav-links/.nav-toggle/.brand` 旧样式，新增 Dock 全套样式；移动端适配；body 底部留白 |
+| `scripts/main.js` | 修改 | 删除汉堡菜单逻辑；新增 Dock 邻近放大；scroll spy 选择器改为 `.dock-link`；Hero 区高亮「首页」 |
+
+### 说明
+- 因 Dock 悬浮于视口底部，`body` 增加 `padding-bottom` 预留空间；移动端将「返回顶部」按钮上移，避免与 Dock 重叠。
+- 图标采用 Emoji，无需外部图标库，离线可用。
+- 旧导航类名已从 HTML/CSS/JS 中完全清除，仅本文件历史记录保留描述。
+
+### 验证方式
+- HTML 标签配对、CSS 大括号、JS 大括号/小括号配对检查通过。
+- `index.html` / `styles/style.css` / `scripts/main.js` 均返回 HTTP 200。
+
+---
+
+## [v1.6] 更正 slogan 为「梦想即力量」
 
 - **日期**：2026-09-07
 - **作者**：katzegott
