@@ -2665,3 +2665,38 @@ html.is-booting .cursor-trail {
     transition: none;
   }
 }
+
+/* ==========================================================================
+   v1.16 CRT 屏幕投影感：极淡水平扫描线 + 微弱噪点
+   AI-generated: 在既有黄色正弦波（canvas#waveBg）与旧动态扫描线
+   （body::after，每 6px 一组、9s 缓慢移动）之上，再叠加一层「屏幕本身」的
+   质感——静止的细密水平暗线 + 极弱灰噪点，让整页更像一台老式 CRT 在投射画面。
+   实现要点：
+   ① 只用一个伪元素（html::after）承载两层背景，零 DOM 改动；
+   ② 噪点用内联 SVG feTurbulence 生成并平铺（stitchTiles 保证接缝无缝），
+      比全页 filter: url(#noise) 快得多，也不会随滚动重算；
+   ③ z-index 10000：高于彩蛋浮层(9998)与开启动画(9999)，使质感统一覆盖
+      所有画面（含浮层与开机自检）；又低于自定义光标(10001/10002)，
+      避免光标被噪点糊掉；
+   ④ 暗线在黑底上几乎不可见、只在黄色波形与亮内容上显现，这正是 CRT 特征；
+   ⑤ pointer-events: none，纯装饰，不影响任何交互。
+   ========================================================================== */
+
+html::after {
+  content: "";
+  position: fixed;
+  inset: 0;
+  z-index: 10000;
+  pointer-events: none;
+  background-image:
+    /* 上：极弱灰噪点（去饱和后平铺，透明度即强度） */
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='3' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='160' height='160' filter='url(%23n)' opacity='0.2'/%3E%3C/svg%3E"),
+    /* 下：静止水平扫描线（1px 暗线 / 3px 周期） */
+    repeating-linear-gradient(
+      to bottom,
+      rgba(0, 0, 0, 0.14) 0 1px,
+      rgba(0, 0, 0, 0) 1px 3px
+    );
+  background-size: 160px 160px, auto;
+  background-repeat: repeat, repeat;
+}
