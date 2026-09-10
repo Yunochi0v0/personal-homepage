@@ -270,3 +270,44 @@ document.querySelectorAll(".is-placeholder").forEach((link) => {
     "bot"
   );
 })();
+
+/* ---------- 10. 彩蛋：输入「梦想即力量」跳转 ---------- */
+(function () {
+  const eggBox = document.getElementById("easterEgg");
+  const eggForm = document.getElementById("easterEggForm");
+  const eggInput = document.getElementById("easterEggInput");
+  const eggHint = document.getElementById("easterEggHint");
+  if (!eggForm || !eggInput) return;
+
+  const MAGIC = "梦想即力量";
+  const TARGET_URL = "https://anime.bang-dream.com/yumemita/";
+
+  // 更新提示文案（空字符串则隐藏）
+  function setHint(text) {
+    if (!eggHint) return;
+    eggHint.textContent = text;
+    eggHint.classList.toggle("show", !!text);
+  }
+
+  // 提交时（回车或点击 ✨）触发：去除首尾空格后精确匹配
+  eggForm.addEventListener("submit", (e) => {
+    e.preventDefault();
+    const value = eggInput.value.trim();
+
+    if (value === MAGIC) {
+      // 命中暗号：发光提示后跳转
+      if (eggBox) eggBox.classList.add("triggered");
+      setHint("✦ 咒语生效，梦想即力量 · 正在进入…");
+      setTimeout(() => {
+        window.location.href = TARGET_URL;
+      }, 700);
+    } else if (value) {
+      // 暗号不对：轻微抖动提示
+      setHint("咒语不对哦，再想想…");
+      if (eggBox) {
+        eggBox.classList.add("shake");
+        setTimeout(() => eggBox.classList.remove("shake"), 420);
+      }
+    }
+  });
+})();
