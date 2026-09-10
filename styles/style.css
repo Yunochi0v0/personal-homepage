@@ -192,12 +192,26 @@ body::after {
 
 .nav-toggle {
   display: none;
-  background: none;
-  border: none;
   cursor: pointer;
-  width: 34px;
-  height: 34px;
+  width: 38px;
+  height: 38px;
   position: relative;
+  border-radius: 9px;
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  background:
+    linear-gradient(160deg, rgba(255, 255, 255, 0.26) 0%, rgba(255, 255, 255, 0.05) 40%, rgba(255, 255, 255, 0) 62%),
+    rgba(255, 232, 26, 0.08);
+  backdrop-filter: blur(12px) saturate(170%);
+  -webkit-backdrop-filter: blur(12px) saturate(170%);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.35);
+  transition: background 0.25s, box-shadow 0.25s;
+}
+
+.nav-toggle:hover {
+  background:
+    linear-gradient(160deg, rgba(255, 255, 255, 0.34) 0%, rgba(255, 255, 255, 0.08) 40%, rgba(255, 255, 255, 0) 62%),
+    rgba(255, 232, 26, 0.16);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.5), 0 0 14px rgba(255, 232, 26, 0.3);
 }
 
 .nav-toggle span {
@@ -211,9 +225,9 @@ body::after {
   box-shadow: 0 0 6px rgba(255, 232, 26, 0.6);
 }
 
-.nav-toggle span:nth-child(1) { top: 9px; }
-.nav-toggle span:nth-child(2) { top: 16px; }
-.nav-toggle span:nth-child(3) { top: 23px; }
+.nav-toggle span:nth-child(1) { top: 12px; }
+.nav-toggle span:nth-child(2) { top: 19px; }
+.nav-toggle span:nth-child(3) { top: 26px; }
 
 .nav-toggle.active span:nth-child(1) { transform: translateY(7px) rotate(45deg); }
 .nav-toggle.active span:nth-child(2) { opacity: 0; }
@@ -416,7 +430,10 @@ body::after {
   flex-wrap: wrap;
 }
 
+/* ---------- 液态玻璃按钮（Liquid Glass） ---------- */
+/* AI-generated: 液态玻璃质感（毛玻璃 + 顶部镜面高光 + 玻璃厚度内阴影 + hover 光泽扫过） */
 .btn {
+  position: relative;
   display: inline-block;
   padding: 12px 32px;
   text-decoration: none;
@@ -424,35 +441,78 @@ body::after {
   font-size: 0.95rem;
   letter-spacing: 2px;
   text-transform: uppercase;
-  transition: transform 0.2s, box-shadow 0.2s, background 0.2s;
+  overflow: hidden;
+  color: var(--text);
+  border: 1px solid rgba(255, 255, 255, 0.24);
+  background:
+    linear-gradient(160deg, rgba(255, 255, 255, 0.3) 0%, rgba(255, 255, 255, 0.06) 34%, rgba(255, 255, 255, 0) 60%),
+    rgba(255, 232, 26, 0.14);
+  backdrop-filter: blur(14px) saturate(180%);
+  -webkit-backdrop-filter: blur(14px) saturate(180%);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.5),
+    inset 0 -3px 9px rgba(0, 0, 0, 0.35),
+    inset 0 0 22px rgba(255, 232, 26, 0.08);
+  transition: transform 0.25s, box-shadow 0.3s, background 0.3s, color 0.3s;
   clip-path: polygon(10px 0, 100% 0, 100% calc(100% - 10px), calc(100% - 10px) 100%, 0 100%, 0 10px);
+}
+
+/* 玻璃表面光泽扫过（hover 时从左到右划过） */
+.btn::after {
+  content: "";
+  position: absolute;
+  top: -20%;
+  left: -75%;
+  width: 45%;
+  height: 140%;
+  background: linear-gradient(100deg, transparent, rgba(255, 255, 255, 0.55), transparent);
+  transform: skewX(-20deg);
+  pointer-events: none;
+  transition: left 0.65s ease;
 }
 
 .btn:hover {
   transform: translateY(-3px);
 }
 
+.btn:hover::after {
+  left: 130%;
+}
+
 .btn-primary {
-  background: var(--primary);
-  color: #000;
-  box-shadow: var(--neon);
+  color: #fffce6;
+  border-color: rgba(255, 232, 26, 0.55);
+  background:
+    linear-gradient(160deg, rgba(255, 255, 255, 0.36) 0%, rgba(255, 255, 255, 0.08) 34%, rgba(255, 255, 255, 0) 60%),
+    rgba(255, 232, 26, 0.28);
+  text-shadow: 0 0 12px rgba(255, 232, 26, 0.55);
 }
 
 .btn-primary:hover {
-  background: var(--primary-hover);
-  box-shadow: 0 0 18px rgba(255, 232, 26, 0.8);
+  color: #ffffff;
+  background:
+    linear-gradient(160deg, rgba(255, 255, 255, 0.44) 0%, rgba(255, 255, 255, 0.12) 34%, rgba(255, 255, 255, 0) 60%),
+    rgba(255, 232, 26, 0.42);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.7),
+    inset 0 -3px 9px rgba(0, 0, 0, 0.28),
+    0 0 26px rgba(255, 232, 26, 0.45);
 }
 
 .btn-ghost {
-  border: 2px solid var(--primary);
   color: var(--primary);
-  background: rgba(255, 232, 26, 0.04);
+  border-color: rgba(255, 232, 26, 0.5);
+  background:
+    linear-gradient(160deg, rgba(255, 255, 255, 0.24) 0%, rgba(255, 255, 255, 0.05) 34%, rgba(255, 255, 255, 0) 60%),
+    rgba(255, 232, 26, 0.05);
 }
 
 .btn-ghost:hover {
-  background: var(--primary);
-  color: #000;
-  box-shadow: var(--neon);
+  color: #ffffff;
+  border-color: var(--primary);
+  background:
+    linear-gradient(160deg, rgba(255, 255, 255, 0.32) 0%, rgba(255, 255, 255, 0.09) 34%, rgba(255, 255, 255, 0) 60%),
+    rgba(255, 232, 26, 0.22);
 }
 
 .scroll-hint {
@@ -991,21 +1051,33 @@ body::after {
 }
 
 .twin-suggests button {
-  background: rgba(255, 232, 26, 0.08);
-  border: 1px solid var(--card-border);
+  position: relative;
+  overflow: hidden;
+  background:
+    linear-gradient(160deg, rgba(255, 255, 255, 0.26) 0%, rgba(255, 255, 255, 0.05) 36%, rgba(255, 255, 255, 0) 62%),
+    rgba(255, 232, 26, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  backdrop-filter: blur(10px) saturate(160%);
+  -webkit-backdrop-filter: blur(10px) saturate(160%);
   color: var(--text-muted);
   font-size: 0.82rem;
   padding: 6px 14px;
   cursor: pointer;
   letter-spacing: 1px;
-  transition: color 0.2s, border-color 0.2s, background 0.2s;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.3);
+  transition: color 0.2s, border-color 0.2s, background 0.2s, box-shadow 0.2s, transform 0.2s;
 }
 
 .twin-suggests button:hover {
   color: var(--primary);
-  border-color: var(--primary);
-  background: rgba(255, 232, 26, 0.14);
-  box-shadow: 0 0 10px rgba(255, 232, 26, 0.3);
+  border-color: rgba(255, 232, 26, 0.6);
+  background:
+    linear-gradient(160deg, rgba(255, 255, 255, 0.32) 0%, rgba(255, 255, 255, 0.09) 36%, rgba(255, 255, 255, 0) 62%),
+    rgba(255, 232, 26, 0.18);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.5),
+    0 0 14px rgba(255, 232, 26, 0.35);
+  transform: translateY(-2px);
 }
 
 .twin-input {
@@ -1037,19 +1109,30 @@ body::after {
 .twin-input button {
   width: 48px;
   flex: none;
-  border: 2px solid var(--primary);
-  background: var(--primary);
-  color: #000;
   cursor: pointer;
   display: grid;
   place-items: center;
+  border: 1px solid rgba(255, 255, 255, 0.55);
+  background:
+    linear-gradient(160deg, rgba(255, 255, 255, 0.55) 0%, rgba(255, 255, 255, 0.12) 40%, rgba(255, 255, 255, 0) 66%),
+    rgba(255, 232, 26, 0.72);
+  backdrop-filter: blur(10px) saturate(170%);
+  -webkit-backdrop-filter: blur(10px) saturate(170%);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.8),
+    inset 0 -3px 8px rgba(0, 0, 0, 0.25);
+  transition: background 0.25s, box-shadow 0.25s, transform 0.25s;
   clip-path: polygon(8px 0, 100% 0, 100% calc(100% - 8px), calc(100% - 8px) 100%, 0 100%, 0 8px);
-  transition: background 0.2s, box-shadow 0.2s;
 }
 
 .twin-input button:hover {
-  background: var(--primary-hover);
-  box-shadow: var(--neon);
+  background:
+    linear-gradient(160deg, rgba(255, 255, 255, 0.62) 0%, rgba(255, 255, 255, 0.15) 40%, rgba(255, 255, 255, 0) 66%),
+    rgba(255, 238, 85, 0.95);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.9),
+    0 0 18px rgba(255, 232, 26, 0.6);
+  transform: translateY(-1px);
 }
 
 .twin-input button span {
@@ -1083,6 +1166,61 @@ body::after {
   opacity: 0.6;
 }
 
+/* ---------- 彩蛋（页面最下端 · 隐藏惊喜） ---------- */
+.easter-egg {
+  padding: 14px 16px 22px;
+  background: var(--bg-alt);
+  border-top: 1px dashed var(--card-border);
+  text-align: center;
+}
+
+.easter-egg-form {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  max-width: 260px;
+  width: 100%;
+  opacity: 0.5;
+  transition: opacity 0.3s ease;
+}
+
+.easter-egg-form:hover,
+.easter-egg-form:focus-within {
+  opacity: 1;
+}
+
+.easter-egg-form input {
+  flex: 1;
+  min-width: 0;
+  padding: 7px 12px;
+  font-size: 0.85rem;
+  color: var(--text);
+  background: var(--bg);
+  border: 1px solid var(--card-border);
+  border-radius: 999px;
+  outline: none;
+  transition: border-color 0.3s ease;
+}
+
+.easter-egg-form input:focus {
+  border-color: var(--primary);
+}
+
+.easter-egg-form button {
+  width: 34px;
+  height: 34px;
+  flex: none;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1rem;
+  border: none;
+  border-radius: 50%;
+  background: var(--primary);
+  color: #fff;
+  cursor: pointer;
+}
+
 /* ---------- 返回顶部 ---------- */
 .back-top {
   position: fixed;
@@ -1091,8 +1229,12 @@ body::after {
   z-index: 150;
   width: 48px;
   height: 48px;
-  border: 2px solid var(--primary);
-  background: var(--card-solid);
+  border: 1px solid rgba(255, 232, 26, 0.55);
+  background:
+    linear-gradient(160deg, rgba(255, 255, 255, 0.28) 0%, rgba(255, 255, 255, 0.06) 40%, rgba(255, 255, 255, 0) 62%),
+    rgba(255, 232, 26, 0.1);
+  backdrop-filter: blur(14px) saturate(170%);
+  -webkit-backdrop-filter: blur(14px) saturate(170%);
   color: var(--primary);
   font-size: 1.3rem;
   font-weight: 900;
@@ -1100,7 +1242,10 @@ body::after {
   opacity: 0;
   visibility: hidden;
   transform: translateY(16px);
-  transition: opacity 0.3s, transform 0.3s, visibility 0.3s, background 0.3s;
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.4),
+    inset 0 -3px 8px rgba(0, 0, 0, 0.35);
+  transition: opacity 0.3s, transform 0.3s, visibility 0.3s, background 0.3s, box-shadow 0.3s;
   clip-path: polygon(8px 0, 100% 0, 100% calc(100% - 8px), calc(100% - 8px) 100%, 0 100%, 0 8px);
 }
 
@@ -1160,6 +1305,11 @@ body::after {
 .btn-primary,
 .btn-ghost {
   filter: drop-shadow(0 0 12px rgba(255, 232, 26, 0.18));
+}
+
+.btn-primary:hover,
+.btn-ghost:hover {
+  filter: drop-shadow(0 0 20px rgba(255, 232, 26, 0.5));
 }
 
 .about-card:hover,
