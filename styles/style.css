@@ -1598,7 +1598,7 @@ body::after {
 }
 
 /* 悬停可交互元素（按钮 / 链接 / 文本框 / 卡片）：
-   光标整体切换为一颗四芒星，并在切换瞬间旋转一整圈 */
+   光标整体切换为一颗青色四芒星，并在切换瞬间旋转一整圈 */
 .cursor-dot.is-hover {
   width: 28px;
   height: 28px;
@@ -1614,11 +1614,17 @@ body::after {
   content: "";
   position: absolute;
   inset: 0;
-  background: var(--primary);
+  /* AI-generated: v1.15 四芒星由黄色改为青色 --accent。
+     原因：按钮点亮（Dock 图标 / 主按钮悬停）本身就是黄底，
+     光标若用同一种黄，两者叠加时会糊成一片、层次不清；
+     青色是站点已确立的副色（滚动进度条渐变、拖尾 alt 粒子），
+     改用青色既与整体风格一致，又与外圈光环同色呼应。
+     注：中心点常态（非悬停）仍是黄点，不在此规则内。 */
+  background: var(--accent);
   /* clip-path 会裁掉 box-shadow，故改用 drop-shadow 做外发光 */
   filter:
-    drop-shadow(0 0 6px rgba(255, 232, 26, 0.95))
-    drop-shadow(0 0 16px rgba(255, 232, 26, 0.45));
+    drop-shadow(0 0 6px rgba(0, 240, 255, 0.95))
+    drop-shadow(0 0 16px rgba(0, 240, 255, 0.45));
   clip-path: polygon(
     50% 0%,
     62% 38%,
