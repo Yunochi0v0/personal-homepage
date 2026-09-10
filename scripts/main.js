@@ -614,7 +614,7 @@ document.querySelectorAll(".is-placeholder").forEach((link) => {
 
   // 悬停这些元素时光环放大
   const HOVER_SELECTOR =
-    "a, button, input, textarea, select, .btn, .about-card, .project-card, .contact-card, .skill-item, .dock-icon";
+    "a, button, input, textarea, select, .btn, .about-card, .mission, .contact-card, .skill-item, .dock-icon";
 
   const TRAIL_STEP = 14; // 每移动约 14px 落一个粒子
   const MAX_TRAIL = 26; // 同屏粒子上限，避免性能压力
@@ -853,7 +853,7 @@ document.querySelectorAll(".is-placeholder").forEach((link) => {
   }
 
   const LINES = [
-    "DEEPWORKS BIOS v1.16.0",
+    "DEEPWORKS BIOS v1.17.0",
     "MEMTEST 640K ............... <OK>",
     "NEON SHADER LOAD ........... <OK>",
     "SINE WAVE ENGINE ........... <OK>",

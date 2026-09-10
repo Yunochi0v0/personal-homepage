@@ -732,80 +732,7 @@ body::after {
 }
 
 /* ---------- Projects ---------- */
-.projects-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
-  gap: 24px;
-}
-
-.project-card {
-  position: relative;
-  background: var(--card);
-  border: 1px solid var(--card-border);
-  padding: 28px 26px;
-  transition: transform 0.3s, border-color 0.3s, background 0.3s, box-shadow 0.3s;
-  overflow: hidden;
-  clip-path: polygon(18px 0, 100% 0, 100% calc(100% - 18px), calc(100% - 18px) 100%, 0 100%, 0 18px);
-}
-
-.project-card::before {
-  content: "";
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  height: 3px;
-  background: linear-gradient(90deg, transparent, var(--primary), transparent);
-  transform: scaleX(0);
-  transform-origin: left;
-  transition: transform 0.4s;
-  box-shadow: var(--neon);
-}
-
-.project-card::after {
-  content: "";
-  position: absolute;
-  top: 0;
-  bottom: 0;
-  right: 0;
-  width: 3px;
-  background: linear-gradient(180deg, transparent, var(--primary), transparent);
-  opacity: 0;
-  transition: opacity 0.3s;
-}
-
-.project-card:hover {
-  transform: translateY(-8px);
-  border-color: var(--primary);
-  background: rgba(255, 232, 26, 0.05);
-  box-shadow: var(--neon);
-}
-
-.project-card:hover::before {
-  transform: scaleX(1);
-}
-
-.project-card:hover::after {
-  opacity: 1;
-}
-
-.project-icon {
-  font-size: 2.4rem;
-  margin-bottom: 14px;
-  filter: drop-shadow(0 0 8px rgba(255, 232, 26, 0.5));
-}
-
-.project-card h3 {
-  font-size: 1.15rem;
-  margin-bottom: 8px;
-  letter-spacing: 1px;
-}
-
-.project-card p {
-  color: var(--text-muted);
-  font-size: 0.92rem;
-  margin-bottom: 18px;
-}
+/* v1.17 起项目区改用「MISSION 任务列表 + 全息面板」，样式见文件末尾 v1.17 段 */
 
 .tag {
   display: inline-block;
@@ -1495,7 +1422,6 @@ body::after {
 
 /* ---------- 霓虹边框外发光 ---------- */
 .about-card,
-.project-card,
 .contact-card,
 .btn-primary,
 .btn-ghost {
@@ -1508,7 +1434,6 @@ body::after {
 }
 
 .about-card:hover,
-.project-card:hover,
 .contact-card:hover {
   filter: drop-shadow(0 0 18px rgba(255, 232, 26, 0.34));
 }
@@ -1825,8 +1750,7 @@ body::before {
   filter: drop-shadow(10px 10px 0 rgba(255, 232, 26, 0.13));
 }
 
-/* 项目 / 联系卡片：18px 切角 → 两级 8px 台阶 */
-.project-card,
+/* 联系卡片：18px 切角 → 两级 8px 台阶 */
 .contact-card {
   clip-path: polygon(
     16px 0,
@@ -1846,7 +1770,6 @@ body::before {
   filter: drop-shadow(7px 7px 0 rgba(255, 232, 26, 0.12));
 }
 
-.project-card:hover,
 .contact-card:hover {
   box-shadow: none;
   filter: drop-shadow(10px 10px 0 rgba(255, 232, 26, 0.24));
@@ -1899,7 +1822,6 @@ body::before {
 
 /* 1. 文字框 / 卡片：实心底 + 粗描边 + 左上高光、右下暗部 */
 .about-card,
-.project-card,
 .contact-card {
   background: #0c0c0c;
   border: 3px solid rgba(255, 232, 26, 0.55);
@@ -1944,7 +1866,6 @@ body::before {
 }
 
 /* 悬停：描边点亮 + 底色微亮 + 硬投影加深 */
-.project-card:hover,
 .contact-card:hover {
   background: #141414;
   border-color: var(--primary);
@@ -2699,4 +2620,254 @@ html::after {
     );
   background-size: 160px 160px, auto;
   background-repeat: repeat, repeat;
+}
+
+/* ==========================================================================
+   v1.17 项目区改造：MISSION 任务列表 + 悬停「全息投影」简报面板
+   AI-generated: 把原来的三张并列卡片换成「一排排带 [MISSION_0x] 前缀的任务行」，
+   鼠标悬停（或键盘聚焦）时在该行右侧浮出一块青色半透明全息面板，显示详细描述。
+   实现要点：
+   ① 纯 CSS 驱动（:hover / :focus-within），不新增任何脚本逻辑，天然支持键盘；
+   ② 全息面板走站点副色 --accent（青），与黄色主色形成「投影 vs 实体」的对比，
+      并延续 v1.16 的 CRT 语言（水平横纹 + 发光描边 + 玻璃模糊）；
+   ③ 列表限宽 600px，为右侧面版（320px）预留空间，避免溢出视口；
+   ④ 窄屏与触摸设备上改为内联常显，保证信息不丢失、不依赖悬停。
+   ========================================================================== */
+
+/* 1. 列表：限宽以给右侧面板留出空间 */
+.missions {
+  max-width: 600px;
+}
+
+.mission-list {
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+/* 2. 任务行：延续既有卡片的 8-bit 像素控件语言 */
+.mission {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 16px 20px;
+  background: #0c0c0c;
+  border: 3px solid rgba(255, 232, 26, 0.55);
+  border-radius: 0;
+  box-shadow:
+    inset 3px 3px 0 rgba(255, 232, 26, 0.12),
+    inset -3px -3px 0 rgba(0, 0, 0, 0.7),
+    6px 6px 0 rgba(255, 232, 26, 0.14);
+  transition: background 0.3s, border-color 0.3s, box-shadow 0.3s, transform 0.3s;
+}
+
+.mission:hover,
+.mission:focus-within {
+  background: #141414;
+  border-color: var(--primary);
+  transform: translateX(4px); /* 向右微移，暗示面板自右侧展开 */
+  box-shadow:
+    inset 3px 3px 0 rgba(255, 232, 26, 0.16),
+    inset -3px -3px 0 rgba(0, 0, 0, 0.7),
+    6px 6px 0 rgba(255, 232, 26, 0.26);
+}
+
+/* 3. 编号：像素字体 + 青色辉光 */
+.mission-id {
+  flex: none;
+  font-family: var(--pixel-font);
+  font-size: 0.62rem;
+  line-height: 1.6;
+  letter-spacing: 0.5px;
+  color: var(--accent);
+  text-shadow: 0 0 8px rgba(0, 240, 255, 0.45);
+}
+
+/* 4. 名称：中文用正文字体，悬停点亮为黄 */
+.mission-name {
+  flex: 1 1 auto;
+  min-width: 0;
+  font-size: 1rem;
+  font-weight: 700;
+  letter-spacing: 1px;
+  color: var(--text);
+  transition: color 0.3s;
+}
+
+.mission:hover .mission-name,
+.mission:focus-within .mission-name {
+  color: var(--primary);
+}
+
+/* 5. 状态标签 */
+.mission-status {
+  flex: none;
+  padding: 4px 10px;
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 1px;
+  color: var(--text-muted);
+  background: #101010;
+  border: 2px solid rgba(255, 232, 26, 0.4);
+  border-radius: 0;
+  box-shadow:
+    inset 2px 2px 0 rgba(255, 232, 26, 0.1),
+    inset -2px -2px 0 rgba(0, 0, 0, 0.6);
+}
+
+/* 进行中：实心黄，最醒目 */
+.mission-status.is-active {
+  color: #050505;
+  background: var(--primary);
+  border-color: var(--primary-hover);
+  box-shadow: 0 0 12px rgba(255, 232, 26, 0.35);
+}
+
+/* 6. 全息投影面板：默认隐藏，悬停 / 键盘聚焦时自右侧浮出 */
+.mission-holo {
+  position: absolute;
+  top: 50%;
+  left: calc(100% + 18px);
+  z-index: 20;
+  width: 320px;
+  padding: 16px 18px;
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+  transform: translateY(-50%) translateX(-14px) scale(0.97);
+  transform-origin: left center;
+  transition: opacity 0.26s ease, transform 0.26s ease, visibility 0.26s;
+  /* 全息质感：CRT 横纹 + 青色玻璃 + 发光描边 + 内辉光 */
+  background-color: rgba(4, 14, 18, 0.82);
+  background-image:
+    repeating-linear-gradient(
+      180deg,
+      rgba(0, 240, 255, 0.07) 0 1px,
+      rgba(0, 0, 0, 0) 1px 3px
+    ),
+    linear-gradient(180deg, rgba(0, 240, 255, 0.1), rgba(0, 240, 255, 0.02));
+  border: 2px solid rgba(0, 240, 255, 0.55);
+  border-radius: 0;
+  backdrop-filter: blur(8px) saturate(140%);
+  -webkit-backdrop-filter: blur(8px) saturate(140%);
+  box-shadow:
+    inset 0 0 26px rgba(0, 240, 255, 0.12),
+    0 0 20px rgba(0, 240, 255, 0.18);
+}
+
+.mission:hover .mission-holo,
+.mission:focus-within .mission-holo {
+  opacity: 1;
+  visibility: visible;
+  transform: translateY(-50%) translateX(0) scale(1);
+}
+
+/* 指向任务行的连接三角（45° 方块只留左、下描边） */
+.mission-holo::before {
+  content: "";
+  position: absolute;
+  top: 50%;
+  left: -9px;
+  width: 14px;
+  height: 14px;
+  transform: translateY(-50%) rotate(45deg);
+  background: rgba(4, 14, 18, 0.95);
+  border-left: 2px solid rgba(0, 240, 255, 0.55);
+  border-bottom: 2px solid rgba(0, 240, 255, 0.55);
+}
+
+/* 7. 面板内容 */
+.holo-head {
+  font-family: var(--pixel-font);
+  font-size: 0.55rem;
+  letter-spacing: 1px;
+  color: var(--accent);
+  margin-bottom: 10px;
+  text-shadow: 0 0 8px rgba(0, 240, 255, 0.5);
+}
+
+.holo-desc {
+  font-size: 0.88rem;
+  line-height: 1.75;
+  color: #cfe9ee;
+  margin-bottom: 12px;
+}
+
+.holo-meta {
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  font-size: 0.78rem;
+}
+
+.holo-meta li {
+  display: flex;
+  gap: 10px;
+  padding-top: 6px;
+  border-top: 1px dashed rgba(0, 240, 255, 0.2);
+}
+
+.holo-meta em {
+  flex: none;
+  width: 56px;
+  font-style: normal;
+  color: rgba(0, 240, 255, 0.75);
+}
+
+.holo-meta span {
+  color: var(--text-muted);
+}
+
+/* 8. 空间不足（<1140px）或触摸设备：面板改为内联常显，信息不丢失 */
+@media (max-width: 1139px), (hover: none) {
+  .missions {
+    max-width: 100%;
+  }
+
+  .mission {
+    flex-wrap: wrap; /* 让面板换到下一行 */
+  }
+
+  .mission:hover {
+    transform: none;
+  }
+
+  .mission-holo {
+    position: static;
+    flex: 1 0 100%; /* 独占一整行 */
+    width: auto;
+    margin-top: 14px;
+    opacity: 1;
+    visibility: visible;
+    pointer-events: auto;
+    transform: none;
+  }
+
+  .mission-holo::before {
+    content: none;
+  }
+}
+
+/* 9. 减弱动态效果：去掉位移与淡入 */
+@media (prefers-reduced-motion: reduce) {
+  .mission,
+  .mission-holo {
+    transition: none;
+  }
+
+  .mission:hover {
+    transform: none;
+  }
+
+  .mission-holo {
+    transform: translateY(-50%);
+  }
+
+  .mission:hover .mission-holo,
+  .mission:focus-within .mission-holo {
+    transform: translateY(-50%);
+  }
 }

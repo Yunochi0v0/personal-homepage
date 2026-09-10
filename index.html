@@ -7,7 +7,7 @@
   <title>刘聿宸 · 个人主页</title>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@700;900&family=Press+Start+2P&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="styles/style.css?v=1.16.0" />
+  <link rel="stylesheet" href="styles/style.css?v=1.17.0" />
   <!-- 开启动画：提前锁定页面滚动，避免动画播放期间背景被滚动。
        若脚本异常或未执行，则由 CSS 兜底动画与 <noscript> 保证页面仍可正常显示。 -->
   <script>
@@ -182,26 +182,63 @@
     <section id="projects" class="section">
       <div class="container">
         <h2 class="section-title reveal glitch" data-text="项目">项目<span class="title-en" aria-hidden="true">PROJECTS</span></h2>
-        <p class="section-sub reveal">正在完成与计划中的作品（占位，待填充）</p>
-        <div class="projects-grid">
-          <article class="project-card reveal" data-delay="0">
-            <div class="project-icon">🚀</div>
-            <h3>本个人主页</h3>
-            <p>个人主页 MVP，纯 HTML/CSS/JS，包含我的介绍、技能与联系方式。</p>
-            <span class="tag">进行中</span>
-          </article>
-          <article class="project-card reveal" data-delay="100">
-            <div class="project-icon">💡</div>
-            <h3>课程项目（占位）</h3>
-            <p>课程里的 AI 辅助真实项目，将在这里记录内容与进度。</p>
-            <span class="tag">占位</span>
-          </article>
-          <article class="project-card reveal" data-delay="200">
-            <div class="project-icon">✨</div>
-            <h3>我的下一个想法（占位）</h3>
-            <p>正在酝酿中的小点子，等它成型后我会写在这里。</p>
-            <span class="tag">占位</span>
-          </article>
+        <p class="section-sub reveal">正在完成与计划中的作品 · 悬停查看任务简报</p>
+        <!-- AI-generated: 任务列表。悬停（或键盘聚焦）条目时，右侧浮出「全息投影」详情面板。
+             面板为纯 CSS 驱动，无需脚本；详细文案仍为占位，请按实际情况调整。 -->
+        <div class="missions">
+          <ol class="mission-list">
+            <li class="mission reveal" data-delay="0">
+              <span class="mission-id">[MISSION_01]</span>
+              <span class="mission-name">本个人主页</span>
+              <span class="mission-status is-active">进行中</span>
+              <div class="mission-holo">
+                <p class="holo-head">// MISSION BRIEF</p>
+                <p class="holo-desc">
+                  用于记录学习与成长的个人主页 MVP。纯 HTML / CSS / JavaScript 手写，
+                  无框架、无构建步骤；包含自我介绍、技能进度、项目档案与数字孪生问答。
+                </p>
+                <ul class="holo-meta">
+                  <li><em>技术栈</em><span>HTML / CSS / JS</span></li>
+                  <li><em>状态</em><span>持续迭代中</span></li>
+                  <li><em>方式</em><span>AI 辅助开发</span></li>
+                </ul>
+              </div>
+            </li>
+            <li class="mission reveal" data-delay="100">
+              <span class="mission-id">[MISSION_02]</span>
+              <span class="mission-name">课程项目</span>
+              <span class="mission-status">待填充</span>
+              <div class="mission-holo">
+                <p class="holo-head">// MISSION BRIEF</p>
+                <p class="holo-desc">
+                  课程里的真实项目，会在这里记录目标、过程与收获。
+                  目前尚未开工，欢迎回来查看更新。
+                </p>
+                <ul class="holo-meta">
+                  <li><em>技术栈</em><span>待定</span></li>
+                  <li><em>状态</em><span>计划中</span></li>
+                  <li><em>方式</em><span>AI 辅助开发</span></li>
+                </ul>
+              </div>
+            </li>
+            <li class="mission reveal" data-delay="200">
+              <span class="mission-id">[MISSION_03]</span>
+              <span class="mission-name">我的下一个想法</span>
+              <span class="mission-status">待填充</span>
+              <div class="mission-holo">
+                <p class="holo-head">// MISSION BRIEF</p>
+                <p class="holo-desc">
+                  正在酝酿中的小点子，等它成型后我会写下完整的设计与实现。
+                  如果你有想看我做的东西，也欢迎写信告诉我。
+                </p>
+                <ul class="holo-meta">
+                  <li><em>技术栈</em><span>待定</span></li>
+                  <li><em>状态</em><span>构思中</span></li>
+                  <li><em>方式</em><span>Vibe Coding</span></li>
+                </ul>
+              </div>
+            </li>
+          </ol>
         </div>
       </div>
     </section>
@@ -301,6 +338,6 @@
   <!-- 返回顶部 -->
   <button class="back-top" id="backTop" aria-label="返回顶部">↑</button>
 
-  <script src="scripts/main.js?v=1.16.0"></script>
+  <script src="scripts/main.js?v=1.17.0"></script>
 </body>
 </html>
