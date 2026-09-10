@@ -10,7 +10,46 @@
 
 ---
 
-## [v1.16] CRT 屏幕投影感：极淡水平扫描线 + 微弱噪点（当前）
+## [v1.17] 项目区改造：MISSION 任务列表 + 悬停「全息投影」简报面板（当前）
+
+- **日期**：2026-09-10
+- **作者**：katzegott
+
+### 新增
+- 用户需求：把项目展示改成一排排带有 `[MISSION_01]`、`[MISSION_02]`、`[MISSION_03]` 前缀的列表；鼠标悬停时，在该条目**右侧**弹出一个悬浮的「全息投影」面板显示详细描述，风格与整体一致。
+- 实现：原三张并列卡片（`.projects-grid` / `.project-card`）替换为 `.missions` → `ol.mission-list` → `li.mission` 任务行；每条任务行内置一块 `.mission-holo` 全息面板；同时清理了旧卡片的全部样式引用。
+
+### 说明
+- **纯 CSS 驱动，未新增任何脚本**：面板显隐完全由 `:hover` 与 `:focus-within` 控制，不依赖 JS 事件。`pointer-events: none` 让隐藏面板不拦截鼠标；`:focus-within` 则让键盘用户 Tab 到任务行时同样能看到简报，无需为可访问性额外写代码。
+- **配色的语义分工**：任务行沿用站点主色黄（`--primary`）的 8-bit 像素控件语言——实心底 `#0c0c0c`、3px 黄描边、左上高光/右下暗部的 bevel、硬投影，代表「实体」；弹出的面板则改用副色青（`--accent`），代表「投影出来的光」。黄与青的对比让「全息」在视觉上一眼可辨，同时两者都是站点既有配色，不引入第三种颜色。
+- **全息质感的构成**：① 青色半透明玻璃底 + `backdrop-filter: blur(8px) saturate(140%)`；② 上下渐变提亮（`rgba(0,240,255,.10)` → `.02`）；③ 2px 青色发光描边；④ 内辉光 `inset 0 0 26px` + 外辉光 `0 0 20px`；⑤ 与 v1.16 一脉相承的 **CRT 水平横纹**（1px / 3px 周期），让面板看起来像真的在「扫描成像」；⑥ 左侧一枚 45° 方块只留左、下描边，形成指向任务行的连接三角。
+- **入场动效**：默认 `opacity: 0` + `visibility: hidden` + `translateX(-14px) scale(0.97)`（以左中为原点），悬停时滑到位并放大到 1。位移方向与「从任务行右侧展开」的物理直觉一致。
+- **布局核算（避免溢出）**：`.missions` 限宽 600px，面板宽 320px，加上 18px 间隙共需 **938px**；容器 `.container` 为 `max-width: 1020px` + 左右各 22px 内边距，可用 **976px**，余 38px。`body` 仅有 `overflow-x: hidden`，而各 `.section` / `.container` 都没有 `overflow: hidden`，因此浮出面板不会被裁剪。
+- **响应式**：`@media (max-width: 1139px), (hover: none)` 时改为**内联常显**——面板 `position: static` + `flex: 1 0 100%` 换行独占一整行，`::before` 三角隐藏。这样窄屏与触摸设备（无悬停能力）上信息不会丢失，也不依赖悬停才能阅读。
+- **`prefers-reduced-motion: reduce`**：去掉行位移与面板淡入，直接显示。
+
+### 关键修复
+- `scripts/main.js` 的 `HOVER_SELECTOR` 原本列出 `.project-card`，用于让自定义四芒星光标在可交互卡片上放大。项目区改用 `.mission` 后**必须同步替换**，否则鼠标移到新任务行上光标不会再触发悬停态。这是本次唯一一处 JS 改动，虽小但漏改会导致交互退化。
+
+### 涉及文件
+| 文件 | 类型 | 说明 |
+| --- | --- | --- |
+| `index.html` | 修改 | 项目区 DOM 重写：`.projects-grid` 三卡片 → `.missions` / `ol.mission-list` / 3 条 `li.mission`（编号 + 名称 + 状态 + `.mission-holo` 简报面板）；副标题改为「悬停查看任务简报」；版本号 `?v=1.16.0` → `?v=1.17.0`（CSS / JS 各一处） |
+| `styles/style.css` | 修改 | 新增 v1.17 段落（`.missions` / `.mission` / `.mission-id` / `.mission-name` / `.mission-status` / `.mission-holo` / `.holo-head` / `.holo-desc` / `.holo-meta` + 响应式与 reduced-motion）；**移除** `.projects-grid`、`.project-card` 及其 `::before`/`::after`/`h3`/`p`、`.project-icon` 的定义，并从 6 处组合选择器中摘掉 `.project-card` |
+| `scripts/main.js` | 修改 | `HOVER_SELECTOR` 中 `.project-card` → `.mission`；BIOS 版本号同步为 `v1.17.0` |
+
+### 验证方式
+- **静态断言（30/30 通过）**：DOM 侧 11 项（容器/有序列表/3 条条目/三个编号前缀/3 块面板/简报标题/描述/要素列表/旧结构已移除）；CSS 侧 15 项（绝对定位、右侧 `calc(100% + 18px)`、默认隐藏、玻璃模糊、青色描边与内辉光、CRT 横纹、宽 320px、列表限宽 600px、悬停显示、`:focus-within`、连接三角、窄屏内联、reduced-motion、无 `.project-card` 残留）；JS 侧 2 项（`HOVER_SELECTOR` 已含 `.mission`、已无 `.project-card`）；布局 2 项（938 < 976 不溢出、断点覆盖）。
+- **回归测试**：JavaScriptCore + DOM stub 重跑 `boot-runner.js` 与 `egg-runner.js` → 全部通过，无运行时错误。
+- CSS 花括号 381/381、圆括号 751/751。
+- `index.html` / `styles/style.css` / `scripts/main.js` 均返回 HTTP 200。
+
+### 备注
+面板内的详细描述文案仍为占位内容（`[MISSION_02]` / `[MISSION_03]` 明确标注「待填充」），待有真实项目后替换即可，无需改动样式。
+
+---
+
+## [v1.16] CRT 屏幕投影感：极淡水平扫描线 + 微弱噪点
 
 - **日期**：2026-09-10
 - **作者**：katzegott
