@@ -307,16 +307,23 @@ document.querySelectorAll(".is-placeholder").forEach((link) => {
   );
 })();
 
-/* ---------- 10. 彩蛋：输入「梦想即力量」跳转 ---------- */
+/* ---------- 10. 彩蛋：键盘连打 lycnb 解锁浮层 + 输入「梦想即力量」跳转 ---------- */
+/* AI-generated: 常态隐藏，键盘依次按下 l-y-c-n-b 后以固定浮层弹出；
+   浮层内输入暗号「梦想即力量」点亮并跳转。
+   边界处理：焦点在输入框打字 / 输入法组字中 / 带修饰键 / 开启动画播放期间
+   都不计入口令；口令缓冲空闲 1.5s 自动清空；Esc、关闭按钮、点击遮罩均可退出。 */
 (function () {
   const eggBox = document.getElementById("easterEgg");
   const eggForm = document.getElementById("easterEggForm");
   const eggInput = document.getElementById("easterEggInput");
   const eggHint = document.getElementById("easterEggHint");
+  const eggClose = document.getElementById("easterEggClose");
   if (!eggForm || !eggInput) return;
 
   const MAGIC = "梦想即力量";
   const TARGET_URL = "https://anime.bang-dream.com/yumemita/";
+  const UNLOCK_KEYS = "lycnb"; // 隐藏关卡口令
+  const BUFFER_TTL = 1500; // 口令缓冲的空闲有效期（毫秒）
 
   // 更新提示文案（空字符串则隐藏）
   function setHint(text) {
@@ -325,6 +332,242 @@ document.querySelectorAll(".is-placeholder").forEach((link) => {
     eggHint.classList.toggle("show", !!text);
   }
 
+  /* ---------- 浮层显隐 ---------- */
+  function isOpen() {
+    return !!eggBox && eggBox.classList.contains("revealed");
+  }
+
+  /* ---------- 开启动画：终端解密序列 ---------- */
+  /* AI-generated: 与站点开启动画刻意区分主题——这里是「青色密钥解密」：
+     遮罩直接压黑（不做电子枪亮点展开）→ 逐行输出解密日志（其中两行尾部
+     乱码滚动）→ JS 逐帧推进的百分比进度条 → ACCESS GRANTED 闪烁 +
+     扫描线扫过面板。总时长约 4.6 秒，播放期间点击或 Esc 可跳过。 */
+  const BOOT_LINES = [
+    "> INCOMING SIGNAL ............... OK",
+    "> DECRYPTING KEY ",
+    "> KEY ACCEPTED: l-y-c-n-b",
+    "> HIDDEN LEVEL LOCATED ........... OK",
+    "> LOADING MODULE "
+  ];
+  const SCRAMBLE_CHARS = "!<>-_\\/[]{}=+*^?#0123456789";
+  const SCRAMBLE_INDEXES = [1, 4]; // 这两行在"解密中"阶段尾部字符随机滚动
+
+  let bootRunning = false;
+  let finishBoot = null;
+
+  function playEggBoot() {
+    const boot = document.getElementById("eggBoot");
+    const log = document.getElementById("eggBootLog");
+    const fill = document.getElementById("eggBootBarFill");
+    const status = document.getElementById("eggBootStatus");
+
+    const reduceMotion =
+      typeof window.matchMedia === "function" &&
+      window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+    // 减弱动态效果，或动画元素缺失：直接显示输入区，保证彩蛋始终可用
+    if (reduceMotion || !boot || !log) {
+      if (eggBox) eggBox.classList.add("egg-ready");
+      setHint("✦ 隐藏关卡已解锁");
+      requestAnimationFrame(() => eggInput.focus());
+      return;
+    }
+
+    // 复位（重复打开时重新播放）
+    boot.classList.remove("is-done", "is-sweeping");
+    log.textContent = "";
+    if (fill) fill.style.width = "0%";
+    if (status) {
+      status.textContent = "";
+      status.classList.remove("is-granted");
+    }
+    if (eggBox) eggBox.classList.remove("egg-ready");
+
+    const timers = [];
+    const printed = [];
+    let scrambleTimer = 0;
+    let barTimer = 0;
+    let settled = false;
+
+    function at(ms, fn) {
+      timers.push(setTimeout(fn, ms));
+    }
+
+    function render() {
+      log.textContent = printed.join("\n");
+    }
+
+    function onBootKey(e) {
+      if (e.key === "Escape") finish();
+    }
+
+    function finish() {
+      if (settled) return;
+      settled = true;
+      bootRunning = false;
+      finishBoot = null;
+
+      for (let i = 0; i < timers.length; i++) clearTimeout(timers[i]);
+      timers.length = 0;
+      if (scrambleTimer) {
+        clearInterval(scrambleTimer);
+        scrambleTimer = 0;
+      }
+      if (barTimer) {
+        clearInterval(barTimer);
+        barTimer = 0;
+      }
+      window.removeEventListener("keydown", onBootKey);
+      boot.removeEventListener("pointerdown", finish);
+
+      boot.classList.add("is-done");
+      if (eggBox) eggBox.classList.add("egg-ready");
+      setHint("✦ 隐藏关卡已解锁");
+      requestAnimationFrame(() => eggInput.focus());
+    }
+
+    finishBoot = finish;
+    bootRunning = true;
+    window.addEventListener("keydown", onBootKey);
+    boot.addEventListener("pointerdown", finish);
+
+    // ① 逐行打印解密日志（每行 400ms）
+    BOOT_LINES.forEach((line, index) => {
+      at(300 + index * 400, () => {
+        printed[index] = line;
+        render();
+      });
+    });
+
+    // ② 两行"解密中"日志：尾部乱码滚动约 0.6s 后定格
+    SCRAMBLE_INDEXES.forEach((index) => {
+      const startAt = 300 + index * 400;
+      at(startAt + 60, () => {
+        printed[index] = BOOT_LINES[index];
+        scrambleTimer = setInterval(() => {
+          let s = BOOT_LINES[index];
+          for (let i = 0; i < 12; i++) {
+            s += SCRAMBLE_CHARS[Math.floor(Math.random() * SCRAMBLE_CHARS.length)];
+          }
+          printed[index] = s;
+          render();
+        }, 70);
+      });
+      at(startAt + 620, () => {
+        clearInterval(scrambleTimer);
+        scrambleTimer = 0;
+        printed[index] = BOOT_LINES[index] + "........... OK";
+        render();
+      });
+    });
+
+    // ③ 进度条：JS 逐帧推进并显示百分比（0 → 100%）
+    at(2350, () => {
+      let pct = 0;
+      barTimer = setInterval(() => {
+        pct = Math.min(100, pct + 2 + Math.floor(Math.random() * 3));
+        if (fill) fill.style.width = pct + "%";
+        if (status) status.textContent = "LOADING " + ("00" + pct).slice(-3) + "%";
+        if (pct >= 100) {
+          clearInterval(barTimer);
+          barTimer = 0;
+        }
+      }, 34);
+    });
+
+    // ④ 结果与收尾：先收掉进度条，避免百分比把它自己写回去
+    at(3500, () => {
+      if (barTimer) {
+        clearInterval(barTimer);
+        barTimer = 0;
+      }
+      if (fill) fill.style.width = "100%";
+      if (!status) return;
+      status.textContent = "ACCESS GRANTED";
+      status.classList.add("is-granted");
+    });
+    at(3900, () => boot.classList.add("is-sweeping"));
+    at(4500, finish);
+  }
+
+  function openEgg() {
+    if (!eggBox || isOpen()) return;
+    eggBox.classList.add("revealed");
+    eggBox.setAttribute("aria-hidden", "false");
+    setHint("");
+    playEggBoot();
+  }
+
+  function closeEgg() {
+    if (!isOpen()) return;
+    // 动画尚未结束就被关闭：先把动画收尾，避免定时器继续跑
+    if (bootRunning && finishBoot) finishBoot();
+    eggBox.classList.remove("revealed");
+    eggBox.setAttribute("aria-hidden", "true");
+    setHint("");
+    eggInput.blur();
+  }
+
+  if (eggClose) eggClose.addEventListener("click", closeEgg);
+
+  // 点击面板之外的遮罩区域也可关闭
+  if (eggBox) {
+    eggBox.addEventListener("click", (e) => {
+      if (e.target === eggBox) closeEgg();
+    });
+  }
+
+  /* ---------- 键盘连打口令解锁 ---------- */
+  function isTypingTarget(node) {
+    if (!node) return false;
+    const tag = (node.tagName || "").toLowerCase();
+    return (
+      tag === "input" ||
+      tag === "textarea" ||
+      tag === "select" ||
+      node.isContentEditable === true
+    );
+  }
+
+  let buffer = "";
+  let bufferTimer = 0;
+
+  window.addEventListener("keydown", (e) => {
+    // Esc：动画播放中先跳过动画，动画结束后再按才是关闭浮层
+    if (e.key === "Escape") {
+      if (bootRunning) return;
+      closeEgg();
+      return;
+    }
+
+    // 带修饰键、输入法组字中的按键一律忽略
+    if (e.ctrlKey || e.metaKey || e.altKey || e.isComposing) return;
+
+    // 正在输入框里打字：不参与口令，并清空已累计的缓冲
+    if (isTypingTarget(e.target)) {
+      buffer = "";
+      return;
+    }
+
+    // 开启动画播放期间不响应，避免口令字母被"按键跳过动画"的逻辑吞掉
+    if (document.documentElement.classList.contains("is-booting")) return;
+
+    // 只统计单个可见字符（忽略 Shift、方向键、F1 等）
+    if (!e.key || e.key.length !== 1) return;
+
+    buffer = (buffer + e.key.toLowerCase()).slice(-UNLOCK_KEYS.length);
+    clearTimeout(bufferTimer);
+    bufferTimer = setTimeout(() => {
+      buffer = "";
+    }, BUFFER_TTL);
+
+    if (buffer === UNLOCK_KEYS) {
+      buffer = "";
+      openEgg();
+    }
+  });
+
+  /* ---------- 暗号提交 ---------- */
   // 提交时（回车或点击 ✨）触发：去除首尾空格后精确匹配
   eggForm.addEventListener("submit", (e) => {
     e.preventDefault();
@@ -466,4 +709,188 @@ document.querySelectorAll(".is-placeholder").forEach((link) => {
   });
 
   requestAnimationFrame(tick);
+})();
+
+/* ============ 12. 背景动态正弦波（黄色 · Canvas） ============ */
+/* AI-generated: 用 Canvas 绘制 3 条缓慢流动的黄色正弦波作为页面背景。
+   细节：① 跟随 devicePixelRatio 适配，避免高分屏发虚；
+   ② 频率按视口宽度换算，保证屏幕上始终能看到固定数量的周期；
+   ③ 尊重系统「减弱动态效果」设置，此时只画静止波形；
+   ④ 页面切到后台时暂停绘制，节省性能。 */
+(function initWaveBackground() {
+  const canvas = document.getElementById("waveBg");
+  if (!canvas || typeof canvas.getContext !== "function") return;
+  const ctx = canvas.getContext("2d");
+  if (!ctx) return;
+
+  const reduced =
+    typeof window.matchMedia === "function" &&
+    window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+  // y / amp 为视口高度比例；cycles 为屏幕内可见的周期数（数值越大波长越短、波峰越陡）；
+  // speed 为相位速度（弧度/秒），已随更短的波长同步上调，使波峰横向移动速度保持约 60px/秒
+  const WAVES = [
+    { y: 0.3, amp: 0.055, cycles: 8, speed: 2.1, width: 2, alpha: 0.32 },
+    { y: 0.52, amp: 0.07, cycles: 7, speed: -1.85, width: 2.6, alpha: 0.22 },
+    { y: 0.76, amp: 0.05, cycles: 9, speed: 2.35, width: 1.8, alpha: 0.26 }
+  ];
+
+  let w = 0;
+  let h = 0;
+
+  function resize() {
+    const dpr = Math.min(window.devicePixelRatio || 1, 2);
+    w = canvas.clientWidth || window.innerWidth;
+    h = canvas.clientHeight || window.innerHeight;
+    canvas.width = Math.max(1, Math.round(w * dpr));
+    canvas.height = Math.max(1, Math.round(h * dpr));
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+  }
+
+  function draw(time) {
+    ctx.clearRect(0, 0, w, h);
+    const t = time / 1000;
+
+    for (let i = 0; i < WAVES.length; i++) {
+      const wave = WAVES[i];
+      if (w <= 0 || h <= 0) continue;
+
+      const baseY = h * wave.y;
+      const amp = h * wave.amp;
+      const k = (Math.PI * 2 * wave.cycles) / w; // 弧度/像素，按屏宽换算
+      const phase = t * wave.speed;
+
+      ctx.beginPath();
+      for (let x = 0; x <= w; x += 3) {
+        const y = baseY + Math.sin(x * k + phase) * amp;
+        if (x === 0) ctx.moveTo(x, y);
+        else ctx.lineTo(x, y);
+      }
+
+      ctx.strokeStyle = "rgba(255, 232, 26, " + wave.alpha + ")";
+      ctx.lineWidth = wave.width;
+      ctx.lineJoin = "round";
+      ctx.lineCap = "round";
+      ctx.shadowColor = "rgba(255, 232, 26, " + (wave.alpha * 0.8).toFixed(3) + ")";
+      ctx.shadowBlur = 8;
+      ctx.stroke();
+    }
+
+    ctx.shadowBlur = 0; // 复位，避免影响后续绘制
+  }
+
+  let raf = null;
+  let elapsed = 0;
+
+  function loop(now) {
+    elapsed = now;
+    draw(elapsed);
+    raf = requestAnimationFrame(loop);
+  }
+
+  function start() {
+    if (raf !== null || reduced) return;
+    raf = requestAnimationFrame(loop);
+  }
+
+  function stop() {
+    if (raf === null) return;
+    cancelAnimationFrame(raf);
+    raf = null;
+  }
+
+  resize();
+  draw(0);
+
+  window.addEventListener("resize", () => {
+    resize();
+    draw(elapsed);
+  });
+
+  if (!reduced) {
+    start();
+    document.addEventListener("visibilitychange", () => {
+      if (document.hidden) stop();
+      else start();
+    });
+  }
+})();
+
+/* ============ 13. 开启动画（复古 CRT 开机自检） ============ */
+/* AI-generated: 逐行打印 BIOS 自检文字，随后进度条跳格走满、显示品牌名，
+   最后整屏收束成一条水平亮线后消失。
+   边界处理：① 尊重系统「减弱动态效果」，或 URL 带 ?noboot 时直接跳过；
+   ② 点击 / 按键 / 触摸可随时跳过；③ 跳过时清理所有未触发的定时器。 */
+(function initBootSequence() {
+  const boot = document.getElementById("bootScreen");
+  if (!boot) return;
+
+  const root = document.documentElement;
+  const log = document.getElementById("bootLog");
+
+  function releaseScroll() {
+    root.classList.remove("is-booting");
+  }
+
+  function finish() {
+    releaseScroll();
+    boot.classList.add("is-closing");
+    setTimeout(function () {
+      boot.classList.add("is-done");
+    }, 700);
+  }
+
+  const reduced =
+    typeof window.matchMedia === "function" &&
+    window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  const search = (window.location && window.location.search) || "";
+
+  // 减弱动态效果 / 显式跳过：不播放动画，直接让页面可用
+  if (reduced || search.indexOf("noboot") !== -1) {
+    boot.classList.add("is-done");
+    releaseScroll();
+    return;
+  }
+
+  const LINES = [
+    "DEEPWORKS BIOS v1.11.0",
+    "MEMTEST 640K ............... <OK>",
+    "NEON SHADER LOAD ........... <OK>",
+    "SINE WAVE ENGINE ........... <OK>",
+    "AUDIO INTERFACE ............ <OK>",
+    "MOUNT /LIUYUCHEN ........... <OK>"
+  ];
+
+  const timers = [];
+  let skipped = false;
+
+  function at(ms, fn) {
+    timers.push(setTimeout(fn, ms));
+  }
+
+  function clearTimers() {
+    for (let i = 0; i < timers.length; i++) clearTimeout(timers[i]);
+    timers.length = 0;
+  }
+
+  function skip() {
+    if (skipped) return;
+    skipped = true;
+    clearTimers();
+    finish();
+  }
+
+  window.addEventListener("pointerdown", skip, { once: true });
+  window.addEventListener("keydown", skip, { once: true });
+
+  if (log) {
+    LINES.forEach(function (line, index) {
+      at(580 + index * 170, function () {
+        log.innerHTML +=
+          line.replace("<OK>", '<span class="boot-ok">[ OK ]</span>') + "\n";
+      });
+    });
+  }
+
+  at(4050, finish);
 })();

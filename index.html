@@ -6,10 +6,35 @@
   <meta name="description" content="刘聿宸的个人主页 - 梦想即力量" />
   <title>刘聿宸 · 个人主页</title>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
-  <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@700;900&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="styles/style.css" />
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@700;900&family=Press+Start+2P&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="styles/style.css?v=1.11.0" />
+  <!-- 开启动画：提前锁定页面滚动，避免动画播放期间背景被滚动。
+       若脚本异常或未执行，则由 CSS 兜底动画与 <noscript> 保证页面仍可正常显示。 -->
+  <script>
+    (function () {
+      var mq = window.matchMedia;
+      var reduced =
+        typeof mq === "function" &&
+        mq.call(window, "(prefers-reduced-motion: reduce)").matches;
+      if (!reduced) document.documentElement.classList.add("is-booting");
+    })();
+  </script>
+  <noscript><style>.boot { display: none !important; }</style></noscript>
 </head>
 <body>
+  <!-- 开启动画（复古 CRT 开机自检） -->
+  <div class="boot" id="bootScreen" aria-hidden="true">
+    <span class="boot-dot"></span>
+    <div class="boot-screen">
+      <pre class="boot-log" id="bootLog"></pre>
+      <div class="boot-bar"><i></i></div>
+      <p class="boot-status">LIU YUCHEN<span class="boot-caret"></span></p>
+    </div>
+  </div>
+
+  <!-- 背景动态正弦波（黄色 · Canvas 绘制） -->
+  <canvas id="waveBg" class="wave-bg" aria-hidden="true"></canvas>
+
   <!-- 顶部滚动进度条 -->
   <div class="scroll-progress" id="scrollProgress"></div>
 
@@ -95,7 +120,7 @@
     <!-- 2. About -->
     <section id="about" class="section">
       <div class="container">
-        <h2 class="section-title reveal glitch" data-text="关于我">关于我</h2>
+        <h2 class="section-title reveal glitch" data-text="关于我">关于我<span class="title-en" aria-hidden="true">ABOUT</span></h2>
         <p class="section-sub reveal">一点关于我的介绍</p>
         <div class="about-card reveal">
           <p>
@@ -120,7 +145,7 @@
     <!-- 3. Skills -->
     <section id="skills" class="section section-alt">
       <div class="container">
-        <h2 class="section-title reveal glitch" data-text="技能">技能</h2>
+        <h2 class="section-title reveal glitch" data-text="技能">技能<span class="title-en" aria-hidden="true">SKILLS</span></h2>
         <p class="section-sub reveal">我掌握与正在学习的内容</p>
         <div class="skills-grid">
           <!-- AI-generated: 技能条目，进度为占位，请按实际情况调整 -->
@@ -148,7 +173,7 @@
     <!-- 4. Projects -->
     <section id="projects" class="section">
       <div class="container">
-        <h2 class="section-title reveal glitch" data-text="项目">项目</h2>
+        <h2 class="section-title reveal glitch" data-text="项目">项目<span class="title-en" aria-hidden="true">PROJECTS</span></h2>
         <p class="section-sub reveal">正在完成与计划中的作品（占位，待填充）</p>
         <div class="projects-grid">
           <article class="project-card reveal" data-delay="0">
@@ -176,7 +201,7 @@
     <!-- 5. Contact -->
     <section id="contact" class="section section-alt">
       <div class="container">
-        <h2 class="section-title reveal glitch" data-text="联系我">联系我</h2>
+        <h2 class="section-title reveal glitch" data-text="联系我">联系我<span class="title-en" aria-hidden="true">CONTACT</span></h2>
         <p class="section-sub reveal">欢迎交流，期待认识你</p>
         <div class="contact-grid">
           <a class="contact-card reveal" href="mailto:319008328@qq.com">
@@ -201,7 +226,7 @@
   <!-- 6. 数字孪生（虚拟的我 · 基于个人简介问答） -->
   <section id="twin" class="section twin-section">
     <div class="container">
-      <h2 class="section-title reveal glitch" data-text="数字孪生">数字孪生</h2>
+      <h2 class="section-title reveal glitch" data-text="数字孪生">数字孪生<span class="title-en" aria-hidden="true">DIGITAL TWIN</span></h2>
       <p class="section-sub reveal">虚拟的我 · 基于个人简介与你对话，认识一个「程序化的刘聿宸」</p>
 
       <div class="twin-card reveal">
@@ -244,18 +269,30 @@
     </div>
   </footer>
 
-  <!-- 8. 彩蛋（页面最下端 · 隐藏惊喜） -->
-  <div class="easter-egg" id="easterEgg">
-    <form class="easter-egg-form" id="easterEggForm" autocomplete="off">
-      <input id="easterEggInput" type="text" placeholder="我是彩蛋" aria-label="我是彩蛋" maxlength="20" />
-      <button type="submit" aria-label="触发彩蛋">✨</button>
-    </form>
-    <p class="easter-egg-hint" id="easterEggHint" aria-live="polite"></p>
+  <!-- 8. 彩蛋（隐藏关卡：键盘连打 lycnb 后以固定浮层弹出） -->
+  <div class="easter-egg" id="easterEgg" role="dialog" aria-modal="true" aria-labelledby="easterEggTitle" aria-hidden="true">
+    <div class="easter-egg-panel">
+      <button class="easter-egg-close" id="easterEggClose" type="button" aria-label="关闭彩蛋">×</button>
+      <!-- 开启动画：终端解密序列（与站点开启动画同为 CRT 风格，但主题不同） -->
+      <div class="egg-boot" id="eggBoot" aria-hidden="true">
+        <pre class="egg-boot-log" id="eggBootLog"></pre>
+        <div class="egg-boot-bar"><i id="eggBootBarFill"></i></div>
+        <p class="egg-boot-status" id="eggBootStatus"></p>
+      </div>
+      <div class="easter-egg-body">
+        <p class="easter-egg-title" id="easterEggTitle">// 隐藏暗号</p>
+        <form class="easter-egg-form" id="easterEggForm" autocomplete="off">
+          <input id="easterEggInput" type="text" placeholder="我是彩蛋" aria-label="我是彩蛋" maxlength="20" />
+          <button type="submit" aria-label="触发彩蛋">✨</button>
+        </form>
+        <p class="easter-egg-hint" id="easterEggHint" aria-live="polite"></p>
+      </div>
+    </div>
   </div>
 
   <!-- 返回顶部 -->
   <button class="back-top" id="backTop" aria-label="返回顶部">↑</button>
 
-  <script src="scripts/main.js"></script>
+  <script src="scripts/main.js?v=1.11.0"></script>
 </body>
 </html>

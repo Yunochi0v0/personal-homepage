@@ -599,23 +599,31 @@ body::after {
 .about-card::before {
   content: "";
   position: absolute;
-  top: 24px;
+  top: 21px;
   left: 0;
-  width: 34px;
-  height: 3px;
-  background: var(--primary);
-  box-shadow: var(--neon);
+  width: 36px;
+  height: 6px;
+  background: repeating-linear-gradient(
+    90deg,
+    var(--primary) 0 6px,
+    transparent 6px 12px
+  );
+  box-shadow: none;
 }
 
 .about-card::after {
   content: "";
   position: absolute;
   left: 20px;
-  top: 0;
+  top: 34px;
   bottom: 0;
-  width: 3px;
-  background: linear-gradient(180deg, var(--primary), transparent);
-  opacity: 0.25;
+  width: 6px;
+  background: repeating-linear-gradient(
+    180deg,
+    rgba(255, 232, 26, 0.45) 0 6px,
+    transparent 6px 14px
+  );
+  opacity: 0.7;
 }
 
 .about-card p {
@@ -1255,26 +1263,95 @@ body::after {
   box-shadow: var(--neon);
 }
 
-/* ---------- 彩蛋（页面最底部 · 隐藏惊喜） ---------- */
-/* AI-generated: 低调动效 + 命中「梦想即力量」时发光并跳转 */
+/* ---------- 彩蛋（隐藏关卡 · 固定浮层） ---------- */
+/* AI-generated: 常态隐藏，键盘依次连打 lycnb 后以像素浮层弹出；
+   命中「梦想即力量」时整体点亮并跳转 */
 .easter-egg {
-  position: relative;
-  padding: 28px 0 46px;
+  position: fixed;
+  inset: 0;
+  z-index: 9998;
+  display: none;
+  place-items: center;
+  padding: 24px;
+  background: rgba(3, 3, 3, 0.86);
   text-align: center;
-  background: var(--bg-alt);
-  border-top: 1px dashed rgba(255, 232, 26, 0.14);
-  transition: border-color 0.4s;
 }
 
-.easter-egg::before {
-  content: "// 隐藏暗号";
-  display: block;
+.easter-egg.revealed {
+  display: grid;
+  animation: eggMaskIn 0.24s linear both;
+}
+
+@keyframes eggMaskIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+/* 像素面板：与站内 8-bit 控件同一套视觉语言 */
+.easter-egg-panel {
+  position: relative;
+  width: min(420px, 92vw);
+  padding: 34px 26px 30px;
+  background: #0c0c0c;
+  border: 3px solid rgba(255, 232, 26, 0.45);
+  box-shadow:
+    inset 3px 3px 0 rgba(255, 232, 26, 0.12),
+    inset -3px -3px 0 rgba(0, 0, 0, 0.72),
+    8px 8px 0 rgba(255, 232, 26, 0.16);
+  clip-path: polygon(14px 0, 100% 0, 100% calc(100% - 14px), calc(100% - 14px) 100%, 0 100%, 0 14px);
+}
+
+.easter-egg.revealed .easter-egg-panel {
+  animation: eggPanelIn 0.42s steps(6, end) both;
+}
+
+@keyframes eggPanelIn {
+  0% { opacity: 0; transform: translateY(14px) scale(0.96); }
+  100% { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+/* 面板标题（原 ::before 的「// 隐藏暗号」改为真实元素，便于单独点亮 */
+.easter-egg-title {
+  margin: 0 0 18px;
   font-size: 0.66rem;
   letter-spacing: 4px;
   text-transform: uppercase;
   color: rgba(255, 232, 26, 0.32);
-  margin-bottom: 14px;
   transition: color 0.4s, text-shadow 0.4s;
+}
+
+/* 关闭按钮：右上角像素方块 */
+.easter-egg-close {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  width: 30px;
+  height: 30px;
+  display: grid;
+  place-items: center;
+  font-size: 0.95rem;
+  line-height: 1;
+  color: rgba(255, 232, 26, 0.6);
+  background: #141414;
+  border: 2px solid rgba(255, 232, 26, 0.32);
+  cursor: pointer;
+  transition: color 0.2s, background 0.2s, border-color 0.2s;
+}
+
+.easter-egg-close:hover,
+.easter-egg-close:focus-visible {
+  color: #000;
+  background: var(--primary);
+  border-color: var(--primary);
+  outline: none;
+}
+
+/* 系统「减弱动态效果」时不做位移与跳格，直接显示 */
+@media (prefers-reduced-motion: reduce) {
+  .easter-egg.revealed,
+  .easter-egg.revealed .easter-egg-panel {
+    animation: none;
+  }
 }
 
 .easter-egg-form {
@@ -1343,12 +1420,16 @@ body::after {
   opacity: 1;
 }
 
-/* 命中暗号：整体点亮 */
-.easter-egg.triggered {
-  border-top-color: rgba(255, 232, 26, 0.6);
+/* 命中暗号：面板整体点亮 */
+.easter-egg.triggered .easter-egg-panel {
+  border-color: var(--primary);
+  box-shadow:
+    inset 3px 3px 0 rgba(255, 232, 26, 0.2),
+    inset -3px -3px 0 rgba(0, 0, 0, 0.72),
+    8px 8px 0 rgba(255, 232, 26, 0.32);
 }
 
-.easter-egg.triggered::before {
+.easter-egg.triggered .easter-egg-title {
   color: var(--primary);
   text-shadow: 0 0 10px rgba(255, 232, 26, 0.7);
 }
@@ -1624,5 +1705,921 @@ body::after {
   100% {
     opacity: 0;
     transform: translate(var(--dx, 0px), var(--dy, 10px)) rotate(45deg) scale(0.15);
+  }
+}
+
+/* ==========================================================================
+   v1.9 像素风格层（Pixel / 8-bit）
+   AI-generated: 在赛博朋克霓虹基调上叠加像素质感——
+   像素字体（英文/数字）、台阶式切角、硬边阴影、点阵纹理。
+   注：中文没有可用的网络像素字形，故仍回退到系统字体，
+   像素感由形状、阴影与纹理承担。
+   ========================================================================== */
+
+:root {
+  /* Press Start 2P 只含拉丁字形，中文会自动回退到末尾的中文字体 */
+  --pixel-font: "Press Start 2P", ui-monospace, "SFMono-Regular", Menlo,
+    Consolas, monospace, -apple-system, "PingFang SC", "Microsoft YaHei",
+    sans-serif;
+  --pixel-shadow: 6px 6px 0 rgba(255, 232, 26, 0.14);
+}
+
+/* 1. 背景：在原有 44px 网格上叠加 22px 像素点阵 */
+body::before {
+  background-image:
+    linear-gradient(rgba(255, 232, 26, 0.05) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255, 232, 26, 0.05) 1px, transparent 1px),
+    radial-gradient(rgba(255, 232, 26, 0.12) 1px, transparent 1.4px);
+  background-size: 44px 44px, 44px 44px, 22px 22px;
+  background-position: 0 0, 0 0, 11px 11px;
+}
+
+/* 2. 分区标题：像素虚线底纹 + 像素英文小标 */
+.section-title::after {
+  width: 96px;
+  height: 4px;
+  background: repeating-linear-gradient(
+    90deg,
+    var(--primary) 0 6px,
+    transparent 6px 12px
+  );
+  box-shadow: 0 0 12px rgba(255, 232, 26, 0.45);
+}
+
+.title-en {
+  position: absolute;
+  left: 50%;
+  top: -1.55em;
+  transform: translateX(-50%);
+  font-family: var(--pixel-font);
+  font-size: 0.56rem;
+  font-weight: 400;
+  letter-spacing: 3px;
+  line-height: 1;
+  color: var(--accent);
+  opacity: 0.85;
+  text-shadow: 0 0 10px rgba(0, 240, 255, 0.55);
+  white-space: nowrap;
+  pointer-events: none;
+}
+
+/* 3. 英文 / 数字点缀切换为像素字体 */
+.skill-value,
+.twin-badge,
+.footer-note,
+#year,
+.contact-value {
+  font-family: var(--pixel-font);
+}
+
+.skill-value {
+  font-size: 0.7rem;
+  letter-spacing: 1px;
+}
+
+.twin-badge {
+  font-size: 0.55rem;
+  letter-spacing: 2px;
+}
+
+.footer-note {
+  font-size: 0.6rem;
+  letter-spacing: 2px;
+}
+
+.contact-value {
+  font-size: 0.58rem;
+  letter-spacing: 0;
+  word-break: break-all;
+}
+
+/* 4. 像素台阶切角：把原来的斜切角改成两级台阶（8-bit 阶梯） */
+
+/* 关于我卡片：24px 切角 → 两级 12px 台阶 */
+.about-card {
+  clip-path: polygon(
+    24px 0,
+    100% 0,
+    100% calc(100% - 24px),
+    calc(100% - 12px) calc(100% - 24px),
+    calc(100% - 12px) calc(100% - 12px),
+    calc(100% - 24px) calc(100% - 12px),
+    calc(100% - 24px) 100%,
+    0 100%,
+    0 24px,
+    12px 24px,
+    12px 12px,
+    24px 12px
+  );
+  /* clip-path 会裁掉 box-shadow，硬阴影改用 drop-shadow 实现 */
+  box-shadow: none;
+  filter: drop-shadow(10px 10px 0 rgba(255, 232, 26, 0.13));
+}
+
+/* 项目 / 联系卡片：18px 切角 → 两级 8px 台阶 */
+.project-card,
+.contact-card {
+  clip-path: polygon(
+    16px 0,
+    100% 0,
+    100% calc(100% - 16px),
+    calc(100% - 8px) calc(100% - 16px),
+    calc(100% - 8px) calc(100% - 8px),
+    calc(100% - 16px) calc(100% - 8px),
+    calc(100% - 16px) 100%,
+    0 100%,
+    0 16px,
+    8px 16px,
+    8px 8px,
+    16px 8px
+  );
+  box-shadow: none;
+  filter: drop-shadow(7px 7px 0 rgba(255, 232, 26, 0.12));
+}
+
+.project-card:hover,
+.contact-card:hover {
+  box-shadow: none;
+  filter: drop-shadow(10px 10px 0 rgba(255, 232, 26, 0.24));
+}
+
+/* 按钮与联系图标：统一为两级 4px 小台阶 */
+.btn,
+.contact-icon {
+  clip-path: polygon(
+    8px 0,
+    100% 0,
+    100% calc(100% - 8px),
+    calc(100% - 4px) calc(100% - 8px),
+    calc(100% - 4px) calc(100% - 4px),
+    calc(100% - 8px) calc(100% - 4px),
+    calc(100% - 8px) 100%,
+    0 100%,
+    0 8px,
+    4px 8px,
+    4px 4px,
+    8px 4px
+  );
+}
+
+/* 5. 技能条目：像素硬阴影（无模糊的实心偏移） */
+.skill-item {
+  box-shadow: var(--pixel-shadow);
+}
+
+.skill-item:hover {
+  box-shadow: var(--neon), var(--pixel-shadow);
+}
+
+/* 6. 顶部滚动进度条：改为像素分段拼接 */
+.scroll-progress {
+  background: repeating-linear-gradient(
+    90deg,
+    var(--primary) 0 8px,
+    var(--accent) 8px 16px
+  );
+  box-shadow: none;
+}
+
+/* ==========================================================================
+   v1.9b 8-bit 文字框与按钮（实体像素控件）
+   AI-generated: 把此前的「液态玻璃」质感替换为 8-bit 实体控件——
+   实心底色、粗像素描边、内嵌高光/暗部（bevel 立体感）、硬投影；
+   按钮按下时整体位移，还原红白机/街机按钮的手感。
+   ========================================================================== */
+
+/* 1. 文字框 / 卡片：实心底 + 粗描边 + 左上高光、右下暗部 */
+.about-card,
+.project-card,
+.contact-card {
+  background: #0c0c0c;
+  border: 3px solid rgba(255, 232, 26, 0.55);
+  border-radius: 0;
+  backdrop-filter: none;
+  -webkit-backdrop-filter: none;
+  box-shadow:
+    inset 3px 3px 0 rgba(255, 232, 26, 0.12),
+    inset -3px -3px 0 rgba(0, 0, 0, 0.7);
+}
+
+/* 数字孪生窗口同样处理，并把 20px 斜切角改成两级 10px 台阶 */
+.twin-card {
+  background: #0c0c0c;
+  border: 3px solid var(--primary);
+  clip-path: polygon(
+    20px 0,
+    100% 0,
+    100% calc(100% - 20px),
+    calc(100% - 10px) calc(100% - 20px),
+    calc(100% - 10px) calc(100% - 10px),
+    calc(100% - 20px) calc(100% - 10px),
+    calc(100% - 20px) 100%,
+    0 100%,
+    0 20px,
+    10px 20px,
+    10px 10px,
+    20px 10px
+  );
+  box-shadow: none;
+  filter: drop-shadow(8px 8px 0 rgba(255, 232, 26, 0.12));
+}
+
+/* 技能条目：矩形面板，可安全使用外投影硬阴影 */
+.skill-item {
+  background: #0c0c0c;
+  border: 3px solid rgba(255, 232, 26, 0.55);
+  box-shadow:
+    inset 3px 3px 0 rgba(255, 232, 26, 0.12),
+    inset -3px -3px 0 rgba(0, 0, 0, 0.7),
+    6px 6px 0 rgba(255, 232, 26, 0.14);
+}
+
+/* 悬停：描边点亮 + 底色微亮 + 硬投影加深 */
+.project-card:hover,
+.contact-card:hover {
+  background: #141414;
+  border-color: var(--primary);
+  filter: drop-shadow(8px 8px 0 rgba(255, 232, 26, 0.28));
+}
+
+.skill-item:hover {
+  background: #141414;
+  border-color: var(--primary);
+  box-shadow:
+    inset 3px 3px 0 rgba(255, 232, 26, 0.16),
+    inset -3px -3px 0 rgba(0, 0, 0, 0.7),
+    6px 6px 0 rgba(255, 232, 26, 0.26);
+}
+
+/* 图标方块与标签：一并像素化 */
+.contact-icon {
+  background: #101010;
+  border: 3px solid rgba(255, 232, 26, 0.5);
+  box-shadow:
+    inset 2px 2px 0 rgba(255, 232, 26, 0.14),
+    inset -2px -2px 0 rgba(0, 0, 0, 0.7);
+}
+
+.tag {
+  background: #101010;
+  border: 2px solid rgba(255, 232, 26, 0.4);
+  border-radius: 0;
+  box-shadow:
+    inset 2px 2px 0 rgba(255, 232, 26, 0.1),
+    inset -2px -2px 0 rgba(0, 0, 0, 0.6);
+}
+
+/* 2. 主按钮：实心像素块 + 内嵌立体 + 黄色硬投影，按下时下沉 */
+.btn {
+  background: #101010;
+  color: var(--primary);
+  border: 3px solid var(--primary);
+  border-radius: 0;
+  text-shadow: none;
+  backdrop-filter: none;
+  -webkit-backdrop-filter: none;
+  box-shadow:
+    inset 3px 3px 0 rgba(255, 232, 26, 0.18),
+    inset -3px -3px 0 rgba(0, 0, 0, 0.75);
+  filter: drop-shadow(4px 4px 0 rgba(255, 232, 26, 0.45));
+  transition: transform 0.08s steps(2, end), filter 0.12s, background 0.15s,
+    color 0.15s, border-color 0.15s;
+}
+
+/* 关掉液态玻璃的光泽扫过 */
+.btn::after {
+  display: none;
+}
+
+.btn:hover {
+  transform: none;
+  background: #181818;
+  color: var(--primary-hover);
+  filter: drop-shadow(5px 5px 0 rgba(255, 232, 26, 0.6));
+}
+
+.btn:active {
+  transform: translate(4px, 4px);
+  filter: drop-shadow(1px 1px 0 rgba(255, 232, 26, 0.55));
+}
+
+.btn-primary {
+  background: var(--primary);
+  color: #000;
+  border-color: var(--primary);
+  box-shadow:
+    inset 3px 3px 0 rgba(255, 255, 255, 0.55),
+    inset -3px -3px 0 rgba(0, 0, 0, 0.3);
+}
+
+.btn-primary:hover {
+  background: var(--primary-hover);
+  color: #000;
+  box-shadow:
+    inset 3px 3px 0 rgba(255, 255, 255, 0.6),
+    inset -3px -3px 0 rgba(0, 0, 0, 0.3);
+}
+
+.btn-ghost {
+  background: #101010;
+  color: var(--primary);
+  border-color: var(--primary);
+}
+
+.btn-ghost:hover {
+  background: #1c1c1c;
+  color: var(--primary-hover);
+  border-color: var(--primary-hover);
+}
+
+/* 3. 输入框：深色实心 + 内凹阴影，聚焦时描边点亮 */
+.twin-input input,
+#easterEggInput {
+  background: #080808;
+  border: 3px solid rgba(255, 232, 26, 0.3);
+  border-radius: 0;
+  box-shadow: inset 3px 3px 0 rgba(0, 0, 0, 0.8);
+}
+
+.twin-input input:focus,
+#easterEggInput:focus {
+  background: #0d0d0d;
+  border-color: var(--primary);
+  box-shadow:
+    inset 3px 3px 0 rgba(0, 0, 0, 0.8),
+    inset 0 0 0 2px rgba(255, 232, 26, 0.18);
+}
+
+/* 4. 对话气泡：像素描边 */
+.msg.bot,
+.msg.user {
+  border-radius: 0;
+}
+
+.msg.bot {
+  background: #0c0c0c;
+  border: 2px solid rgba(255, 232, 26, 0.4);
+  border-left: 4px solid var(--primary);
+  box-shadow:
+    inset 2px 2px 0 rgba(255, 232, 26, 0.1),
+    inset -2px -2px 0 rgba(0, 0, 0, 0.6);
+}
+
+.msg.user {
+  background: var(--primary);
+  color: #000;
+  box-shadow:
+    inset 2px 2px 0 rgba(255, 255, 255, 0.5),
+    inset -2px -2px 0 rgba(0, 0, 0, 0.25);
+}
+
+/* 5. 次级按钮：快捷提问 / 发送 / 返回顶部 / 彩蛋提交 */
+.twin-suggests button {
+  background: #101010;
+  border: 2px solid rgba(255, 232, 26, 0.35);
+  border-radius: 0;
+  backdrop-filter: none;
+  -webkit-backdrop-filter: none;
+  box-shadow:
+    inset 2px 2px 0 rgba(255, 232, 26, 0.08),
+    inset -2px -2px 0 rgba(0, 0, 0, 0.6);
+  transition: color 0.15s, border-color 0.15s, background 0.15s;
+}
+
+.twin-suggests button:hover {
+  color: var(--primary);
+  border-color: var(--primary);
+  background: #181818;
+  transform: none;
+  box-shadow:
+    inset 2px 2px 0 rgba(255, 232, 26, 0.16),
+    inset -2px -2px 0 rgba(0, 0, 0, 0.6);
+}
+
+.twin-input button {
+  background: var(--primary);
+  border: 3px solid var(--primary);
+  backdrop-filter: none;
+  -webkit-backdrop-filter: none;
+  box-shadow:
+    inset 3px 3px 0 rgba(255, 255, 255, 0.55),
+    inset -3px -3px 0 rgba(0, 0, 0, 0.3);
+}
+
+.twin-input button:hover {
+  background: var(--primary-hover);
+  transform: none;
+  box-shadow:
+    inset 3px 3px 0 rgba(255, 255, 255, 0.6),
+    inset -3px -3px 0 rgba(0, 0, 0, 0.3);
+}
+
+.twin-input button:active {
+  transform: translate(2px, 2px);
+  box-shadow: inset 2px 2px 0 rgba(0, 0, 0, 0.35);
+}
+
+.back-top {
+  background: #101010;
+  border: 3px solid var(--primary);
+  color: var(--primary);
+  border-radius: 0;
+  backdrop-filter: none;
+  -webkit-backdrop-filter: none;
+  box-shadow:
+    inset 3px 3px 0 rgba(255, 232, 26, 0.18),
+    inset -3px -3px 0 rgba(0, 0, 0, 0.75);
+}
+
+.back-top:hover {
+  background: var(--primary);
+  color: #000;
+  box-shadow:
+    inset 3px 3px 0 rgba(255, 255, 255, 0.55),
+    inset -3px -3px 0 rgba(0, 0, 0, 0.3);
+}
+
+.easter-egg-form button {
+  background: #101010;
+  border: 3px solid rgba(255, 232, 26, 0.5);
+  color: var(--primary);
+  border-radius: 0;
+  box-shadow:
+    inset 2px 2px 0 rgba(255, 232, 26, 0.12),
+    inset -2px -2px 0 rgba(0, 0, 0, 0.7);
+}
+
+.easter-egg-form button:hover {
+  background: var(--primary);
+  color: #000;
+  border-color: var(--primary);
+  transform: none;
+  box-shadow:
+    inset 2px 2px 0 rgba(255, 255, 255, 0.5),
+    inset -2px -2px 0 rgba(0, 0, 0, 0.3);
+}
+
+/* ==========================================================================
+   v1.9c 底部悬浮 Dock 像素化（毛玻璃 → 实体像素面板）
+   AI-generated: Dock 外壳、图标按键、分隔线、指示点与名称气泡统一改为
+   8-bit 实体控件；图标「邻近放大」动效（JS 控制 scale）保持不变。
+   ========================================================================== */
+
+/* 1. 外壳：实心面板 + 粗描边 + bevel + 底部硬投影 */
+.dock {
+  padding: 10px 14px;
+  border-radius: 0;
+  border: 3px solid var(--primary);
+  background: #0c0c0c;
+  backdrop-filter: none;
+  -webkit-backdrop-filter: none;
+  box-shadow:
+    inset 3px 3px 0 rgba(255, 232, 26, 0.12),
+    inset -3px -3px 0 rgba(0, 0, 0, 0.72),
+    0 8px 0 rgba(255, 232, 26, 0.32);
+}
+
+.dock.scrolled {
+  background: #080808;
+  box-shadow:
+    inset 3px 3px 0 rgba(255, 232, 26, 0.16),
+    inset -3px -3px 0 rgba(0, 0, 0, 0.72),
+    0 8px 0 rgba(255, 232, 26, 0.5);
+}
+
+/* 2. 分隔线：像素虚线竖条 */
+.dock-sep {
+  width: 3px;
+  background: repeating-linear-gradient(
+    180deg,
+    rgba(255, 232, 26, 0.45) 0 4px,
+    transparent 4px 9px
+  );
+}
+
+/* 3. 图标按键：方角像素键，悬停 / 激活时翻转为黄底黑字 */
+.dock-icon {
+  border-radius: 0;
+  background: #141414;
+  border: 2px solid rgba(255, 232, 26, 0.35);
+  box-shadow:
+    inset 2px 2px 0 rgba(255, 232, 26, 0.14),
+    inset -2px -2px 0 rgba(0, 0, 0, 0.72);
+  transition: transform 0.18s ease-out, box-shadow 0.2s, border-color 0.2s,
+    background 0.2s, color 0.2s;
+}
+
+.dock-link:hover .dock-icon,
+.dock-link.active .dock-icon {
+  background: var(--primary);
+  color: #000;
+  border-color: var(--primary);
+  box-shadow:
+    inset 2px 2px 0 rgba(255, 255, 255, 0.55),
+    inset -2px -2px 0 rgba(0, 0, 0, 0.28);
+}
+
+/* 4. 当前分区指示点：圆形 → 像素方块 */
+.dock-link::after {
+  width: 6px;
+  height: 6px;
+  bottom: -6px;
+  border-radius: 0;
+  box-shadow: none;
+}
+
+/* 5. 名称气泡：像素描边 + 硬投影 */
+.dock-tip {
+  border-radius: 0;
+  padding: 5px 12px;
+  background: #0a0a0a;
+  border: 2px solid var(--primary);
+  backdrop-filter: none;
+  -webkit-backdrop-filter: none;
+  box-shadow: 4px 4px 0 rgba(255, 232, 26, 0.35);
+}
+
+/* 6. 移动端：保持收紧并锁定方角 */
+@media (max-width: 640px) {
+  .dock {
+    padding: 7px 9px;
+  }
+
+  .dock-icon {
+    border-radius: 0;
+    border-width: 2px;
+  }
+}
+
+/* ==========================================================================
+   v1.9d 背景动态正弦波（黄色 · Canvas）
+   AI-generated: 在网格背景之上叠加流动的黄色正弦波；
+   本段只负责定位与层级，波形本身由 scripts/main.js 用 Canvas 绘制。
+   ========================================================================== */
+
+.wave-bg {
+  position: fixed;
+  inset: 0;
+  display: block;
+  width: 100%;
+  height: 100%;
+  z-index: -1; /* 在网格（body::before, z-index:-2）之上、页面内容之下 */
+  pointer-events: none; /* 不拦截鼠标与自定义光标 */
+  opacity: 0.9;
+}
+
+/* 让原本纯色的分区微微透出背景波浪 */
+.section-alt {
+  background: rgba(13, 13, 13, 0.75);
+}
+
+.twin-section {
+  background: transparent;
+}
+
+.footer {
+  background: rgba(13, 13, 13, 0.75);
+}
+
+/* ==========================================================================
+   v1.9e 开启动画：复古 CRT 开机自检
+   AI-generated: 全屏黑场 → 电子枪亮点横向张开 → BIOS 自检文字逐行打印 →
+   像素进度条跳格走满 → 品牌名与闪烁光标 → 整屏收束成一条水平亮线后消失。
+   配色沿用站点黑底 + 黄色主色 + 青色点缀；点击 / 按键 / 触摸可跳过。
+   ========================================================================== */
+
+/* 1. 动画播放期间锁定页面滚动 */
+html.is-booting,
+html.is-booting body {
+  overflow: hidden;
+}
+
+/* 2. 全屏黑场。
+   animation 为纯 CSS 兜底：即使脚本异常未能移除该层，8 秒后也会自动隐藏。 */
+.boot {
+  position: fixed;
+  inset: 0;
+  z-index: 9999;
+  display: grid;
+  place-items: center;
+  padding: 6vh 6vw;
+  background: #000;
+  overflow: hidden;
+  animation: bootFallback 0s linear 8s forwards;
+}
+
+@keyframes bootFallback {
+  to { display: none; }
+}
+
+/* CRT 扫描线 */
+.boot::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background: repeating-linear-gradient(
+    0deg,
+    rgba(0, 0, 0, 0.45) 0px,
+    rgba(0, 0, 0, 0.45) 1px,
+    transparent 1px,
+    transparent 3px
+  );
+}
+
+/* CRT 暗角 */
+.boot::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 3;
+  pointer-events: none;
+  box-shadow: inset 0 0 170px 50px rgba(0, 0, 0, 0.96);
+}
+
+/* 3. 电子枪亮点：先横向张开，再纵向铺满整屏后隐去 */
+.boot-dot {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 0;
+  height: 2px;
+  transform: translate(-50%, -50%);
+  background: #fff;
+  box-shadow:
+    0 0 18px 4px rgba(255, 232, 26, 0.8),
+    0 0 60px 14px rgba(255, 232, 26, 0.35);
+  animation: bootOpen 0.85s cubic-bezier(0.18, 0.86, 0.26, 1) forwards;
+}
+
+@keyframes bootOpen {
+  0% { width: 0; height: 2px; opacity: 1; }
+  32% { width: 76%; height: 3px; opacity: 1; }
+  66% { width: 100%; height: 62vh; opacity: 0.8; }
+  100% { width: 100%; height: 100vh; opacity: 0; }
+}
+
+/* 4. 自检文字区（等宽像素字体，中文不参与） */
+.boot-screen {
+  position: relative;
+  z-index: 2;
+  width: min(620px, 86vw);
+  color: var(--primary);
+  font-family: var(--pixel-font);
+  font-size: clamp(8px, 1.05vw, 11px);
+  line-height: 2.2;
+  opacity: 0;
+  animation: bootAppear 0.34s ease 0.58s forwards;
+}
+
+@keyframes bootAppear {
+  to { opacity: 1; }
+}
+
+.boot-log {
+  min-height: 13.2em;
+  margin: 0 0 1.1em;
+  white-space: pre-wrap;
+  font: inherit;
+  color: var(--primary);
+  text-shadow: 0 0 7px rgba(255, 232, 26, 0.45);
+}
+
+.boot-ok {
+  color: var(--accent);
+  text-shadow: 0 0 7px rgba(0, 240, 255, 0.5);
+}
+
+/* 5. 像素进度条：跳格推进，呼应 8-bit 控件 */
+.boot-bar {
+  height: 11px;
+  margin: 0 0 1.15em;
+  border: 2px solid rgba(255, 232, 26, 0.55);
+  background: #0a0a0a;
+  box-shadow: inset 2px 2px 0 rgba(0, 0, 0, 0.85);
+}
+
+.boot-bar i {
+  display: block;
+  width: 0;
+  height: 100%;
+  background: var(--primary);
+  box-shadow: 0 0 12px rgba(255, 232, 26, 0.65);
+  animation: bootBar 1.9s steps(24, end) 1.5s forwards;
+}
+
+@keyframes bootBar {
+  to { width: 100%; }
+}
+
+/* 6. 品牌名 + 闪烁光标 */
+.boot-status {
+  margin: 0;
+  font-size: 1.4em;
+  letter-spacing: 2px;
+  opacity: 0;
+  text-shadow:
+    0 0 10px rgba(255, 232, 26, 0.55),
+    0 0 26px rgba(255, 232, 26, 0.22);
+  animation: bootAppear 0.4s ease 3.4s forwards;
+}
+
+.boot-caret {
+  display: inline-block;
+  width: 0.62em;
+  height: 0.92em;
+  margin-left: 0.4em;
+  vertical-align: -0.08em;
+  background: var(--primary);
+  animation: bootCaret 0.8s steps(1, end) 3.4s infinite;
+}
+
+@keyframes bootCaret {
+  0%, 50% { opacity: 1; }
+  50.01%, 100% { opacity: 0; }
+}
+
+/* 7. 收束：文字隐去，亮线压缩成一条水平线后消失 */
+.boot.is-closing .boot-screen {
+  animation: none;
+  opacity: 0;
+  transition: opacity 0.18s linear;
+}
+
+.boot.is-closing::before,
+.boot.is-closing::after {
+  opacity: 0;
+  transition: opacity 0.18s linear;
+}
+
+.boot.is-closing .boot-dot {
+  animation: bootCollapse 0.64s cubic-bezier(0.6, 0, 0.78, 0.2) forwards;
+}
+
+@keyframes bootCollapse {
+  0% { width: 100%; height: 100vh; opacity: 0; }
+  28% { width: 100%; height: 2px; opacity: 1; }
+  100% { width: 0; height: 2px; opacity: 1; }
+}
+
+/* 8. 动画结束 / 被跳过：彻底移除该层 */
+.boot.is-done {
+  display: none;
+}
+
+/* 9. 移动端：收紧字号与留白 */
+@media (max-width: 640px) {
+  .boot {
+    padding: 5vh 6vw;
+  }
+
+  .boot-screen {
+    width: 88vw;
+    font-size: 8px;
+  }
+}
+
+/* ==========================================================================
+   v1.11 彩蛋开启动画：终端解密序列
+   AI-generated: 与站点开启动画（BIOS 自检 / 黄色主色 / 电子枪亮点横向展开 /
+   收束成一条水平亮线）刻意做出区分——本动画是「青色密钥解密」主题：
+   遮罩直接压黑并让扫描线下扫，终端逐行输出解密日志（含乱码滚动），
+   进度条由 JS 逐帧推进并显示百分比数字，结尾以 ACCESS GRANTED 闪烁 +
+   扫描线扫过面板收尾。总时长约 4.6 秒，点击或按 Esc 可跳过。
+   ========================================================================== */
+
+/* 1. 输入区：动画期间隐藏，动画结束后淡入 */
+.easter-egg-body {
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity 0.4s ease, visibility 0s linear 0.4s;
+}
+
+.easter-egg.egg-ready .easter-egg-body {
+  opacity: 1;
+  visibility: visible;
+  transition: opacity 0.4s ease;
+}
+
+/* 关闭按钮始终可点，层级高于终端层 */
+.easter-egg-close {
+  z-index: 3;
+}
+
+/* 2. 终端层：覆盖面板内部 */
+.egg-boot {
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 14px;
+  padding: 26px 22px;
+  background: #050505;
+  font-family: var(--pixel-font);
+  font-size: 8px;
+  line-height: 2;
+  text-align: left;
+  color: var(--accent);
+}
+
+.egg-boot.is-done {
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.3s linear;
+}
+
+.egg-boot-log {
+  margin: 0;
+  min-height: 10em;
+  white-space: pre-wrap;
+  word-break: break-all;
+  font: inherit;
+  color: var(--accent);
+  text-shadow: 0 0 7px rgba(0, 240, 255, 0.45);
+}
+
+/* 3. 进度条：由 JS 逐帧推进（区别于开启动画的纯 CSS 跳格条） */
+.egg-boot-bar {
+  height: 10px;
+  border: 2px solid rgba(0, 240, 255, 0.5);
+  background: #0a0a0a;
+  box-shadow: inset 2px 2px 0 rgba(0, 0, 0, 0.85);
+}
+
+.egg-boot-bar i {
+  display: block;
+  width: 0;
+  height: 100%;
+  background: var(--accent);
+  box-shadow: 0 0 10px rgba(0, 240, 255, 0.6);
+}
+
+.egg-boot-status {
+  margin: 0;
+  min-height: 1.4em;
+  letter-spacing: 2px;
+  color: rgba(0, 240, 255, 0.75);
+}
+
+/* 4. 结尾：ACCESS GRANTED 闪烁 + 轻微故障抖动，主色由青转黄 */
+.egg-boot-status.is-granted {
+  font-size: 1.5em;
+  letter-spacing: 3px;
+  color: var(--primary);
+  text-shadow:
+    0 0 10px rgba(255, 232, 26, 0.7),
+    0 0 26px rgba(255, 232, 26, 0.25);
+  animation: eggGranted 0.28s steps(2, end) 3, eggGlitch 0.42s linear 3;
+}
+
+@keyframes eggGranted {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.25; }
+}
+
+@keyframes eggGlitch {
+  0%, 100% { transform: translate(0, 0); }
+  25% { transform: translate(-2px, 1px); }
+  50% { transform: translate(2px, -1px); }
+  75% { transform: translate(-1px, -1px); }
+}
+
+/* 5. 收尾：扫描线自上而下扫过终端区 */
+.egg-boot.is-sweeping::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  height: 46px;
+  background: linear-gradient(
+    180deg,
+    rgba(0, 240, 255, 0),
+    rgba(0, 240, 255, 0.16),
+    rgba(0, 240, 255, 0)
+  );
+  animation: eggSweep 0.6s linear;
+}
+
+@keyframes eggSweep {
+  from { top: -46px; }
+  to { top: 100%; }
+}
+
+/* 6. 减弱动态效果：去掉闪烁、抖动与扫描，仅保留淡入 */
+@media (prefers-reduced-motion: reduce) {
+  .egg-boot-status.is-granted {
+    animation: none;
+  }
+
+  .egg-boot.is-sweeping::after {
+    content: none;
+    animation: none;
+  }
+
+  .easter-egg-body,
+  .easter-egg.egg-ready .easter-egg-body {
+    transition: none;
   }
 }
