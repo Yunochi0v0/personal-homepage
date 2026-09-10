@@ -2297,6 +2297,22 @@ html.is-booting body {
   overflow: hidden;
 }
 
+/* 1b. 动画播放期间隐藏鼠标指针。
+   AI-generated: 原生指针（含链接 / 按钮上的手型）与自定义霓虹光标一并隐藏，
+   避免自检画面上出现突兀的箭头；状态类由 index.html 内联脚本早于渲染加上，
+   动画结束（含用户跳过）移除 is-booting 后自动恢复，无需额外 JS。
+   opacity 需要 !important 覆盖 JS 写在元素内联 style 上的值。 */
+html.is-booting,
+html.is-booting * {
+  cursor: none !important;
+}
+
+html.is-booting .cursor-dot,
+html.is-booting .cursor-ring,
+html.is-booting .cursor-trail {
+  opacity: 0 !important;
+}
+
 /* 2. 全屏黑场。
    animation 为纯 CSS 兜底：即使脚本异常未能移除该层，8 秒后也会自动隐藏。 */
 .boot {
