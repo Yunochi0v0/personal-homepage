@@ -7,7 +7,7 @@
   <title>刘聿宸 · 个人主页</title>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@700;900&family=Press+Start+2P&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="styles/style.css?v=1.17.0" />
+  <link rel="stylesheet" href="styles/style.css?v=1.18.0" />
   <!-- 开启动画：提前锁定页面滚动，避免动画播放期间背景被滚动。
        若脚本异常或未执行，则由 CSS 兜底动画与 <noscript> 保证页面仍可正常显示。 -->
   <script>
@@ -335,9 +335,32 @@
     </div>
   </div>
 
+  <!-- 9. 待机彩蛋（3 分钟无任何操作时自动触发） -->
+  <div class="idle-egg" id="idleEgg" role="dialog" aria-modal="true" aria-labelledby="idleEggTitle" aria-hidden="true">
+    <!-- 红色警报闪烁层 -->
+    <div class="idle-alert" aria-hidden="true"></div>
+    <!-- 快速滚动的乱码层 -->
+    <pre class="idle-scramble" id="idleScramble" aria-hidden="true"></pre>
+    <div class="idle-egg-inner">
+      <!-- 开启动画：待机警报自检（与隐藏关卡同为终端序列，但主题是红色警报） -->
+      <div class="idle-boot" id="idleBoot" aria-hidden="true">
+        <pre class="idle-boot-log" id="idleBootLog"></pre>
+        <div class="idle-boot-bar"><i id="idleBootBarFill"></i></div>
+        <p class="idle-boot-status" id="idleBootStatus"></p>
+      </div>
+      <!-- 提醒内容 -->
+      <div class="idle-egg-body" id="idleEggBody">
+        <p class="idle-egg-kicker">// STANDBY ALERT</p>
+        <p class="idle-egg-title" id="idleEggTitle">何意味，你还在吗？</p>
+        <p class="idle-egg-note">检测到 180 秒无任何操作，页面已进入待机警报</p>
+        <button class="idle-egg-exit" id="idleEggExit" type="button">退出</button>
+      </div>
+    </div>
+  </div>
+
   <!-- 返回顶部 -->
   <button class="back-top" id="backTop" aria-label="返回顶部">↑</button>
 
-  <script src="scripts/main.js?v=1.17.0"></script>
+  <script src="scripts/main.js?v=1.18.0"></script>
 </body>
 </html>

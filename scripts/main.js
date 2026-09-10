@@ -853,7 +853,7 @@ document.querySelectorAll(".is-placeholder").forEach((link) => {
   }
 
   const LINES = [
-    "DEEPWORKS BIOS v1.17.0",
+    "DEEPWORKS BIOS v1.18.0",
     "MEMTEST 640K ............... <OK>",
     "NEON SHADER LOAD ........... <OK>",
     "SINE WAVE ENGINE ........... <OK>",
@@ -893,4 +893,309 @@ document.querySelectorAll(".is-placeholder").forEach((link) => {
   }
 
   at(4050, finish);
+})();
+
+/* ---------- 14. 待机彩蛋（3 分钟无任何操作时自动触发） ---------- */
+/* AI-generated: 站点是零依赖的原生 JS（没有 React，也没有构建步骤），
+   所以这里用原生写法实现与 React useEffect 完全等价的语义：
+
+     useEffect(() => {
+       const timer = setTimeout(trigger, 180000);
+       return () => clearTimeout(timer);   // 依赖变化 / 组件卸载时清理
+     }, [交互计数]);
+
+   对应关系：
+     · armIdleTimer()   ≈ 上面那个 setTimeout（建立定时器）
+     · onActivity()     ≈ 依赖变化时的「先 cleanup 再重建」（每次交互重置）
+     · 订阅 ACTIVITY_EVENTS ≈ useEffect 的依赖订阅
+     · closeIdleEgg() 里重新计时 ≈ cleanup 后再挂载
+
+   效果与需求一致：任何交互都重新计时，满 3 分钟无操作即触发彩蛋。
+   相比 React 版还少了一层 state → render → effect 的往返，事件回调里
+   直接重置更即时，也不依赖任何框架运行时。 */
+(function initIdleEgg() {
+  const egg = document.getElementById("idleEgg");
+  if (!egg) return;
+
+  const IDLE_MS = 180000; // 3 分钟
+  const EXIT = document.getElementById("idleEggExit");
+  const scramble = document.getElementById("idleScramble");
+
+  // 视为「用户还在」的交互事件（覆盖鼠标、键盘、滚轮、触摸与聚焦）
+  const ACTIVITY_EVENTS = [
+    "mousemove",
+    "mousedown",
+    "pointerdown",
+    "wheel",
+    "keydown",
+    "scroll",
+    "touchstart",
+    "focus",
+  ];
+
+  /* ---------- 满屏乱码噪声层 ---------- */
+  const GLYPHS = "!<>-_\\/[]{}=+*^?#0123456789ABCDEF|";
+  const SCRAMBLE_COLS = 46;
+  const SCRAMBLE_ROWS = 40;
+  let scrambleTimer = 0;
+
+  function randomLine() {
+    let s = "";
+    for (let i = 0; i < SCRAMBLE_COLS; i++) {
+      s += GLYPHS[Math.floor(Math.random() * GLYPHS.length)];
+    }
+    return s;
+  }
+
+  // 一次写满整屏，之后每 50ms 整体重写；配合 CSS 的 translateY 动画
+  // 形成「字符快速向上滚动」的观感
+  function renderScramble() {
+    if (!scramble) return;
+    const rows = [];
+    for (let i = 0; i < SCRAMBLE_ROWS; i++) rows.push(randomLine());
+    scramble.textContent = rows.join("\n");
+  }
+
+  function startScramble() {
+    if (!scramble || scrambleTimer) return;
+    renderScramble();
+    scrambleTimer = setInterval(renderScramble, 50);
+  }
+
+  function stopScramble() {
+    if (scrambleTimer) {
+      clearInterval(scrambleTimer);
+      scrambleTimer = 0;
+    }
+  }
+
+  /* ---------- 开启动画：红色待机警报自检 ---------- */
+  /* 与隐藏关卡（lycnb）的终端序列同构：逐行打印 → 其中两行尾部乱码滚动
+     → JS 逐帧推进的百分比进度条 → 结尾闪烁 + 高亮状态。 */
+  const ALERT_LINES = [
+    "> IDLE MONITOR ................ 180s",
+    "> OPERATOR STATUS ",
+    "> NO INPUT DETECTED ........... OK",
+    "> WAKING CHANNEL ",
+    "> STANDBY ALERT ............... ARMED",
+  ];
+  const SCRAMBLE_CHARS = "!<>-_\\/[]{}=+*^?#0123456789";
+  const SCRAMBLE_INDEXES = [1, 3]; // 这两行在"扫描中"阶段尾部字符随机滚动
+
+  let bootRunning = false;
+  let finishBoot = null;
+
+  function playAlertBoot() {
+    const boot = document.getElementById("idleBoot");
+    const log = document.getElementById("idleBootLog");
+    const fill = document.getElementById("idleBootBarFill");
+    const status = document.getElementById("idleBootStatus");
+
+    const reduceMotion =
+      typeof window.matchMedia === "function" &&
+      window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+    // 减弱动态效果，或动画元素缺失：直接显示提醒，保证彩蛋始终可用
+    if (reduceMotion || !boot || !log) {
+      egg.classList.add("is-ready");
+      return;
+    }
+
+    // 复位（重复触发时重新播放）
+    boot.classList.remove("is-done");
+    log.textContent = "";
+    if (fill) fill.style.width = "0%";
+    if (status) {
+      status.textContent = "";
+      status.classList.remove("is-awake");
+    }
+    egg.classList.remove("is-ready");
+
+    const timers = [];
+    const printed = [];
+    let scrambleTick = 0;
+    let barTimer = 0;
+    let settled = false;
+
+    function at(ms, fn) {
+      timers.push(setTimeout(fn, ms));
+    }
+
+    function render() {
+      log.textContent = printed.join("\n");
+    }
+
+    function onBootKey(e) {
+      if (e.key === "Escape") finish();
+    }
+
+    function finish() {
+      if (settled) return;
+      settled = true;
+      bootRunning = false;
+      finishBoot = null;
+
+      for (let i = 0; i < timers.length; i++) clearTimeout(timers[i]);
+      timers.length = 0;
+      if (scrambleTick) {
+        clearInterval(scrambleTick);
+        scrambleTick = 0;
+      }
+      if (barTimer) {
+        clearInterval(barTimer);
+        barTimer = 0;
+      }
+      window.removeEventListener("keydown", onBootKey);
+      boot.removeEventListener("pointerdown", finish);
+
+      boot.classList.add("is-done");
+      egg.classList.add("is-ready");
+      if (EXIT) requestAnimationFrame(() => EXIT.focus());
+    }
+
+    finishBoot = finish;
+    bootRunning = true;
+    window.addEventListener("keydown", onBootKey);
+    boot.addEventListener("pointerdown", finish);
+
+    // ① 逐行打印自检日志（每行 360ms，节奏比隐藏关卡略急促）
+    ALERT_LINES.forEach(function (line, index) {
+      at(260 + index * 360, function () {
+        printed[index] = line;
+        render();
+      });
+    });
+
+    // ② 两行"扫描中"日志：尾部乱码滚动约 0.55s 后定格
+    SCRAMBLE_INDEXES.forEach(function (index) {
+      const startAt = 260 + index * 360;
+      at(startAt + 60, function () {
+        printed[index] = ALERT_LINES[index];
+        scrambleTick = setInterval(function () {
+          let s = ALERT_LINES[index];
+          for (let i = 0; i < 12; i++) {
+            s += SCRAMBLE_CHARS[Math.floor(Math.random() * SCRAMBLE_CHARS.length)];
+          }
+          printed[index] = s;
+          render();
+        }, 70);
+      });
+      at(startAt + 560, function () {
+        clearInterval(scrambleTick);
+        scrambleTick = 0;
+        printed[index] = ALERT_LINES[index] + "........... OK";
+        render();
+      });
+    });
+
+    // ③ 进度条：JS 逐帧推进并显示百分比
+    at(2100, function () {
+      let pct = 0;
+      barTimer = setInterval(function () {
+        pct = Math.min(100, pct + 3 + Math.floor(Math.random() * 4));
+        if (fill) fill.style.width = pct + "%";
+        if (status) status.textContent = "SCANNING " + ("00" + pct).slice(-3) + "%";
+        if (pct >= 100) {
+          clearInterval(barTimer);
+          barTimer = 0;
+        }
+      }, 34);
+    });
+
+    // ④ 收尾：先停掉进度条，避免百分比把结果覆盖回去
+    at(3150, function () {
+      if (barTimer) {
+        clearInterval(barTimer);
+        barTimer = 0;
+      }
+      if (fill) fill.style.width = "100%";
+      if (!status) return;
+      status.textContent = "ARE YOU STILL THERE?";
+      status.classList.add("is-awake");
+    });
+    at(3600, finish);
+  }
+
+  /* ---------- 浮层显隐 ---------- */
+  let idleOpen = false;
+
+  function openIdleEgg() {
+    if (idleOpen) return;
+    idleOpen = true;
+    egg.classList.add("revealed");
+    egg.setAttribute("aria-hidden", "false");
+    startScramble();
+    playAlertBoot();
+  }
+
+  function closeIdleEgg() {
+    if (!idleOpen) return;
+    // 动画未播完就被关闭：先收尾，避免定时器继续跑
+    if (bootRunning && finishBoot) finishBoot();
+    idleOpen = false;
+    egg.classList.remove("revealed", "is-ready");
+    egg.setAttribute("aria-hidden", "true");
+    stopScramble();
+    if (EXIT) EXIT.blur();
+    // 关闭后重新挂表：用户如果继续不操作，3 分钟后会再次提醒
+    armIdleTimer();
+  }
+
+  if (EXIT) EXIT.addEventListener("click", closeIdleEgg);
+
+  // 点击浮层空白区域也可关闭
+  egg.addEventListener("click", function (e) {
+    if (e.target === egg) closeIdleEgg();
+  });
+
+  /* ---------- 待机计时（useEffect 等价语义的核心） ---------- */
+  let idleTimer = 0;
+
+  function armIdleTimer() {
+    if (idleOpen) return;
+    clearTimeout(idleTimer); // 等价于 effect 的 cleanup
+    idleTimer = setTimeout(triggerIdle, IDLE_MS);
+  }
+
+  function disarmIdleTimer() {
+    clearTimeout(idleTimer);
+    idleTimer = 0;
+  }
+
+  function triggerIdle() {
+    disarmIdleTimer();
+    // 站点开启动画播放中，或隐藏关卡浮层正开着：这次不打扰，重新挂表
+    if (document.documentElement.classList.contains("is-booting")) {
+      armIdleTimer();
+      return;
+    }
+    const eggBox = document.getElementById("easterEgg");
+    if (eggBox && eggBox.classList.contains("revealed")) {
+      armIdleTimer();
+      return;
+    }
+    if (idleOpen) return;
+    openIdleEgg();
+  }
+
+  function onActivity() {
+    // 浮层已打开时不再重置，避免用户点「退出」的同一串动作把计时推迟
+    if (idleOpen) return;
+    armIdleTimer();
+  }
+
+  ACTIVITY_EVENTS.forEach(function (name) {
+    window.addEventListener(name, onActivity, { passive: true });
+  });
+
+  // Esc：动画播放中先跳过动画，动画结束后再按才关闭浮层（与隐藏关卡一致）
+  window.addEventListener("keydown", function (e) {
+    if (e.key !== "Escape") return;
+    if (!idleOpen) return;
+    if (bootRunning) return; // 交给动画自身的 onBootKey 处理
+    closeIdleEgg();
+  });
+
+  // 首次挂表
+  armIdleTimer();
 })();

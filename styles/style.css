@@ -2871,3 +2871,260 @@ html::after {
     transform: translateY(-50%);
   }
 }
+
+/* ==========================================================================
+   v1.18 待机彩蛋：3 分钟无任何操作后自动触发
+   --------------------------------------------------------------------------
+   触发逻辑与显隐控制由 scripts/main.js 第 14 段负责（原生 JS 实现与
+   React useEffect 等价的「订阅事件 + 定时器 + 重置 + 清理」语义）。
+
+   视觉主题：与隐藏关卡（lycnb，青色「密钥解密」）刻意区分 —— 这里是
+   红色「待机警报」：全屏红色脉冲闪烁 + 快速滚动的乱码噪声层 + 一段
+   红色终端自检动画 + 大字提醒 + 退出按钮。
+
+   红色是本段新引入的局部色，仅用于警报语义；其余配色仍取自站点变量，
+   保证与整体像素风格一致。
+   ========================================================================== */
+
+.idle-egg {
+  --alert: #ff2b2b;
+  --alert-dim: rgba(255, 43, 43, 0.55);
+  position: fixed;
+  inset: 0;
+  z-index: 9990;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+  background: #050505;
+  transition: opacity 0.32s ease, visibility 0s linear 0.32s;
+}
+
+.idle-egg.revealed {
+  opacity: 1;
+  visibility: visible;
+  pointer-events: auto;
+  transition: opacity 0.32s ease;
+}
+
+/* 1. 红色警报层：高频脉冲的红色泛光，压迫感但保留内容可读 */
+.idle-alert {
+  position: absolute;
+  inset: 0;
+  background:
+    radial-gradient(
+      ellipse at center,
+      rgba(255, 43, 43, 0.24),
+      rgba(255, 43, 43, 0.06) 55%,
+      rgba(0, 0, 0, 0.92) 100%
+    ),
+    repeating-linear-gradient(
+      0deg,
+      rgba(255, 43, 43, 0.14) 0 2px,
+      rgba(0, 0, 0, 0) 2px 5px
+    );
+  animation: idleAlert 0.86s steps(2, end) infinite;
+}
+
+@keyframes idleAlert {
+  0%,
+  100% {
+    opacity: 0.35;
+  }
+  50% {
+    opacity: 1;
+  }
+}
+
+/* 2. 乱码层：满屏字符快速向上滚动，作为背景噪声 */
+.idle-scramble {
+  position: absolute;
+  inset: -30% 0;
+  margin: 0;
+  padding: 0 6vw;
+  overflow: hidden;
+  white-space: pre-wrap;
+  word-break: break-all;
+  font-family: var(--pixel-font);
+  font-size: 10px;
+  line-height: 1.9;
+  letter-spacing: 2px;
+  color: rgba(255, 43, 43, 0.3);
+  text-shadow: 0 0 6px rgba(255, 43, 43, 0.35);
+  animation: idleScramble 1.1s linear infinite;
+}
+
+@keyframes idleScramble {
+  from {
+    transform: translateY(0);
+  }
+  to {
+    transform: translateY(-20%);
+  }
+}
+
+/* 3. 内容层 */
+.idle-egg-inner {
+  position: relative;
+  z-index: 2;
+  width: min(560px, 88vw);
+  text-align: center;
+}
+
+/* 4. 开启动画：红色终端自检序列（与隐藏关卡同构，配色转红） */
+.idle-boot {
+  position: absolute;
+  inset: -30px -22px;
+  z-index: 3;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 14px;
+  padding: 26px 22px;
+  background: #050505;
+  font-family: var(--pixel-font);
+  font-size: 8px;
+  line-height: 2;
+  text-align: left;
+  color: var(--alert);
+}
+
+.idle-boot.is-done {
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.3s linear;
+}
+
+.idle-boot-log {
+  margin: 0;
+  min-height: 10em;
+  white-space: pre-wrap;
+  word-break: break-all;
+  font: inherit;
+  color: var(--alert);
+  text-shadow: 0 0 7px rgba(255, 43, 43, 0.5);
+}
+
+.idle-boot-bar {
+  height: 10px;
+  border: 2px solid var(--alert-dim);
+  background: #0a0a0a;
+  box-shadow: inset 2px 2px 0 rgba(0, 0, 0, 0.85);
+}
+
+.idle-boot-bar i {
+  display: block;
+  width: 0;
+  height: 100%;
+  background: var(--alert);
+  box-shadow: 0 0 10px rgba(255, 43, 43, 0.65);
+}
+
+.idle-boot-status {
+  margin: 0;
+  min-height: 1.4em;
+  letter-spacing: 2px;
+  color: var(--alert-dim);
+}
+
+.idle-boot-status.is-awake {
+  font-size: 1.5em;
+  letter-spacing: 3px;
+  color: #fff;
+  text-shadow:
+    0 0 10px rgba(255, 43, 43, 0.9),
+    0 0 26px rgba(255, 43, 43, 0.4);
+  animation: idleJolt 0.28s steps(2, end) 3;
+}
+
+@keyframes idleJolt {
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.2;
+  }
+}
+
+/* 5. 提醒内容：动画结束后淡入 */
+.idle-egg-body {
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity 0.4s ease, visibility 0s linear 0.4s;
+}
+
+.idle-egg.is-ready .idle-egg-body {
+  opacity: 1;
+  visibility: visible;
+  transition: opacity 0.4s ease;
+}
+
+.idle-egg-kicker {
+  margin: 0 0 14px;
+  font-family: var(--pixel-font);
+  font-size: 8px;
+  letter-spacing: 3px;
+  color: var(--alert);
+  text-shadow: 0 0 8px rgba(255, 43, 43, 0.6);
+}
+
+.idle-egg-title {
+  margin: 0 0 18px;
+  font-size: clamp(1.6rem, 5.6vw, 2.6rem);
+  font-weight: 700;
+  letter-spacing: 4px;
+  color: #fff;
+  text-shadow:
+    0 0 12px rgba(255, 43, 43, 0.85),
+    0 0 34px rgba(255, 43, 43, 0.4);
+}
+
+.idle-egg-note {
+  margin: 0 0 30px;
+  font-size: 0.82rem;
+  letter-spacing: 1px;
+  color: var(--text-muted);
+}
+
+/* 6. 退出按钮：延续站点像素控件语言（方角 / 粗描边 / 硬投影） */
+.idle-egg-exit {
+  padding: 14px 38px;
+  border: 3px solid var(--alert);
+  border-radius: 0;
+  background: #0c0c0c;
+  box-shadow: inset 3px 3px 0 rgba(255, 43, 43, 0.14),
+    inset -3px -3px 0 rgba(0, 0, 0, 0.7), 6px 6px 0 rgba(255, 43, 43, 0.16);
+  color: var(--alert);
+  font-family: var(--pixel-font);
+  font-size: 10px;
+  letter-spacing: 2px;
+  cursor: pointer;
+  transition: background 0.18s ease, color 0.18s ease, border-color 0.18s ease;
+}
+
+.idle-egg-exit:hover,
+.idle-egg-exit:focus-visible {
+  background: var(--alert);
+  border-color: #fff;
+  color: #050505;
+}
+
+/* 7. 减弱动态效果：去掉闪烁与滚动，静态呈现提醒 */
+@media (prefers-reduced-motion: reduce) {
+  .idle-alert {
+    animation: none;
+    opacity: 0.6;
+  }
+
+  .idle-scramble {
+    animation: none;
+  }
+
+  .idle-boot-status.is-awake {
+    animation: none;
+  }
+}
