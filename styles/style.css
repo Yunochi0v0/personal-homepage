@@ -1473,3 +1473,156 @@ body::after {
     padding: 26px 22px;
   }
 }
+
+/* ---------- 自定义霓虹光标 + 轨迹拖尾 ---------- */
+/* AI-generated: 赛博朋克黑黄霓虹光标；仅当 JS 成功挂载后（html.has-cursor）才隐藏原生光标 */
+.has-cursor,
+.has-cursor * {
+  cursor: none;
+}
+
+/* 文本输入框：悬停时一并使用自定义四芒星光标；
+   仅在聚焦输入后恢复系统文本光标，保证打字时插入点可见 */
+.has-cursor input:focus,
+.has-cursor textarea:focus {
+  cursor: text;
+}
+
+.cursor-dot,
+.cursor-ring {
+  position: fixed;
+  left: 0;
+  top: 0;
+  z-index: 500; /* 高于扫描线(320)与悬浮 Dock(200) */
+  pointer-events: none;
+  border-radius: 50%;
+  will-change: transform;
+}
+
+/* 中心黄点：几乎即时跟随 */
+.cursor-dot {
+  width: 8px;
+  height: 8px;
+  margin: -4px 0 0 -4px;
+  background: var(--primary);
+  box-shadow:
+    0 0 10px rgba(255, 232, 26, 0.9),
+    0 0 22px rgba(255, 232, 26, 0.45);
+  transition:
+    width 0.2s ease,
+    height 0.2s ease,
+    margin 0.2s ease;
+}
+
+/* 悬停可交互元素（按钮 / 链接 / 文本框 / 卡片）：
+   光标整体切换为一颗四芒星，并在切换瞬间旋转一整圈 */
+.cursor-dot.is-hover {
+  width: 28px;
+  height: 28px;
+  margin: -14px 0 0 -14px;
+  border-radius: 0;
+  background: transparent;
+  box-shadow: none;
+}
+
+/* 星形画在伪元素上：旋转用标准 transform，
+   与 JS 每帧写入父元素用于定位的 transform 互不干扰 */
+.cursor-dot.is-hover::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: var(--primary);
+  /* clip-path 会裁掉 box-shadow，故改用 drop-shadow 做外发光 */
+  filter:
+    drop-shadow(0 0 6px rgba(255, 232, 26, 0.95))
+    drop-shadow(0 0 16px rgba(255, 232, 26, 0.45));
+  clip-path: polygon(
+    50% 0%,
+    62% 38%,
+    100% 50%,
+    62% 62%,
+    50% 100%,
+    38% 62%,
+    0% 50%,
+    38% 38%
+  );
+  animation: starSpinOnce 0.7s cubic-bezier(0.22, 0.61, 0.36, 1);
+}
+
+/* 只旋转一整圈（360°）后自然停下，不循环 */
+@keyframes starSpinOnce {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+/* 按下时四芒星轻微收紧，保留点击手感 */
+.cursor-dot.is-hover.is-down {
+  width: 22px;
+  height: 22px;
+  margin: -11px 0 0 -11px;
+}
+
+/* 外圈青环：缓动延迟跟随 */
+.cursor-ring {
+  width: 36px;
+  height: 36px;
+  margin: -18px 0 0 -18px;
+  border: 1.5px solid rgba(0, 240, 255, 0.75);
+  box-shadow:
+    0 0 12px rgba(0, 240, 255, 0.45),
+    inset 0 0 12px rgba(0, 240, 255, 0.2);
+  transition:
+    width 0.2s ease,
+    height 0.2s ease,
+    margin 0.2s ease,
+    border-color 0.2s ease,
+    background 0.2s ease,
+    box-shadow 0.2s ease;
+}
+
+/* 四芒星状态下淡出外圈光环，让光标整体就是一颗星 */
+.cursor-ring.is-hover {
+  opacity: 0 !important;
+}
+
+/* 按下：收紧 */
+.cursor-ring.is-down {
+  width: 22px;
+  height: 22px;
+  margin: -11px 0 0 -11px;
+  border-color: rgba(255, 232, 26, 1);
+  background: rgba(255, 232, 26, 0.16);
+}
+
+/* 拖尾粒子：黄/青交替的菱形碎块 */
+.cursor-trail {
+  position: fixed;
+  left: 0;
+  top: 0;
+  z-index: 490;
+  width: 6px;
+  height: 6px;
+  margin: -3px 0 0 -3px;
+  pointer-events: none;
+  background: var(--primary);
+  box-shadow: 0 0 8px rgba(255, 232, 26, 0.85);
+  transform: rotate(45deg);
+  opacity: 0.9;
+  animation: trailFade 0.55s ease-out forwards;
+}
+
+.cursor-trail.alt {
+  background: var(--accent);
+  box-shadow: 0 0 8px rgba(0, 240, 255, 0.85);
+}
+
+@keyframes trailFade {
+  0% {
+    opacity: 0.9;
+    transform: translate(0, 0) rotate(45deg) scale(1);
+  }
+  100% {
+    opacity: 0;
+    transform: translate(var(--dx, 0px), var(--dy, 10px)) rotate(45deg) scale(0.15);
+  }
+}

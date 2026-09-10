@@ -347,3 +347,123 @@ document.querySelectorAll(".is-placeholder").forEach((link) => {
     }
   });
 })();
+
+/* ---------- 11. 自定义霓虹光标 + 轨迹拖尾 ----------
+   AI-generated: 仅在桌面精确指针且允许动效时启用；
+   原生的隐藏（html.has-cursor）推迟到用户第一次移动鼠标才生效，
+   脚本未运行或出错时完全不产生影响，保证光标始终可用 */
+(function () {
+  const finePointer = window.matchMedia("(hover: hover) and (pointer: fine)").matches;
+  const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  if (!finePointer || reduceMotion || !document.body) return;
+
+  const root = document.documentElement;
+  const dot = document.createElement("div");
+  const ring = document.createElement("div");
+  dot.className = "cursor-dot";
+  ring.className = "cursor-ring";
+  dot.setAttribute("aria-hidden", "true");
+  ring.setAttribute("aria-hidden", "true");
+  dot.style.opacity = "0";
+  ring.style.opacity = "0";
+  document.body.appendChild(dot);
+  document.body.appendChild(ring);
+
+  // 悬停这些元素时光环放大
+  const HOVER_SELECTOR =
+    "a, button, input, textarea, select, .btn, .about-card, .project-card, .contact-card, .skill-item, .dock-icon";
+
+  const TRAIL_STEP = 14; // 每移动约 14px 落一个粒子
+  const MAX_TRAIL = 26; // 同屏粒子上限，避免性能压力
+  let mx = window.innerWidth / 2;
+  let my = window.innerHeight / 2;
+  let rx = mx;
+  let ry = my;
+  let lastX = mx;
+  let lastY = my;
+  let trailCount = 0;
+  let started = false;
+
+  function spawnTrail(x, y) {
+    if (trailCount >= MAX_TRAIL) return;
+    const p = document.createElement("span");
+    p.className = "cursor-trail" + (Math.random() > 0.5 ? " alt" : "");
+    p.style.left = x + "px";
+    p.style.top = y + "px";
+    p.style.setProperty("--dx", (Math.random() * 28 - 14).toFixed(1) + "px");
+    p.style.setProperty("--dy", (Math.random() * 22 + 8).toFixed(1) + "px");
+    document.body.appendChild(p);
+    trailCount += 1;
+    p.addEventListener("animationend", () => {
+      p.remove();
+      trailCount -= 1;
+    });
+  }
+
+  function onMove(e) {
+    mx = e.clientX;
+    my = e.clientY;
+    if (!started) {
+      // 首次移动：对齐位置、显示自定义光标，并在此刻才隐藏原生光标
+      started = true;
+      rx = mx;
+      ry = my;
+      lastX = mx;
+      lastY = my;
+      root.classList.add("has-cursor");
+      dot.style.opacity = "1";
+      ring.style.opacity = "1";
+    }
+    const dx = mx - lastX;
+    const dy = my - lastY;
+    if (dx * dx + dy * dy >= TRAIL_STEP * TRAIL_STEP) {
+      spawnTrail(mx, my);
+      lastX = mx;
+      lastY = my;
+    }
+  }
+
+  function tick() {
+    // 光环缓动跟随，形成拖曳感
+    rx += (mx - rx) * 0.18;
+    ry += (my - ry) * 0.18;
+    dot.style.transform = "translate(" + mx + "px, " + my + "px)";
+    ring.style.transform = "translate(" + rx.toFixed(2) + "px, " + ry.toFixed(2) + "px)";
+    requestAnimationFrame(tick);
+  }
+
+  window.addEventListener("mousemove", onMove, { passive: true });
+
+  document.addEventListener("mouseover", (e) => {
+    if (e.target && e.target.closest && e.target.closest(HOVER_SELECTOR)) {
+      ring.classList.add("is-hover");
+      dot.classList.add("is-hover"); // 中心点切换为四芒星
+    }
+  });
+  document.addEventListener("mouseout", (e) => {
+    if (e.target && e.target.closest && e.target.closest(HOVER_SELECTOR)) {
+      const to = e.relatedTarget;
+      if (!to || !to.closest || !to.closest(HOVER_SELECTOR)) {
+        ring.classList.remove("is-hover");
+        dot.classList.remove("is-hover");
+      }
+    }
+  });
+
+  window.addEventListener("mousedown", () => ring.classList.add("is-down"));
+  window.addEventListener("mouseup", () => ring.classList.remove("is-down"));
+
+  // 移出窗口时隐藏，移回时恢复（未开始前保持隐藏）
+  document.addEventListener("mouseleave", () => {
+    dot.style.opacity = "0";
+    ring.style.opacity = "0";
+  });
+  document.addEventListener("mouseenter", () => {
+    if (started) {
+      dot.style.opacity = "1";
+      ring.style.opacity = "1";
+    }
+  });
+
+  requestAnimationFrame(tick);
+})();
