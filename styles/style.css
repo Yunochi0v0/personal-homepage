@@ -2168,24 +2168,41 @@ body::before {
    8-bit 实体控件；图标「邻近放大」动效（JS 控制 scale）保持不变。
    ========================================================================== */
 
-/* 1. 外壳：实心面板 + 粗描边 + bevel + 底部硬投影 */
+/* 1. 外壳：整体深色半透明毛玻璃底板 + 粗描边 + bevel + 底部硬投影。
+   AI-generated: v1.14 把 v1.9c 的「实心面板」改回毛玻璃，但仍然保持像素语言——
+   方角、3px 黄色描边、bevel 内阴影与硬投影全部保留，只把底色不透明度降下来
+   并开启 backdrop-filter，让背后的网格与黄色正弦波透出来；
+   顶部再叠一层 1px 黄色扫描线纹理，避免玻璃感冲淡 8-bit 味道。
+   滚动后（.scrolled）底色略微加深，保证图标与背景的对比度。 */
 .dock {
   padding: 10px 14px;
   border-radius: 0;
   border: 3px solid var(--primary);
-  background: #0c0c0c;
-  backdrop-filter: none;
-  -webkit-backdrop-filter: none;
+  background:
+    repeating-linear-gradient(
+      180deg,
+      rgba(255, 232, 26, 0.05) 0 1px,
+      rgba(0, 0, 0, 0) 1px 3px
+    ),
+    rgba(8, 8, 8, 0.6);
+  backdrop-filter: blur(12px) saturate(150%);
+  -webkit-backdrop-filter: blur(12px) saturate(150%);
   box-shadow:
-    inset 3px 3px 0 rgba(255, 232, 26, 0.12),
+    inset 3px 3px 0 rgba(255, 232, 26, 0.16),
     inset -3px -3px 0 rgba(0, 0, 0, 0.72),
     0 8px 0 rgba(255, 232, 26, 0.32);
 }
 
 .dock.scrolled {
-  background: #080808;
+  background:
+    repeating-linear-gradient(
+      180deg,
+      rgba(255, 232, 26, 0.06) 0 1px,
+      rgba(0, 0, 0, 0) 1px 3px
+    ),
+    rgba(4, 4, 4, 0.76);
   box-shadow:
-    inset 3px 3px 0 rgba(255, 232, 26, 0.16),
+    inset 3px 3px 0 rgba(255, 232, 26, 0.2),
     inset -3px -3px 0 rgba(0, 0, 0, 0.72),
     0 8px 0 rgba(255, 232, 26, 0.5);
 }
