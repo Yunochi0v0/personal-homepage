@@ -853,7 +853,7 @@ document.querySelectorAll(".is-placeholder").forEach((link) => {
   }
 
   const LINES = [
-    "DEEPWORKS BIOS v1.18.0",
+    "DEEPWORKS BIOS v1.19.0",
     "MEMTEST 640K ............... <OK>",
     "NEON SHADER LOAD ........... <OK>",
     "SINE WAVE ENGINE ........... <OK>",
@@ -935,13 +935,54 @@ document.querySelectorAll(".is-placeholder").forEach((link) => {
 
   /* ---------- 满屏乱码噪声层 ---------- */
   const GLYPHS = "!<>-_\\/[]{}=+*^?#0123456789ABCDEF|";
-  const SCRAMBLE_COLS = 46;
-  const SCRAMBLE_ROWS = 40;
+  /* 行列数不再是写死的固定值，而是按视口尺寸算出来的，保证任何屏幕都铺满。
+     SCRAMBLE_OVERSCAN：内容高度 = 视口高度 × 该系数。CSS 的滚动动画会
+     上移 20% 的元素高度，多出的这一截用来保证滚动过程中底部不露白。 */
+  const SCRAMBLE_OVERSCAN = 1.35;
+  let scrambleCols = 46;
+  let scrambleRows = 40;
+  let charW = 12; // 单个字符的横向步进（含字距）
+  let charH = 19; // 单行高度
   let scrambleTimer = 0;
+
+  /* 实测单字符宽高：用与 .idle-scramble 相同的字体设置插一个探针量一次，
+     不依赖对像素字体尺寸的硬编码猜测（不同设备字体回退宽度会变）。 */
+  function measureCell() {
+    if (!scramble || typeof document.createElement !== "function") return;
+    let probe = null;
+    try {
+      probe = document.createElement("span");
+      probe.textContent = "0000000000"; // 10 个字符，宽度除以 10 即单字符步进
+      probe.style.position = "absolute";
+      probe.style.top = "0";
+      probe.style.left = "0";
+      probe.style.visibility = "hidden";
+      probe.style.whiteSpace = "pre";
+      scramble.appendChild(probe);
+      if (typeof probe.getBoundingClientRect !== "function") return;
+      const rect = probe.getBoundingClientRect();
+      if (rect.width > 0) charW = rect.width / 10;
+      if (rect.height > 0) charH = rect.height;
+    } catch (err) {
+      // 测量失败（或运行在无布局能力的测试环境）时保留已有值
+    } finally {
+      if (probe && probe.parentNode === scramble) scramble.removeChild(probe);
+    }
+  }
+
+  /* 按当前视口算出铺满需要多少行、多少列 */
+  function layoutScramble() {
+    const vw = window.innerWidth || 1280;
+    const vh = window.innerHeight || 800;
+    if (!(charW > 2)) charW = 12;
+    if (!(charH > 2)) charH = 19;
+    scrambleCols = Math.ceil(vw / charW) + 1;
+    scrambleRows = Math.ceil((vh * SCRAMBLE_OVERSCAN) / charH) + 1;
+  }
 
   function randomLine() {
     let s = "";
-    for (let i = 0; i < SCRAMBLE_COLS; i++) {
+    for (let i = 0; i < scrambleCols; i++) {
       s += GLYPHS[Math.floor(Math.random() * GLYPHS.length)];
     }
     return s;
@@ -952,12 +993,14 @@ document.querySelectorAll(".is-placeholder").forEach((link) => {
   function renderScramble() {
     if (!scramble) return;
     const rows = [];
-    for (let i = 0; i < SCRAMBLE_ROWS; i++) rows.push(randomLine());
+    for (let i = 0; i < scrambleRows; i++) rows.push(randomLine());
     scramble.textContent = rows.join("\n");
   }
 
   function startScramble() {
     if (!scramble || scrambleTimer) return;
+    measureCell();
+    layoutScramble();
     renderScramble();
     scrambleTimer = setInterval(renderScramble, 50);
   }
@@ -968,6 +1011,18 @@ document.querySelectorAll(".is-placeholder").forEach((link) => {
       scrambleTimer = 0;
     }
   }
+
+  // 浮层打开期间窗口尺寸变化：重新测量并铺满
+  window.addEventListener(
+    "resize",
+    function () {
+      if (!idleOpen || !scramble) return;
+      measureCell();
+      layoutScramble();
+      renderScramble();
+    },
+    { passive: true }
+  );
 
   /* ---------- 开启动画：红色待机警报自检 ---------- */
   /* 与隐藏关卡（lycnb）的终端序列同构：逐行打印 → 其中两行尾部乱码滚动

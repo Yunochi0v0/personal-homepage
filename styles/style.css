@@ -2939,21 +2939,28 @@ html::after {
   }
 }
 
-/* 2. 乱码层：满屏字符快速向上滚动，作为背景噪声 */
+/* 2. 乱码层：满屏字符快速向上滚动，作为背景噪声
+      行列数由 JS 按视口尺寸动态计算（见 main.js 第 14 段 measureCell /
+      layoutScramble），保证任何屏幕都真正铺满。
+       ・inset: 0 + overflow: hidden：元素正好等于视口，多出的内容被裁掉
+       ・white-space: pre：不自动折行，每行字符数 = 列数，宽度精确可控
+       ・内容高度约为视口的 1.35 倍，配合 translateY(-20%) 的循环位移，
+         滚动过程中上下都不会露出空白 */
 .idle-scramble {
   position: absolute;
-  inset: -30% 0;
+  inset: 0;
   margin: 0;
-  padding: 0 6vw;
+  padding: 0;
   overflow: hidden;
-  white-space: pre-wrap;
-  word-break: break-all;
+  white-space: pre;
+  word-break: normal;
   font-family: var(--pixel-font);
   font-size: 10px;
   line-height: 1.9;
   letter-spacing: 2px;
-  color: rgba(255, 43, 43, 0.3);
-  text-shadow: 0 0 6px rgba(255, 43, 43, 0.35);
+  color: rgba(255, 43, 43, 0.38);
+  text-shadow: 0 0 6px rgba(255, 43, 43, 0.4);
+  will-change: transform;
   animation: idleScramble 1.1s linear infinite;
 }
 
