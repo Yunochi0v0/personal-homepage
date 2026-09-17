@@ -38,9 +38,15 @@
 
 ### 验证方式
 - 后端连通自检（curl）：`GET /rest/v1/feedback` 被 RLS 拒绝（401，符合预期）；`POST` 带唯一标记的测试行返回 201 成功——标记 `v122check-1789636533` 需在 Table Editor 找到并删除。
-- 静态检查：三处版本号一致性（CSS link / main.js script / feedback.js script）、`<body data-version>` 与 BIOS 版本号、CHANGELOG 首条与（当前）标记、feedback.js 花括号配平、文件中无 secret key 字样。
+- 静态检查：三处版本号一致性（CSS link / main.js script / feedback.js script）、`<body data-version>` 与 BIOS 版本号、CHANGELOG 首条与（当前）标记、feedback.js 花括号配平、仓库文件中无真实密钥（service_role / JWT / 连接串）。
 - 运行时回归（JavaScriptCore）：feedback-runner 断言加载无错误、初始隐藏态、徽章打开 / 遮罩与 Esc 关闭、Esc 监听增减、必填与超长校验、合法提交 payload（含 `version="1.22.0"`）、`sending` 防重复（仅一次 insert）、成功面板、失败保留内容可重试；再重跑 boot / egg / idle 三套回归确认 main.js 未受影响。
 - 人工验收（用户）：本地 8123 打开页面，点右下角「反馈」徽章填表提交，看到 ✓ 面板；随后在 Supabase Table Editor 中找到该条记录（并删除自检标记行）。
+
+### 修复（v1.22.1）
+- 用户反馈：点徽章后弹层里看不到「提交反馈」按钮。根因：弹层 `max-height: min(86vh, 560px)` + 内部滚动，表单字段较多时按钮被挤出滚动区，需滚动才可见，易被误认为缺失。
+- 修复：`.feedback-submit` 增加 `position: sticky; bottom: 0`，按钮吸附弹层底部，内容再长也始终可见；同步提升资源版本号至 `1.22.1`（CSS link / main.js script / feedback.js script / `<body data-version>` / BIOS 均一致），避免浏览器缓存旧样式。
+- 涉及文件：`styles/style.css`、`index.html`、`scripts/main.js`。
+- 验证：check-v122.py 全绿；feedback-runner 58 PASS；boot / egg / idle 三套回归重跑通过；8123 / 8124 均以新版本号提供。
 
 ---
 
