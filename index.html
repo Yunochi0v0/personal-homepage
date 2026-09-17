@@ -7,7 +7,7 @@
   <title>刘聿宸 · 个人主页</title>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@700;900&family=Press+Start+2P&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="styles/style.css?v=1.21.0" />
+  <link rel="stylesheet" href="styles/style.css?v=1.22.0" />
   <!-- 开启动画：提前锁定页面滚动，避免动画播放期间背景被滚动。
        若脚本异常或未执行，则由 CSS 兜底动画与 <noscript> 保证页面仍可正常显示。 -->
   <script>
@@ -29,7 +29,7 @@
   </script>
   <noscript><style>.boot { display: none !important; }</style></noscript>
 </head>
-<body>
+<body data-version="1.22.0">
   <!-- 开启动画（复古 CRT 开机自检） -->
   <div class="boot" id="bootScreen" aria-hidden="true">
     <span class="boot-dot"></span>
@@ -383,6 +383,63 @@
   <!-- 返回顶部 -->
   <button class="back-top" id="backTop" aria-label="返回顶部">↑</button>
 
-  <script src="scripts/main.js?v=1.21.0"></script>
+  <!-- 访客反馈徽章（v1.22）：叠在返回顶部上方，点击弹出反馈表单 -->
+  <button class="feedback-badge" id="feedbackBadge" type="button" aria-label="留个反馈" aria-haspopup="dialog">反馈</button>
+
+  <!-- 访客反馈弹层（v1.22） -->
+  <div class="feedback-overlay" id="feedbackOverlay" aria-hidden="true">
+    <div class="feedback-modal" id="feedbackModal" role="dialog" aria-modal="true" aria-labelledby="feedbackTitle">
+      <div class="feedback-head">
+        <h3 class="feedback-title" id="feedbackTitle">留个反馈</h3>
+        <button class="feedback-close" id="feedbackClose" type="button" aria-label="关闭">×</button>
+      </div>
+      <p class="feedback-note">反馈不会公开，只有我能看到。</p>
+      <form class="feedback-form" id="feedbackForm" novalidate>
+        <label class="feedback-field">
+          <span class="feedback-label">昵称（可选）</span>
+          <input class="feedback-input" id="fbName" type="text" maxlength="40" placeholder="怎么称呼你？" autocomplete="nickname" />
+        </label>
+        <label class="feedback-field">
+          <span class="feedback-label">关系</span>
+          <select class="feedback-input" id="fbRelation" required>
+            <option value="" disabled selected>请选择</option>
+            <option>同学</option>
+            <option>老师</option>
+            <option>家人</option>
+            <option>朋友</option>
+            <option>同事</option>
+            <option>其他</option>
+            <option>不便透露</option>
+          </select>
+        </label>
+        <label class="feedback-field">
+          <span class="feedback-label">设备</span>
+          <select class="feedback-input" id="fbDevice" required>
+            <option value="" disabled selected>请选择</option>
+            <option>电脑</option>
+            <option>手机</option>
+            <option>平板</option>
+            <option>其他</option>
+          </select>
+        </label>
+        <label class="feedback-field">
+          <span class="feedback-label">反馈内容 *</span>
+          <textarea class="feedback-input feedback-message" id="fbMessage" maxlength="1000" rows="5" placeholder="想对我说点什么？"></textarea>
+          <span class="feedback-counter" id="fbCounter">0 / 1000</span>
+        </label>
+        <p class="feedback-error" id="fbError" role="alert" hidden></p>
+        <button class="feedback-submit" id="fbSubmit" type="submit">提交反馈</button>
+      </form>
+      <div class="feedback-success" id="fbSuccess" hidden>
+        <p class="feedback-success-icon">✓</p>
+        <p class="feedback-success-text">已收到，谢谢你的反馈！</p>
+        <button class="feedback-submit" id="fbDone" type="button">知道了</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="scripts/main.js?v=1.22.0"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.49.4/dist/umd/supabase.min.js"></script>
+  <script src="scripts/feedback.js?v=1.22.0"></script>
 </body>
 </html>
