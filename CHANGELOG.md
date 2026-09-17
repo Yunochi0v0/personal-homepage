@@ -10,7 +10,59 @@
 
 ---
 
-## [v1.23] 新增音乐播放器：右下角 🎵 入口 + 赛博随身听浮窗（当前）
+## [v1.24] 新增「赛博火柴人」可拖动彩蛋（当前）
+
+- **日期**：2026-09-17
+- **作者**：katzegott
+- **类型**：`新增`
+
+### 新增
+- 用户需求：在黄黑科幻 HUD 主页右下角新增一个可拖动的「赛博火柴人」彩蛋，拖到哪就停在哪（**不自动跑回原位**）。
+- 实现（全部 [AI-GEN]）：
+  - **视觉**：内联 `<svg>` 极简火柴人（头/身体/双臂/双腿 7 元素），线条 `stroke: #FFD700` 荧光黄，`filter: drop-shadow(0 0 8px rgba(255,215,0,.8))` 发光；外层 `.stickman`（fixed 右下角，桌面 `right:24 / bottom:220` 避开右侧操作台按钮列、移动端缩小至 36px 且 `bottom:272` 避 Dock 按钮列，z-index 140）。
+  - **待机动画**：`.stickman-inner` 承载 `@keyframes stickman-idle`（`translateY(0) ↔ translateY(-4px)`，3.2s 舒缓循环呼吸）——与 JS 的 `translate3d` 分层，互不覆盖。
+  - **拖动状态**：`mousedown`/`touchstart` 移除待机动画 → 四肢 `@keyframes` 快速交替摆动（手臂 ±38°、腿 ±30°，左右 0.11s 半周期错峰模拟交替迈步，`transform-box: view-box` + 关节 `transform-origin` 绕肩/胯旋转）；`mousemove`/`touchmove` 用 `transform: translate3d(x, y, 0)` 紧跟指针（GPU 加速），光标 `grabbing`。
+  - **松手**：`mouseup`/`touchend`/`touchcancel` 停止奔跑、恢复呼吸，**停在原地**。
+  - **移动端**：`touchstart/touchmove/touchend/touchcancel` 全触屏支持 + `touch-action: none`（拖动时页面不滚动），`passive: false` 以允许 preventDefault；`user-select: none` 防选中。
+  - **无障碍/降级**：`role="img"` + `aria-label`；`prefers-reduced-motion: reduce` 下待机呼吸禁用、但拖动奔跑保持可用（W3C 豁免用户主动交互的短时装饰动画）；结构缺失时脚本静默退出。
+
+### 修复与增强（v1.24 开发中追加）
+- **修复：拖动时手脚不摆动**。根因：`prefers-reduced-motion: reduce` 块与普通规则特异性相同且位于文件末尾，会覆盖四肢摆动动画为 `animation: none`（系统开启「减少动态效果」时完全静止）。修复：reduce 块仅禁用待机呼吸、不再禁用拖动奔跑。
+- **增强：整体放大约 1.36×**（桌面 44×66 → **60×90**，移动端 36×54 → **48×72**），线条加粗 `stroke-width 3 → 4`、发光加强 `8px/0.8 → 10px/0.85`，跑动幅度更醒目。
+- **增强：跑动感**。四肢摆动幅度加大（臂 ±38° → **±45°**、腿 ±30° → **±40°**），并新增 `@keyframes stickman-run-bounce` 同节奏上下弹跳（0 ↔ 3px），拖动时"挣扎奔跑"更明显。
+- **加固：四肢 `transform-box: view-box` + 关节 `transform-origin` 内联到 SVG 元素 style**，与 CSS 规则双保险，避免任何级联/覆盖问题。
+- **修复：再次点击/拖动时跳回初始位置**。根因：旧实现用 `baseLeft/baseTop = getBoundingClientRect()` 作为 `translate3d` 的基准，而 `translate3d` 是相对 CSS 静态位置（`right/bottom` 定位点）的偏移——第二次点击时基准里混入了上次位移，位移被清零、瞬间跳回右下角。修复：改为**指针增量累加**（`getTranslate()` 读取当前 transform + `lastX/lastY` 增量叠加），多次拖动从上次停下的位置无缝继续，永不跳回。stickman-runner 新增 2 条「再次拖动不跳回」断言（20 PASS）。
+- **重构：奔跑动画改为 JS + rAF 驱动 SVG 原生 transform 属性旋转**（v1.24.2）。前两版用 CSS `@keyframes` + `transform: rotate()` 作用于 SVG `<line>` 元素，在部分 Chromium/WebKit 版本下渲染不生效（拖动时四肢不动，用户两次反馈）。重构后：`requestAnimationFrame` 循环内正弦摆动，直接 `setAttribute("transform", "rotate(角度 关节x 关节y)")`——绕关节旋转是 **SVG 内建能力**，不依赖 CSS `transform-box`/`transform-origin`/CSS 动画对 SVG 图形元素的支持，100% 渲染生效。身体弹跳（`stickman-run-bounce`）保留为 CSS（作用于 HTML div，可靠）。同时：删除四肢 CSS 动画与内联 transform-box/origin（避免与属性旋转叠加冲突）、火柴人不再受 `prefers-reduced-motion` 限制（用户主动交互豁免，并恢复浮窗/均衡器的 reduce 兜底）。stickman-runner 重写至 29 断言（含「四肢经 SVG 属性旋转」「左右肢同刻角度相反」「松手清空四肢恢复静态」等）。
+- **增强：四肢两段式「摆动 + 屈曲」双通道奔跑**（v1.24.3）。前几版四肢为单段直线（整臂整腿刚体摆动，肘/膝始终伸直），奔跑姿态生硬。v1.24.3 将四肢拆为 **8 段**（上臂+前臂、大腿+小腿 × 左右）：肩/髋继续「摆动」（臂 ±45°、腿 ±40°，左右相位差 π 交替），新增肘/膝「屈曲」通道——
+  - **肘部屈曲**：前臂 `base 115 ± 15°`，后摆折叠（上臂-前臂夹角 82° 深弯）↔ 前摆舒展（夹角 112°）；
+  - **膝部屈曲**：小腿 `base ±45 − 33°`，前摆屈膝收腿（大腿-小腿夹角 90°）↔ 后蹬近伸直（夹角 24°）；
+  - **关节链组合**：两段式无法用单一 `transform rotate` 表达（前臂须先绕肘、再随上臂绕肩），故渲染改为**每帧计算各段世界坐标**，直接写 `<line>` 的 `x1/y1/x2/y2` 与 4 个新增关节圆（`.stick-joint-{el,kn}-{l,r}`，金色实心）的 `cx/cy`；`stopRun` 时坐标还原为 HTML 原始值（单一数据源，无累积误差）。
+  - **节奏放慢**：奔跑周期 `PERIOD 0.22s → 0.30s`（JS 四肢摆动与 CSS 身体弹跳同步放慢），动作更从容自然（用户反馈「放慢一点」）。
+  - **朝向跟随拖动方向**（用户反馈「向右拖朝右跑、向左拖朝左跑」）：`onMove` 用水平速度滑动平均（`velX = velX*0.5 + dx*0.5`，阈值 ±1.5 抗单帧抖动）判定本次拖动方向，对整体 SVG 应用 `scaleX(±1)` 水平镜像（flip-x，绕 viewBox 中心，CSS 加 `transform-box: view-box; transform-origin: 50% 50%`），奔跑视觉方向随之反转；向右拖朝右、向左拖朝左、小幅抖动不翻转、松手复位默认朝右。**v1.24.5 修正**：首次实现方向与实际视觉相反（用户反馈「奔跑方向反了」），镜像符号取反 `scaleX(-runDir)` 完成左右调换。
+  - **点击说话彩蛋（v1.24.6）**（用户需求：点击火柴人弹出科幻对话气泡）：`onEnd` 用「按下点 ↔ 最后指针点」欧氏距离 `< 5px` 区分点击与拖拽（鼠标与触屏统一），点击随机抽取 8 条台词池（`LINES`，含「欢迎来到我的赛博空间…」「404: 节操未找到…」等，`[AI-GEN]` 起草、可自行增删改）写入气泡文本并显示；再次点击刷新新台词（`lastLineIdx` 避免连句重复）；`setTimeout 4000ms` 自动淡出；`document` 捕获阶段 `mousedown/touchstart` 判断目标不在 `.stickman` 内即关闭（点击火柴人本身不关闭、交给刷新逻辑）；`touchcancel` 不触发。气泡样式贴 HUD 风格：`.stick-bubble` 深色半透明 `rgba(0,0,0,.8)` + `backdrop-filter: blur(8px)`、黄色细边框 `1px solid #FFD700`、白色等宽文字、`::after` 黄色三角尾巴指向火柴人头顶、`transform: translateX(-50%) scale(0.8) → scale(1)` 缩放淡入过渡；气泡为 `.stickman` 内部 absolute 元素，随拖动一起移动。
+  - **验证**：新增 `.deepworks/tmp/render-stickman.py` 帧级几何验证（从 stickman.js 提取 LIMBS 配置渲染 8 帧关键姿势，断言屈膝 >60°/<35°、折肘 <90°/>105°、左右交替 ≥6 帧差 >20°、端点不越界不落头）——FRAME CHECK PASSED；stickman-runner 重写至 **33 断言**（8 段坐标写入、关节圆 cx/cy、肘/膝夹角跨帧 83.7↔112.2 / 27.4↔90.1 屈曲动态、坐标还原）全过；v1.24.4 新增 **6 条方向断言**（向右拖 scaleX(1)、向左拖 scaleX(-1)、小幅抖动不翻转、松手复位），runner 至 **39 PASS**；v1.24.6 新增 **17 条点击说话断言**（原位点击弹气泡、文本属台词池、再次点击刷新不连句、4s 定时器自动淡出、点击火柴人不关闭、点击外部关闭、拖动/触屏滑动/touchcancel 不触发、document 捕获监听），runner 至 **56 PASS**；check-v122.py 同步新增 12 条静态断言（气泡结构/台词池/阈值 5px/4s/捕获监听/CSS 样式与动画），185 项 ALL CHECKS PASS。
+
+### 说明
+- **版本号升至 1.24.0**：新功能版本，`index.html` CSS/脚本资源引用、`<body data-version>`、main.js BIOS 全部同步（避免线上浏览器缓存旧 CSS 导致火柴人无样式）。
+- **无依赖**：stickman.js 独立 IIFE，不监听 window keydown（idle-runner `winKeydown=4` 基线不受影响）、无轮询、无外部资源。
+
+### 涉及文件
+| 文件 | 类型 | 说明 |
+| --- | --- | --- |
+| `index.html` | 修改 | `<body>` 版本号升至 `1.24.0`；新增火柴人结构（`.stickman` / `.stickman-inner` / 内联 SVG 火柴人）；引入 `scripts/stickman.js?v=1.24.0`；CSS 与既有脚本版本号同步；v1.24.3 四肢改为两段式 8 段 `<line>` + 4 个关节圆 `<circle class="stick-joint">`；v1.24.6 新增对话气泡 `.stick-bubble` + `.stick-bubble-text`（`[AI-GEN]`），`aria-label` 更新为「可点击说话」 |
+| `styles/style.css` | 修改 | 新增第 11 节：火柴人定位/发光/呼吸/奔跑动画/移动端适配/reduced-motion（`[AI-GEN]`）；v1.24.3 新增 `.stickman-svg .stick-joint` 金色实心关节圆样式；v1.24.6 新增 `.stick-bubble` 气泡样式（深色半透明 + backdrop-blur + 黄边框 + `::after` 三角尾巴 + scale 缩放淡入过渡 + 移动端窄屏适配，`[AI-GEN]`） |
+| `scripts/stickman.js` | 新增 | 拖动逻辑：鼠标 + 触屏统一取点、`translate3d` 跟手、dragging class 切换（`[AI-GEN]`）；v1.24.3 重写渲染核心：LIMBS 8 段配置（base/amp/off 摆动+屈曲）、关节链 PARENT 组合、每帧世界坐标写入 x1/y1/x2/y2 与关节圆 cx/cy；v1.24.6 新增点击说话：`LINES` 台词池（8 条）、`CLICK_DIST=5` 点击/拖拽判定、`showBubble/hideBubble/onDocDown`、4s 定时器（`[AI-GEN]`） |
+| `scripts/main.js` | 修改 | 开启动画 BIOS 版本号同步为 `v1.24.0` |
+
+### 验证方式
+- 静态校验（check-v122.py，V=1.24.0）：版本号六处一致、火柴人结构与动画断言、花括号配平（含 stickman.js）、无真实密钥、资源存在性——ALL PASS（v1.24.3 更新断言：两段式 8 段四肢 + 4 关节圆结构、坐标属性渲染 `setAttribute("x1"...`、关节链父子组合、屈曲幅度配置；v1.24.6 更新断言：气泡结构/台词池/阈值/捕获监听/气泡 CSS）。
+- 行为回归（jsc）：stickman-runner **56 断言**全过（初始待机、8 段坐标写入、关节圆 cx/cy、肘/膝夹角屈曲动态、松手坐标还原、再次拖动不跳回、非主键忽略、触屏全流程、touchcancel 兜底、方向跟随、点击说话全场景、监听注册）；music-runner / feedback-runner / boot / egg / idle 全量回归保持通过。
+- 帧几何验证（.deepworks/tmp/render-stickman.py）：从 stickman.js LIMBS 渲染 8 帧关键姿势，V1–V5（屈膝/折肘/左右交替/端点边界/摆动反相）FRAME CHECK PASSED。
+- 人工验收：本机 8123/8124 拖动火柴人——待机呼吸 → 拖动奔跑（v1.24.3 两段式：前摆屈膝收腿、后蹬伸直、摆臂折肘）→ 松手停原地；**v1.24.6 点击火柴人弹出随机台词气泡（缩放淡入、4s 自动消失、再点刷新、点别处关闭；拖动/滑动不触发）**；移动端模拟窗口（mobile-preview.html）触屏轻点说话、滑动不触发且不滚动页面；reduced-motion 下全部静态。
+
+---
+
+## [v1.23] 新增音乐播放器：右下角 🎵 入口 + 赛博随身听浮窗
 
 - **日期**：2026-09-17
 - **作者**：katzegott
@@ -20,7 +72,7 @@
 - 实现：右下角 🎵 像素徽章叠在反馈徽章上方（桌面 `right:26 / bottom:150`、移动端 `right:14 / bottom:212`，均不移动任何现有元素）→ 点击在按钮上方弹出浮窗（桌面 `right:26 / bottom:210`、移动端缩宽至 `min(340px, 100vw-24px)` 并水平居中，始终不超出屏幕边缘）→ 浮窗内 `#music-player-container` 占位，首次打开时才动态创建网易云外链 iframe（懒加载，优化首屏性能），之后开关浮窗不重复创建、播放不中断。
 
 ### 说明
-- **已接入单曲 1935705479（[MANUAL]）**：网易云外链生成器不可用，改用官方标准格式手工拼装 iframe——`//music.163.com/outchain/player?type=2&id=1935705479&auto=0&height=66`（协议相对 URL，HTTPS 页面无混合内容问题），已直接填入 `index.html` 的 `#music-player-container`，换歌只需改 `id` 参数。
+- **已接入单曲 1935705479（[MANUAL]）**：网易云外链生成器不可用，改用官方标准格式手工拼装 iframe——`https://music.163.com/outchain/player?type=2&id=1935705479&auto=0&height=66`，已直接填入 `index.html` 的 `#music-player-container`，换歌只需改 `id` 参数。**2026-09-17 修正：src 从协议相对 `//music.163.com` 改为显式 `https://` 绝对地址**——本地 `http://localhost:8123/8124` 开发环境下协议相对会解析成 http、经 302 重定向，浏览器对 iframe 内跨域 http→https 重定向不跟随，导致播放器空白/不渲染；https 绝对地址在 http 与 https 页面均可正常嵌入。
 - **iframe 尺寸与白底处理（[AI-GEN]）**：宽度 100%，高度固定 86px（网易云内容 66px + 上下留白内边距）；网易云外链页面为白底且跨域 iframe 无法透明，故对 iframe 施加 `filter: invert(1) hue-rotate(180deg)` 将白底深色化（红色品牌色经 invert + 180° 色相回转大致还原），与主页黄黑赛博风格融合，消除白色方块。
 - **iframe 接入（二选一，均已标注）**：方式 A（当前使用）：iframe 直接粘贴在 `index.html`（`[MANUAL]`）——脚本检测到容器内已有 iframe 后不再创建；方式 B（备选）：把外链地址填到 `scripts/music.js` 顶部 `MUSIC_SRC` 常量（`[MANUAL]`），由脚本动态生成 iframe。
 - **代码标注**：本次 AI 生成的开关浮窗与懒加载逻辑统一标注 `[AI-GEN]`；需人工粘贴 iframe 的位置统一标注 `[MANUAL]`。
@@ -41,6 +93,25 @@
 - 静态校验（check-v122.py，V=1.23.0）：版本号五处一致、音乐模块结构与 z-index 层级、花括号配平、无真实密钥特征、资源存在性——ALL PASS。
 - 行为回归（jsc）：music-runner 覆盖加载无错、初始关闭态、打开创建 iframe、再点关闭、重开不重复创建、容器已有 iframe 时不重复创建；feedback-runner / boot / egg / idle 全量回归保持通过（无 winKeydown 基线污染）。
 - 人工验收：本机 8123 与 GitHub Pages 线上地址点 🎵 开关浮窗，确认浮窗在按钮上方、移动端（≤640px）缩宽居中不超边；单曲 1935705479 播放器正常显示、无白底（深色化后与外壳融合），换歌改 iframe 的 `id` 参数即可。
+
+### UI 微调（2026-09-17 追加 · v1.23.1 样式，功能逻辑不变）
+- **需求**：用户反馈「赛博随身听」UI 与主页风格割裂，要求 5 项微调：白底处理、浮窗位置与层级、右侧按钮布局、播放氛围光效、代码标注。
+- **白底（保留既有 filter 方案，[AI-GEN]）**：对比两种方案后保留 `filter: invert(1) hue-rotate(180deg)`——白底反转深色、红色品牌色经 180° 色相回转还原；「容器上方叠深色遮罩」方案会同时压暗播放器内容且遮罩挡点击（pointer-events），体验更差，弃用。容器 `overflow: hidden` 兜底（`.music-player-container`）。
+- **浮窗位置与层级（[AI-GEN]）**：浮窗从「按钮正上方（right:26 / bottom:210，易遮正文）」改为「悬浮右下角、按钮列左侧（right:90 / bottom:100）」——与三按钮列水平错开，不遮挡正文主区也不压按钮；新增 `.music-backdrop` 全屏极淡暗色遮罩（`rgba(3,3,3,.34)` + 1px blur，z-index 149 < 按钮与浮窗 150），打开浮窗时点亮突出浮窗，点击遮罩可关闭（music.js 联动，元素缺失时静默跳过）。移动端浮窗仍缩宽居中。
+- **右侧按钮布局（[AI-GEN]）**：音乐 / 反馈 / 返回顶部三按钮统一收进 `.side-btns` 容器（fixed 右下角，flex 纵向 `gap:16px` 拉开间距防误触，桌面 `right:26 / bottom:26`、移动端 `right:14 / bottom:92` 避 Dock）；图标由 emoji/文字/箭头字符统一为黄色细线线性 SVG（`stroke: currentColor`，hover 纯黄底黑字点亮），三按钮风格完全一致。
+- **播放氛围光效（[AI-GEN]）**：浮窗打开（`.music-pop.is-open`）时外壳加 `animation: music-breathe 2.6s ease-in-out infinite` 黄色呼吸光晕（box-shadow 14px→30px→64px 三档呼吸），关闭即消失；`prefers-reduced-motion: reduce` 下禁用。
+- **代码标注**：本次微调全部为 AI 生成，在 HTML 容器注释 / CSS 小节 / music.js 联动处统一标注 `[AI-GEN]`；外链 iframe 粘贴处维持 `[MANUAL]` 不变。
+- **白圈修复（2026-09-17 追加，[AI-GEN]）**：播放器卡片外残留一圈白底——根因是 `.music-player-container iframe` 自身的 `background: #050505` 也被 `filter: invert(1)` 反转成 ≈白色（#050505→#fafafa），86px iframe 高于网易云 66px 内容的留白区域露白。修复：深色底移到容器（`.music-player-container { background:#050505 }`，在 filter 作用范围外保持深色），iframe 不再设背景（透明留白透出容器深色底）。
+- **播放中均衡器（2026-09-17 追加，[AI-GEN]）**：浮窗标题栏「赛博随身听」与关闭按钮之间新增 5 根黄色细柱波动动画（`.eq-bars`，`@keyframes eq-wave` 高度 4px↔14px、0.12s 错峰 delay、`box-shadow` 微光），随 `.music-pop.is-open` 点亮/熄灭（与呼吸光晕同一驱动——跨域 iframe 无法获知真实播放状态，以「浮窗打开=正在播放」表现）；`prefers-reduced-motion: reduce` 下禁用。
+- **均衡器加强 + 真实播放状态驱动（2026-09-17 追加，[AI-GEN]）**：① 柱子更醒目——加粗至 3px、波动幅度加大（5px↔14px）、双层辉光（6px+12px）、新增黄色底轨基线、动画提速至 0.9s；② 不再以浮窗打开驱动——跨域 iframe 无法读取网易云播放器真实状态，改为 music.js 轮询 `performance.getEntriesByType("resource")` 匹配网易云音频直链（`.music.126.net` 的 mp3/m4a 等）：播放器点「播放」必然产生新的音频资源条目 → 判定播放中（`.music-pop.is-playing` 点亮柱子）；持续 10s 无新请求 → 判定静止；浮窗打开时启动轮询、关闭时停止。局限：音频整体缓冲完成后播放中不再产生新请求，高网速下播放中后期可能提前静止，暂停判定最多滞后 10s；无定时器环境（命令行测试）静默跳过。
+
+### 涉及文件（UI 微调）
+| 文件 | 类型 | 说明 |
+| --- | --- | --- |
+| `index.html` | 修改 | 三按钮包入 `.side-btns` 容器并替换为线性 SVG 图标；新增 `.music-backdrop` 遮罩元素 |
+| `styles/style.css` | 修改 | 新增第 9 节开头「右侧悬浮操作台」：`.side-btns`（z-index 150 / gap 16px / 移动端避 Dock）、`.music-backdrop`（z-index 149 / .is-open 时 pointer-events 开启）；`.back-top` / `.feedback-badge` / `.music-badge` 去掉独立 fixed 定位、统一为容器内细线风格；`.music-pop` 移至右下角（right 90 / bottom 100）并加呼吸光晕动画与 reduced-motion 兜底 |
+| `scripts/music.js` | 修改 | 开关浮窗时同步切换 `.music-backdrop.is-open` 与 `aria-hidden`；遮罩点击关闭（null 安全） |
+| `.deepworks/tmp/check-v122.py` | 修改 | 断言适配新布局：操作台 z-index/gap/移动端、浮窗 right 90/bottom 100、遮罩层级、呼吸光晕、SVG 图标、music.js 遮罩联动 |
 
 ---
 
