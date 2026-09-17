@@ -10,7 +10,41 @@
 
 ---
 
-## [v1.19] 待机彩蛋：乱码铺满全屏（按视口动态计算行列）（当前）
+## [v1.20] Hero 头像旁新增「当前状态」座舱仪表盘面板（当前）
+
+- **日期**：2026-09-17
+- **作者**：katzegott
+
+### 新增
+- 用户需求：在头像**旁**添加「当前状态」，内容为「当前位置：深圳 / 状态：持续迭代中」，要求像**座舱仪表盘**，颜色风格与主体一致。
+- 实现：在 Hero 区头像右侧新增一块读数面板，与头像横向并排。面板用主色 `--primary`（#ffe81a）描边、半透明黄底、四角「读数框」角标、像素字体小标题，沿用站点既有的 HUD 语言（`.mission-holo` 的 `// MISSION BRIEF`、`.holo-meta` 的「标签 + 值」两栏行）。
+
+### 说明
+- **布局调整**：原先 `.hero-avatar-wrap` 靠 `margin: 0 auto 26px` 自身居中，头像独占一行。现新增 `.hero-top` 作为横向 flex 容器（`align-items: center` + `justify-content: center` + `gap: 34px`），头像与状态板并排居中；`.hero-avatar-wrap` 的 `margin` 归零并加 `flex: none` 防止被压缩，它与下方姓名的间距改由 `.hero-top` 的 `margin-bottom` 统一控制。
+- **仪表盘视觉元素**：
+  - 四角读数框用 `::after` 的 8 组 `linear-gradient` 背景绘制（每个角一横一竖），不必为纯装饰再加 DOM 节点；`inset: 4px` 落在面板 padding 区域内，不遮挡文字。
+  - 小标题 `// CURRENT STATUS` 沿用站点的终端注释惯例，用像素字体 `Press Start 2P`（与 `.contact-value`、BIOS 同源），配 `statusBlink`——每 5 秒一次的极短单帧闪动，模拟显示器刷新。
+  - 两行读数用 `space-between` 左右分栏：左侧「当前位置 / 状态」是灰色标签，右侧是主色数值；行间以 `1px dashed rgba(255, 232, 26, 0.16)` 分隔，末行去掉分隔线与下内边距。
+  - 「持续迭代中」前的指示点沿用站点「进行中」的语义色：主色填充 + `statusPulse` 呼吸（与 `.twin-dot` 同为 1.6~1.8 秒周期的 `ease-in-out` 脉冲）。
+- **配色一致性**：全部取自现有 CSS 变量与同源色值——`--primary` / `--card-border` / 与 `--card` 同系的 `rgba(255, 232, 26, …)` / `--text-muted`，**未引入任何新的色相**，因此与主体黑黄赛博朋克风格一致。
+- **响应式**：`.hero-top` 允许换行；视口 ≤ 560px 时状态板自动落到头像下方，并收窄为 `width: 100%; max-width: 290px`，避免小屏挤压。
+- **无障碍与降级**：面板为 `role="group" aria-label="当前状态"`；纯装饰的英文小标题加 `aria-hidden="true"`。`prefers-reduced-motion: reduce` 下关闭标题闪动与指示点呼吸，静态读数照常显示。
+
+### 涉及文件
+| 文件 | 类型 | 说明 |
+| --- | --- | --- |
+| `index.html` | 修改 | Hero 区新增 `.hero-top` 容器与 `.hero-status` 状态面板；两处资源版本号同步为 `1.20.0` |
+| `styles/style.css` | 新增 | 新增 `.hero-top` 与 `.hero-status` 系列样式（四角角标、标题闪动、指示点脉冲、窄屏与 reduced-motion 适配）；`.hero-avatar-wrap` 间距改由父容器控制 |
+| `scripts/main.js` | 修改 | 开启动画 BIOS 版本号同步为 `v1.20.0` |
+
+### 验证方式
+- 静态检查：CSS 花括号 / 圆括号配对、新增选择器存在性、HTML 类名与 CSS 选择器一一对应。
+- 运行时回归：JavaScriptCore 跑开启动画与彩蛋用例，确认无运行时错误。
+- 人工验收（用户）：Hero 区头像右侧显示「当前位置 深圳 / 状态 持续迭代中」，四角角标与主色发光正常；窗口缩到 ≤ 560px 时状态板换行到头像下方居中。
+
+---
+
+## [v1.19] 待机彩蛋：乱码铺满全屏（按视口动态计算行列）
 
 - **日期**：2026-09-10
 - **作者**：katzegott
