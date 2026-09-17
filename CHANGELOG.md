@@ -10,7 +10,41 @@
 
 ---
 
-## [v1.22] 新增访客反馈功能：右下角徽章 + Supabase 后台（当前）
+## [v1.23] 新增音乐播放器：右下角 🎵 入口 + 赛博随身听浮窗（当前）
+
+- **日期**：2026-09-17
+- **作者**：katzegott
+
+### 新增
+- 用户需求（个人主页 V3 课件）：集成网易云音乐官方外链播放器——右下角新增悬浮 🎵 入口按钮，点击后在按钮上方弹出「赛博随身听」浮窗，再点关闭；浮窗内以主页风格外壳包裹网易云 iframe，默认不自动播放。
+- 实现：右下角 🎵 像素徽章叠在反馈徽章上方（桌面 `right:26 / bottom:150`、移动端 `right:14 / bottom:212`，均不移动任何现有元素）→ 点击在按钮上方弹出浮窗（桌面 `right:26 / bottom:210`、移动端缩宽至 `min(340px, 100vw-24px)` 并水平居中，始终不超出屏幕边缘）→ 浮窗内 `#music-player-container` 占位，首次打开时才动态创建网易云外链 iframe（懒加载，优化首屏性能），之后开关浮窗不重复创建、播放不中断。
+
+### 说明
+- **已接入单曲 1935705479（[MANUAL]）**：网易云外链生成器不可用，改用官方标准格式手工拼装 iframe——`//music.163.com/outchain/player?type=2&id=1935705479&auto=0&height=66`（协议相对 URL，HTTPS 页面无混合内容问题），已直接填入 `index.html` 的 `#music-player-container`，换歌只需改 `id` 参数。
+- **iframe 尺寸与白底处理（[AI-GEN]）**：宽度 100%，高度固定 86px（网易云内容 66px + 上下留白内边距）；网易云外链页面为白底且跨域 iframe 无法透明，故对 iframe 施加 `filter: invert(1) hue-rotate(180deg)` 将白底深色化（红色品牌色经 invert + 180° 色相回转大致还原），与主页黄黑赛博风格融合，消除白色方块。
+- **iframe 接入（二选一，均已标注）**：方式 A（当前使用）：iframe 直接粘贴在 `index.html`（`[MANUAL]`）——脚本检测到容器内已有 iframe 后不再创建；方式 B（备选）：把外链地址填到 `scripts/music.js` 顶部 `MUSIC_SRC` 常量（`[MANUAL]`），由脚本动态生成 iframe。
+- **代码标注**：本次 AI 生成的开关浮窗与懒加载逻辑统一标注 `[AI-GEN]`；需人工粘贴 iframe 的位置统一标注 `[MANUAL]`。
+- **视觉语言**：浮窗沿用站内风格——深色半透明毛玻璃（`rgba(8,8,8,.85)` + backdrop blur）、1px 黄色细边框、`clip-path` 斜切角、`0 0 22px` 黄色微光阴影、`Press Start 2P` 标题字；与反馈徽章同族的 bevel 像素按钮（hover 点亮为纯黄底黑字）。
+- **交互细节**：点击 🎵 徽章开/关浮窗（`aria-expanded` 同步），点浮窗右上角 × 关闭；关闭浮窗不销毁 iframe，音乐可继续播放；浮窗出现/收起有 0.25s 位移渐隐过渡，`prefers-reduced-motion: reduce` 下过渡禁用（CSS 兜底）。
+- **性能与基线**：iframe 在首次打开时才注入 DOM（页面加载时不请求外链）；音乐模块不注册任何 window keydown 监听（idle-runner 的 `winKeydown=4` 基线不受影响），纯 click 交互。
+- **无障碍**：徽章 `aria-label="打开音乐播放器"` + `aria-expanded` + `aria-haspopup="dialog"`，浮窗 `aria-hidden` 随开合切换，关闭按钮 `aria-label="关闭播放器"`。
+
+### 涉及文件
+| 文件 | 类型 | 说明 |
+| --- | --- | --- |
+| `index.html` | 修改 | `<body>` 版本号升至 `1.23.0`；新增 🎵 徽章按钮与「赛博随身听」浮窗骨架（`#musicPop` / `#music-player-container` / `[MANUAL]` 粘贴处）；引入 `scripts/music.js?v=1.23.0`；CSS 与既有脚本版本号同步 |
+| `styles/style.css` | 新增 | 新增第 10 节：音乐徽章（含 hover/active）、浮窗外壳（毛玻璃 + 黄细边 + 切角 + 微光）、播放器容器、移动端缩宽居中与 reduced-motion 兜底 |
+| `scripts/music.js` | 新增 | 开关浮窗逻辑 + iframe 懒加载（`[AI-GEN]` 标注；`MUSIC_SRC` 与粘贴处为 `[MANUAL]` 标注） |
+| `scripts/main.js` | 修改 | 开启动画 BIOS 版本号同步为 `v1.23.0` |
+
+### 验证方式
+- 静态校验（check-v122.py，V=1.23.0）：版本号五处一致、音乐模块结构与 z-index 层级、花括号配平、无真实密钥特征、资源存在性——ALL PASS。
+- 行为回归（jsc）：music-runner 覆盖加载无错、初始关闭态、打开创建 iframe、再点关闭、重开不重复创建、容器已有 iframe 时不重复创建；feedback-runner / boot / egg / idle 全量回归保持通过（无 winKeydown 基线污染）。
+- 人工验收：本机 8123 与 GitHub Pages 线上地址点 🎵 开关浮窗，确认浮窗在按钮上方、移动端（≤640px）缩宽居中不超边；单曲 1935705479 播放器正常显示、无白底（深色化后与外壳融合），换歌改 iframe 的 `id` 参数即可。
+
+---
+
+## [v1.22] 新增访客反馈功能：右下角徽章 + Supabase 后台
 
 - **日期**：2026-09-17
 - **作者**：katzegott
