@@ -853,7 +853,7 @@ document.querySelectorAll(".is-placeholder").forEach((link) => {
   }
 
   const LINES = [
-    "DEEPWORKS BIOS v1.20.0",
+    "DEEPWORKS BIOS v1.21.0",
     "MEMTEST 640K ............... <OK>",
     "NEON SHADER LOAD ........... <OK>",
     "SINE WAVE ENGINE ........... <OK>",
@@ -1171,6 +1171,96 @@ document.querySelectorAll(".is-placeholder").forEach((link) => {
     at(3600, finish);
   }
 
+  /* ---------- 退出动画：故障解除（3 秒） ---------- */
+  /* 与开启动画同构的终端序列，但方向相反：把警报态逐行解除回正常态。
+     3 秒时间轴由 CSS 的 .is-clearing 驱动，这里只负责逐行写日志、
+     推进进度条，并在到点后真正收起浮层。 */
+  const CLEAR_LINES = [
+    "> FAULT DIAGNOSIS ......... CLEARED",
+    "> ALERT CHANNEL ........... CLOSED",
+    "> SYSTEM STATE ............ NOMINAL",
+    "> IDLE MONITOR ............ RESET",
+  ];
+  const CLEAR_MS = 3000;
+
+  let clearing = false;
+
+  function playClearAnimation(onDone) {
+    const layer = document.getElementById("idleClearing");
+    const log = document.getElementById("idleClearLog");
+    const fill = document.getElementById("idleClearBarFill");
+    const status = document.getElementById("idleClearStatus");
+
+    const reduceMotion =
+      typeof window.matchMedia === "function" &&
+      window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+    // 减弱动态效果 / 元素缺失：不播动画，直接结束（浮层照常可关闭）
+    if (reduceMotion || !layer || !log) {
+      onDone();
+      return;
+    }
+
+    clearing = true;
+
+    // 复位：重复触发时从头播放
+    log.textContent = "";
+    if (fill) fill.style.width = "0%";
+    if (status) {
+      status.textContent = "";
+      status.classList.remove("is-restored");
+    }
+
+    // 挂上 .is-clearing，CSS 时间轴开始走
+    egg.classList.add("is-clearing");
+
+    const timers = [];
+    const printed = [];
+    let barTimer = 0;
+
+    function at(ms, fn) {
+      timers.push(setTimeout(fn, ms));
+    }
+
+    // ① 逐行打印解除日志（每行 260ms，节奏与开启动画呼应）
+    CLEAR_LINES.forEach(function (line, index) {
+      at(150 + index * 260, function () {
+        printed[index] = line;
+        log.textContent = printed.join("\n");
+      });
+    });
+
+    // ② 进度条：0 → 100%，走满即标记系统恢复正常
+    at(520, function () {
+      let pct = 0;
+      barTimer = setInterval(function () {
+        pct = Math.min(100, pct + 7 + Math.floor(Math.random() * 8));
+        if (fill) fill.style.width = pct + "%";
+        if (status) status.textContent = "CLEARING " + ("00" + pct).slice(-3) + "%";
+        if (pct >= 100) {
+          clearInterval(barTimer);
+          barTimer = 0;
+          if (status) {
+            status.textContent = "RESTORED";
+            status.classList.add("is-restored");
+          }
+        }
+      }, 30);
+    });
+
+    // ③ 3 秒到点：清掉所有在途定时器，再收起浮层
+    at(CLEAR_MS, function () {
+      for (let i = 0; i < timers.length; i++) clearTimeout(timers[i]);
+      timers.length = 0;
+      if (barTimer) {
+        clearInterval(barTimer);
+        barTimer = 0;
+      }
+      clearing = false;
+      onDone();
+    });
+  }
+
   /* ---------- 浮层显隐 ---------- */
   let idleOpen = false;
 
@@ -1184,11 +1274,17 @@ document.querySelectorAll(".is-placeholder").forEach((link) => {
   }
 
   function closeIdleEgg() {
-    if (!idleOpen) return;
+    if (!idleOpen || clearing) return;
     // 动画未播完就被关闭：先收尾，避免定时器继续跑
     if (bootRunning && finishBoot) finishBoot();
+    // 先播「故障解除」退出动画，3 秒结束后再真正收起浮层
+    playClearAnimation(hideIdleEgg);
+  }
+
+  function hideIdleEgg() {
+    if (!idleOpen) return;
     idleOpen = false;
-    egg.classList.remove("revealed", "is-ready");
+    egg.classList.remove("revealed", "is-ready", "is-clearing");
     egg.setAttribute("aria-hidden", "true");
     stopScramble();
     if (EXIT) EXIT.blur();

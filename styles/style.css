@@ -3252,7 +3252,169 @@ html::after {
   color: #050505;
 }
 
-/* 7. 减弱动态效果：去掉闪烁与滚动，静态呈现提醒 */
+/* 7. 退出动画：故障解除（3 秒）
+   红色警报态逐行自检 → 警报通道关闭 → 全局由警报红过渡回站点主色黄 →
+   显示欢迎回归语 → 末段整体淡出。时间轴全部由 CSS 驱动（.is-clearing），
+   JS 只负责切换类名、逐行写入日志与推进进度条。 */
+.idle-clearing {
+  position: absolute;
+  inset: -30px -22px;
+  z-index: 4;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 14px;
+  padding: 22px;
+  background: #050505;
+  font-family: var(--pixel-font);
+  font-size: 8px;
+  line-height: 2;
+  text-align: left;
+  color: var(--primary);
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+}
+
+.idle-egg.is-clearing .idle-clearing {
+  visibility: visible;
+  animation: clearFade 3s linear both, clearShake 0.42s steps(2, end) both;
+}
+
+/* 3 秒时间轴：末段 10% 淡出 */
+@keyframes clearFade {
+  0% { opacity: 1; }
+  90% { opacity: 1; }
+  100% { opacity: 0; }
+}
+
+/* 起始的信号抖动：像素级位移，模拟刚解除故障时的信号不稳 */
+@keyframes clearShake {
+  0% { transform: translate(0, 0); }
+  16% { transform: translate(-3px, 2px); }
+  32% { transform: translate(3px, -2px); }
+  48% { transform: translate(-2px, -1px); }
+  64% { transform: translate(2px, 1px); }
+  80% { transform: translate(-1px, 0); }
+  100% { transform: translate(0, 0); }
+}
+
+/* 解除过程中：提醒内容让位，避免与解除序列叠字 */
+.idle-egg.is-clearing .idle-egg-body {
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity 0.12s linear, visibility 0s linear 0.12s;
+}
+
+/* 警报泛光停止脉冲并褪为正常态（红 → 黄） */
+.idle-egg.is-clearing .idle-alert {
+  animation: none;
+  opacity: 0.16;
+  background:
+    radial-gradient(
+      ellipse at center,
+      rgba(255, 232, 26, 0.14),
+      rgba(255, 232, 26, 0.04) 55%,
+      rgba(0, 0, 0, 0.92) 100%
+    ),
+    repeating-linear-gradient(
+      0deg,
+      rgba(255, 232, 26, 0.09) 0 2px,
+      rgba(0, 0, 0, 0) 2px 5px
+    );
+  transition: opacity 0.9s ease;
+}
+
+/* 乱码噪声转为主色并安静下来，把视觉重心让给欢迎语 */
+.idle-egg.is-clearing .idle-scramble {
+  color: rgba(255, 232, 26, 0.22);
+  text-shadow: 0 0 5px rgba(255, 232, 26, 0.3);
+  opacity: 0.45;
+  transition: color 0.9s ease, text-shadow 0.9s ease, opacity 0.9s ease;
+}
+
+/* 解除日志：颜色由警报红渐变到主色黄 */
+.idle-clear-log {
+  margin: 0;
+  min-height: 8em;
+  white-space: pre-wrap;
+  word-break: break-all;
+  font: inherit;
+  color: var(--primary);
+  text-shadow: 0 0 8px rgba(255, 232, 26, 0.45);
+}
+
+.idle-egg.is-clearing .idle-clear-log {
+  animation: clearLogColor 1.5s ease-out both;
+}
+
+@keyframes clearLogColor {
+  0% {
+    color: var(--alert);
+    text-shadow: 0 0 7px rgba(255, 43, 43, 0.6);
+  }
+  100% {
+    color: var(--primary);
+    text-shadow: 0 0 8px rgba(255, 232, 26, 0.45);
+  }
+}
+
+.idle-clear-bar {
+  height: 10px;
+  border: 2px solid rgba(255, 232, 26, 0.55);
+  background: #0a0a0a;
+  box-shadow: inset 2px 2px 0 rgba(0, 0, 0, 0.85);
+}
+
+.idle-clear-bar i {
+  display: block;
+  width: 0;
+  height: 100%;
+  background: var(--primary);
+  box-shadow: 0 0 10px rgba(255, 232, 26, 0.65);
+}
+
+.idle-clear-status {
+  margin: 0;
+  min-height: 1.4em;
+  letter-spacing: 2px;
+  color: rgba(255, 232, 26, 0.7);
+}
+
+.idle-clear-status.is-restored {
+  color: #fff;
+  text-shadow: 0 0 10px rgba(255, 232, 26, 0.9), 0 0 26px rgba(255, 232, 26, 0.4);
+}
+
+/* 欢迎回归语：与「何意味，你还在吗？」同一视觉重量，红色问句 → 主色答句 */
+.idle-clear-welcome {
+  margin: 14px 0 0;
+  text-align: center;
+  font-size: clamp(1.35rem, 5vw, 2.2rem);
+  font-weight: 900;
+  letter-spacing: 5px;
+  color: var(--primary);
+  text-shadow: 0 0 14px rgba(255, 232, 26, 0.75), 0 0 40px rgba(255, 232, 26, 0.32);
+  opacity: 0;
+}
+
+.idle-egg.is-clearing .idle-clear-welcome {
+  animation: clearWelcome 0.55s ease-out 1.3s both, clearWelcomeGlitch 0.42s steps(2, end) 1.3s 1;
+}
+
+@keyframes clearWelcome {
+  from { opacity: 0; transform: translateY(10px) scale(0.95); }
+  to { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+/* 入场瞬间的色差抖动：红/青分离一瞬，随即收束为主色发光 */
+@keyframes clearWelcomeGlitch {
+  0% { text-shadow: -4px 0 rgba(255, 43, 43, 0.95), 4px 0 rgba(0, 240, 255, 0.95); }
+  50% { text-shadow: 3px 0 rgba(255, 43, 43, 0.7), -3px 0 rgba(0, 240, 255, 0.7); }
+  100% { text-shadow: 0 0 14px rgba(255, 232, 26, 0.75), 0 0 40px rgba(255, 232, 26, 0.32); }
+}
+
+/* 8. 减弱动态效果：去掉闪烁与滚动，静态呈现提醒 */
 @media (prefers-reduced-motion: reduce) {
   .idle-alert {
     animation: none;
@@ -3265,5 +3427,11 @@ html::after {
 
   .idle-boot-status.is-awake {
     animation: none;
+  }
+
+  /* 退出动画在减弱动态效果下由 JS 直接跳过，这里兜底隐藏解除层 */
+  .idle-egg.is-clearing .idle-clearing {
+    animation: none;
+    opacity: 0;
   }
 }
