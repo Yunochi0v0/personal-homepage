@@ -10,7 +10,41 @@
 
 ---
 
-## [v1.21] 待机彩蛋新增「故障解除」退出动画（当前）
+## [v1.22] 新增访客反馈功能：右下角徽章 + Supabase 后台（当前）
+
+- **日期**：2026-09-17
+- **作者**：katzegott
+
+### 新增
+- 用户需求（个人主页 V3 课件）：新增「访客反馈」——访客在页面右下角点徽章，弹层里填一张小表单，提交后数据进入 Supabase 后台；访客只允许写入，读 / 改 / 删仅主页主人（经 Table Editor）可做。
+- 实现：右下角「反馈」像素徽章叠在返回顶部上方（桌面 `right:26 / bottom:86`、移动端 `right:14 / bottom:148`，均不移动任何现有元素）→ 点击弹出居中弹层（z-index 9995，介于待机彩蛋 9990 与开机动画 9999 / CRT 遮罩 10000 之间）→ 表单字段昵称（可选 ≤40）/ 关系（同学老师家人朋友同事其他不便透露，必选）/ 设备（电脑手机平板其他，必选）/ 内容（必填 ≤1000 字，带字数计数）→ 提交经 Supabase REST API 写入 `public.feedback` 表，自动附带网站版本（`<body data-version>`）与数据库时间戳。
+
+### 说明
+- **后端接线**：前端通过官方 `@supabase/supabase-js@2.49.4`（UMD CDN，jsdelivr）以 `createClient(ProjectURL, publishableKey)` 惰性创建客户端——只有第一次提交时才真正创建。本仓库 `supabase/feedback.sql` 已建表并开启 RLS：`anon / authenticated` 只有一条 INSERT 策略（`with check (true)`），同时显式 `revoke select, update, delete`，所以访客读不到任何一行（故意不写 SELECT 策略），主人查看反馈走控制台 Table Editor（RLS 不拦截主人登录态）。
+- **安全红线**：前端与仓库只出现 publishable key（设计上公开的前端配置）；secret key（service_role）与数据库密码永不进入前端、不进仓库、不进对话记录（课件 p21）。
+- **健壮性**：提交中按钮置灰并显示「提交中…」（`sending` 标志防重复，连点只发一次）；失败时错误行提示并**保留输入内容**，可直接重试；成功后表单隐藏、显示 ✓ 面板；CDN 加载失败或离线时提交给出「后台服务暂时不可用」而不是报错崩溃。
+- **交互细节**：点遮罩 / × / Esc 均可关闭弹层，但发送中禁止关闭（避免状态错乱）；Esc 的 window keydown 监听只在弹层打开期间挂载、关闭时移除，不污染页面其它键盘逻辑（idle-runner 的 `winKeydown=4` 基线不受影响）；再次打开时表单自动复位。
+- **无障碍**：徽章 `aria-label="留个反馈"` + `aria-haspopup="dialog"`，弹层 `role="dialog" / aria-modal / aria-labelledby`，遮罩 `aria-hidden` 随开合切换；弹层内输入框沿用全局 `.has-cursor input:focus` 的文本光标规则。
+- **视觉语言**：徽章与弹层沿用站内像素风——方角、3px 主色描边、bevel 内阴影、clip-path 切角，与返回顶部按钮同族；移动端（≤640px）徽章随之缩小并上移避开底部 Dock；`prefers-reduced-motion: reduce` 下弹层出现动画直接静态呈现（CSS 兜底）。
+
+### 涉及文件
+| 文件 | 类型 | 说明 |
+| --- | --- | --- |
+| `index.html` | 修改 | `<body>` 增加 `data-version="1.22.0"`；新增反馈徽章按钮与弹层结构（表单字段 / 错误行 / 成功面板）；引入 supabase-js UMD CDN 与 `scripts/feedback.js`；CSS 与主脚本版本号同步为 `1.22.0` |
+| `styles/style.css` | 新增 | 新增第 9 节：徽章（含移动端与 hover/active）、弹层遮罩与面板、表单控件像素化、字数计数、错误 / 成功面板、reduced-motion 兜底 |
+| `scripts/feedback.js` | 新增 | 反馈逻辑：惰性 Supabase 客户端、表单校验、防重复提交、成功 / 失败态、Esc 开关监听 |
+| `scripts/main.js` | 修改 | 开启动画 BIOS 版本号同步为 `v1.22.0` |
+| `supabase/feedback.sql` | 新增 | （上一提交已完成）建表 + RLS 权限脚本，本功能的前端与之对接 |
+
+### 验证方式
+- 后端连通自检（curl）：`GET /rest/v1/feedback` 被 RLS 拒绝（401，符合预期）；`POST` 带唯一标记的测试行返回 201 成功——标记 `v122check-1789636533` 需在 Table Editor 找到并删除。
+- 静态检查：三处版本号一致性（CSS link / main.js script / feedback.js script）、`<body data-version>` 与 BIOS 版本号、CHANGELOG 首条与（当前）标记、feedback.js 花括号配平、文件中无 secret key 字样。
+- 运行时回归（JavaScriptCore）：feedback-runner 断言加载无错误、初始隐藏态、徽章打开 / 遮罩与 Esc 关闭、Esc 监听增减、必填与超长校验、合法提交 payload（含 `version="1.22.0"`）、`sending` 防重复（仅一次 insert）、成功面板、失败保留内容可重试；再重跑 boot / egg / idle 三套回归确认 main.js 未受影响。
+- 人工验收（用户）：本地 8123 打开页面，点右下角「反馈」徽章填表提交，看到 ✓ 面板；随后在 Supabase Table Editor 中找到该条记录（并删除自检标记行）。
+
+---
+
+## [v1.21] 待机彩蛋新增「故障解除」退出动画
 
 - **日期**：2026-09-17
 - **作者**：katzegott
