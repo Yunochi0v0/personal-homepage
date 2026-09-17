@@ -7,7 +7,7 @@
   <title>刘聿宸 · 个人主页</title>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@700;900&family=Press+Start+2P&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="styles/style.css?v=1.22.1" />
+  <link rel="stylesheet" href="styles/style.css?v=1.23.0" />
   <!-- 开启动画：提前锁定页面滚动，避免动画播放期间背景被滚动。
        若脚本异常或未执行，则由 CSS 兜底动画与 <noscript> 保证页面仍可正常显示。 -->
   <script>
@@ -29,7 +29,7 @@
   </script>
   <noscript><style>.boot { display: none !important; }</style></noscript>
 </head>
-<body data-version="1.22.1">
+<body data-version="1.23.0">
   <!-- 开启动画（复古 CRT 开机自检） -->
   <div class="boot" id="bootScreen" aria-hidden="true">
     <span class="boot-dot"></span>
@@ -386,6 +386,29 @@
   <!-- 访客反馈徽章（v1.22）：叠在返回顶部上方，点击弹出反馈表单 -->
   <button class="feedback-badge" id="feedbackBadge" type="button" aria-label="留个反馈" aria-haspopup="dialog">反馈</button>
 
+  <!-- 音乐播放器徽章（v1.23 · AI-GEN）：叠在反馈徽章上方，点击弹出「赛博随身听」浮窗 -->
+  <button class="music-badge" id="musicBadge" type="button" aria-label="打开音乐播放器" aria-expanded="false" aria-haspopup="dialog">🎵</button>
+
+  <!-- 音乐播放器浮窗（v1.23 · AI-GEN）：
+       深色半透明外壳 + 黄色细边框 + 斜切角 + 微光，内含网易云外链播放器。
+       首次打开时才动态加载 iframe（懒加载，见 scripts/music.js）。 -->
+  <div class="music-pop" id="musicPop" aria-hidden="true">
+    <div class="music-pop-head">
+      <span class="music-pop-title">🎧 赛博随身听</span>
+      <button class="music-pop-close" id="musicClose" type="button" aria-label="关闭播放器">×</button>
+    </div>
+    <!-- [MANUAL] 网易云外链 iframe（单曲 1935705479，v1.23）：
+         外链生成器不可用时手工拼装，标准格式为
+         //music.163.com/outchain/player?type=2&id=歌曲ID&auto=0&height=66
+         → 换歌只需替换 id 参数；若删除本 iframe，music.js 会改用
+           MUSIC_SRC 动态生成（scripts/music.js 顶部）。 -->
+    <div class="music-player-container" id="music-player-container">
+      <iframe src="//music.163.com/outchain/player?type=2&id=1935705479&auto=0&height=66"
+              frameborder="no" border="0" marginwidth="0" marginheight="0"
+              title="网易云音乐单曲播放器" allow="autoplay; encrypted-media; clipboard-write"></iframe>
+    </div>
+  </div>
+
   <!-- 访客反馈弹层（v1.22） -->
   <div class="feedback-overlay" id="feedbackOverlay" aria-hidden="true">
     <div class="feedback-modal" id="feedbackModal" role="dialog" aria-modal="true" aria-labelledby="feedbackTitle">
@@ -438,8 +461,9 @@
     </div>
   </div>
 
-  <script src="scripts/main.js?v=1.22.1"></script>
+  <script src="scripts/main.js?v=1.23.0"></script>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.49.4/dist/umd/supabase.min.js"></script>
-  <script src="scripts/feedback.js?v=1.22.1"></script>
+  <script src="scripts/feedback.js?v=1.23.0"></script>
+  <script src="scripts/music.js?v=1.23.0"></script>
 </body>
 </html>
