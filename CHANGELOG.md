@@ -10,7 +10,44 @@
 
 ---
 
-## [v1.42.7] 修复：开发历程 LOG 弹窗打不开(当前)
+## [v1.42.8] 彩蛋行解密：触发全站彩蛋后乱码自动还原为真实版本日志（当前）
+
+- **日期**：2026-09-20
+- **作者**：katzegott
+- **类型**：`新增`
+
+### 新增
+- 需求：开发历程弹窗中彩蛋相关版本日志以乱码口令展示；触发对应彩蛋后，文本由乱码更变为原本的版本日志。
+- 实现（[AI-GEN]，数据驱动）：
+  - `history.js` 8 条 `{GARBLE:n}` 加密行补充 `egg`（彩蛋 id）+ `secret`（真实版本日志）字段，文案取自 CHANGELOG / git 历史对应版本的真实记录：
+    | 加密版本 | 对应彩蛋 | 真实版本日志 |
+    | --- | --- | --- |
+    | v1.5 | 页脚暗号「梦想即力量」 | 页面底部彩蛋：输入暗号点亮页面并跳转 BanG Dream |
+    | V2.10 / V2.12 | lycnb 隐藏关卡 | 彩蛋升级为 lycnb 解锁的隐藏关卡浮层 / 修复彩蛋浮层遮挡光标 |
+    | V2.18 / V2.21 | 待机彩蛋 | 3 分钟无操作红色警报 / 「故障解除」退出动画 |
+    | V3.24 | 火柴人彩蛋 | 赛博火柴人：两段式奔跑 / 方向跟随 / 点击说话 |
+    | V3.41.1 | 火柴人稀有台词 | 数字孪生与火柴人定制优化（知识库 25 条 / 稀有台词 / 随机回复池） |
+    | V3.41.2 | copy 键盘彩蛋 | 输入 copy 复制火柴人，上限 10 个超限回收 |
+  - 各彩蛋脚本触发成功时派发 `site-egg` 事件（`detail.name` 为彩蛋 id）：`main.js` 埋点 lycnb / 梦想即力量 / 待机彩蛋三处，`stickman.js` 埋点点击说话（普通台词 + 稀有台词 rare-line）与 copy 两处。
+  - `history.js` 监听 `site-egg` 并永久登记到 `localStorage`（key `personal-homepage-eggs`）；渲染时对应行直接显示 `secret` 明文（`.history-declassified` 亮绿色，不再滚动乱码）；弹窗正开着时收到事件即时重渲染。
+- **版本**：主页版本号 → 1.42.8；`history.js` / `main.js` / `stickman.js` / `style.css` 引用 `?v=1.42.8`；`main.js` BIOS → v1.42.8；`history.js` 新增 V3.42.8 条目。
+
+### 涉及文件
+| 文件 | 类型 | 说明 |
+| --- | --- | --- |
+| `scripts/history.js` | 修改 | 8 条加密行加 `egg`+`secret`；彩蛋登记表（loadEggs / markEgg / eggDone）；`renderVersionText` 解密渲染；监听 `site-egg` 即时刷新；V3.42.8 条目 |
+| `scripts/main.js` | 修改 | lycnb / 梦想即力量 / 待机彩蛋三处派发 `site-egg`；BIOS → 1.42.8 |
+| `scripts/stickman.js` | 修改 | 点击说话与稀有台词、copy 彩蛋派发 `site-egg` |
+| `styles/style.css` | 修改 | 新增 `.history-declassified` 解密行样式 |
+| `index.html` | 修改 | 版本号 → 1.42.8；相关引用 `?v=1.42.8` |
+
+### 验证方式
+- `history.js` / `main.js` / `stickman.js` V8 `--check` 语法通过；页面与脚本 HTTP 200。
+- CDP 浏览器实测：未触发彩蛋时 8 行全为乱码；逐个派发 `site-egg`（lycnb / dream-power / idle / stickman / rare-line / copy）并重开弹窗，对应行解密为真实版本日志，其余行保持乱码；刷新页面后解密状态持久保留。
+
+---
+
+## [v1.42.7] 修复：开发历程 LOG 弹窗打不开(历史)
 
 - **日期**：2026-09-20
 - **作者**：katzegott

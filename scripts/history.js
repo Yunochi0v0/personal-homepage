@@ -11,8 +11,12 @@
    - 无障碍：遮罩 role="dialog" aria-modal，aria-hidden 随开合切换；
      Esc 监听仅在弹窗打开期间挂载、关闭时移除（不污染页面其它键盘逻辑）。
    - 动态乱码：数据中用 {GARBLE:n} 占位一段 n 位乱码口令，渲染时替换为
-     乱码 <span>；弹窗打开期间每 0.3s 从第 1 位到最后一位依次刷新一个字符，
-     产生「逐位滚动乱码」效果；弹窗关闭时清除定时器。reduced-motion 下不滚动。
+      乱码 <span>；弹窗打开期间每 0.3s 从第 1 位到最后一位依次刷新一个字符，
+      产生「逐位滚动乱码」效果；弹窗关闭时清除定时器。reduced-motion 下不滚动。
+   - 彩蛋行解密（v1.42.8）：带 egg + secret 字段的条目是「加密的版本日志」——
+      对应全站彩蛋（页脚暗号 / lycnb 关卡 / 待机 / 火柴人 / copy）被触发后，
+      该行永久解密为真实版本日志（localStorage 持久化），弹窗中不再显示乱码；
+      彩蛋触发由各彩蛋脚本派发 site-egg 事件通知（弹窗开着时即时刷新）。
    ============================================================ */
 (function () {
   "use strict";
@@ -31,7 +35,7 @@
         { v: "v1.2", date: "2026-09-07", text: "默认文字头像替换为动漫头像" },
         { v: "v1.3", date: "2026-09-07", text: "官方校徽图片替换文字占位校徽（TJU / PolyU）" },
         { v: "v1.4", date: "2026-09-07", text: "全站可交互按钮加入液态玻璃质感" },
-        { v: "v1.5", date: "2026-09-07", text: "{GARBLE:29}" },
+        { v: "v1.5", date: "2026-09-07", text: "{GARBLE:29}", egg: "dream-power", secret: "页面底部彩蛋：输入暗号「梦想即力量」点亮页面并跳转 BanG Dream" },
         { v: "v1.6", date: "2026-09-07", text: "全站 slogan 更正为「梦想即力量」" },
         { v: "v1.7", date: "2026-09-10", text: "顶部导航替换为 macOS 风格悬浮 Dock" }
       ]
@@ -45,18 +49,18 @@
       versions: [
         { v: "V2.8", date: "2026-09-10", text: "自定义霓虹光标 + 轨迹拖尾 + 四芒星交互形态" },
         { v: "V2.9", date: "2026-09-10", text: "像素风格（8-bit）：像素字体 / 台阶切角 / 硬阴影 / 动态正弦波背景" },
-        { v: "V2.10", date: "2026-09-10", text: "{GARBLE:17}" },
+        { v: "V2.10", date: "2026-09-10", text: "{GARBLE:17}", egg: "lycnb", secret: "彩蛋升级为 lycnb 解锁的隐藏关卡浮层" },
         { v: "V2.11", date: "2026-09-10", text: "复古 CRT 开启动画：约 4.6 秒终端解密自检" },
-        { v: "V2.12", date: "2026-09-10", text: "{GARBLE:13}" },
+        { v: "V2.12", date: "2026-09-10", text: "{GARBLE:13}", egg: "lycnb", secret: "修复彩蛋浮层与开启动画遮挡自定义光标" },
         { v: "V2.13", date: "2026-09-10", text: "开启动画播放期间隐藏鼠标光标" },
         { v: "V2.14", date: "2026-09-10", text: "Dock 栏整体深色半透明毛玻璃底板" },
         { v: "V2.15", date: "2026-09-10", text: "四芒星光标由黄色改为青色，与按钮点亮色区分" },
         { v: "V2.16", date: "2026-09-10", text: "叠加 CRT 水平扫描线与全页微弱噪点" },
         { v: "V2.17", date: "2026-09-10", text: "项目区改为 MISSION 任务列表 + 悬停全息简报面板" },
-        { v: "V2.18", date: "2026-09-10", text: "{GARBLE:25}" },
+        { v: "V2.18", date: "2026-09-10", text: "{GARBLE:25}", egg: "idle", secret: "新增待机彩蛋：3 分钟无操作触发红色警报与乱码提醒" },
         { v: "V2.19", date: "2026-09-14", text: "待机乱码铺满全屏（按视口实测字符动态计算行列）" },
         { v: "V2.20", date: "2026-09-17", text: "Hero 当前状态座舱仪表盘 + 联系区 GitHub 卡片上线" },
-        { v: "V2.21", date: "2026-09-17", text: "{GARBLE:21}" }
+        { v: "V2.21", date: "2026-09-17", text: "{GARBLE:21}", egg: "idle", secret: "待机彩蛋新增「故障解除」退出动画（3 秒）" }
       ]
     },
     {
@@ -68,7 +72,7 @@
       versions: [
         { v: "V3.22", date: "2026-09-17", text: "访客反馈功能 + Supabase 后台（V3 课件 · 发布 GitHub Pages）" },
         { v: "V3.23", date: "2026-09-17", text: "网易云音乐播放器：右下角 🎵 入口 + 赛博随身听浮窗" },
-        { v: "V3.24", date: "2026-09-17", text: "{GARBLE:27}" },
+        { v: "V3.24", date: "2026-09-17", text: "{GARBLE:27}", egg: "stickman", secret: "新增赛博火柴人彩蛋：两段式奔跑 / 方向跟随 / 点击说话" },
         { v: "V3.25", date: "2026-09-18", text: "音游展示区：世界计划 MASTER 全连记录（数据驱动渲染）" },
         { v: "V3.26", date: "2026-09-18", text: "火柴人橡皮管拉伸改造：三层 DOM 解耦，防 transform 冲突" },
         { v: "V3.30", date: "2026-09-18", text: "火柴人中层仅结构占位，不再直接写 transform" },
@@ -81,13 +85,14 @@
         { v: "V3.39", date: "2026-09-18", text: "待机软绳弧：静止躯干呈自然弧线而非僵直直线" },
         { v: "V3.40", date: "2026-09-18", text: "走路挺直：拖动中弧线收平不驼背，松手弹回软绳弧" },
         { v: "V3.41", date: "2026-09-20", text: "项目板块新增开发历程弹窗：LOG 按钮 + 三大阶段数据驱动展示（V1.0 建站 / V2.0 光标→GitHub / V3.0 发布后迭代）" },
-        { v: "V3.41.1", date: "2026-09-20", text: "{GARBLE:95}" },
-        { v: "V3.41.2", date: "2026-09-20", text: "{GARBLE:51}" },
+        { v: "V3.41.1", date: "2026-09-20", text: "{GARBLE:95}", egg: "rare-line", secret: "数字孪生与火柴人定制优化：知识库 12→25 条全站取材、火柴人稀有台词约 10% 概率、随机回复池兜底" },
+        { v: "V3.41.2", date: "2026-09-20", text: "{GARBLE:51}", egg: "copy", secret: "第三个键盘彩蛋：输入 copy 复制火柴人，上限 10 个，超限一键回收" },
         { v: "V3.42", date: "2026-09-20", text: "成就系统上线：主页新增成就栏，浏览 / 互动解锁成就并点亮，达成时右下角弹出 Steam 风格提示" },
         { v: "V3.42.1", date: "2026-09-20", text: "成就系统 10 项成就落地：待机彩蛋 / 彩蛋关卡 / 诗云传送 / 停留 10 分钟 / 全成就收藏家" },
         { v: "V3.42.2", date: "2026-09-20", text: "页脚新增「了解更多」按钮：点击跳转 B 站视频（BV1UT42167xb），新标签页打开" },
         { v: "V3.42.3", date: "2026-09-20", text: "成就简介保密：未解锁的成就一律以「???」代替简介，不再展示达成条件" },
         { v: "V3.42.4", date: "2026-09-20", text: "新增成就「你被骗了」：点击页脚「了解更多」按钮解锁" },
+        { v: "V3.42.8", date: "2026-09-20", text: "彩蛋行解密：触发全站对应彩蛋（页脚暗号 / lycnb / 待机 / 火柴人 / copy）后，开发历程弹窗中对应乱码口令自动解密为真实版本日志" },
         { v: "V3.42.7", date: "2026-09-20", text: "修复：开发历程弹窗打不开（history.js 上一版本多出一对闭合括号导致语法错误）" },
         { v: "V3.42.6", date: "2026-09-20", text: "英文态像素字体：切换英文后全站文本使用 Press Start 2P 8-bit 像素字体" },
         { v: "V3.42.5", date: "2026-09-20", text: "多语言切换：左上角 EN / 中 按钮一键切换整站中英文，成就 / 数字孪生 / 打字机 slogan 随语言切换" }
@@ -98,6 +103,34 @@
   var overlay, panel, closeBtn, stageList;
   var garbleSpans = [];  // 弹窗中所有乱码 <span>（打开期间每个都滚动刷新）
   var garbleTimers = []; // 各乱码 span 的 setInterval 句柄，空数组表示未运行
+
+  /* ---------- 彩蛋行解密登记表 ----------
+     全站各彩蛋被触发时派发 site-egg 事件（detail.name 为彩蛋 id），此处
+     永久记入 localStorage（personal-homepage-eggs），弹窗渲染时对应乱码行
+     直接显示 secret 真实版本日志。 */
+  var EGG_STORE_KEY = "personal-homepage-eggs"; // 已触发彩蛋 id 数组
+  var eggCache = null;
+
+  function loadEggs() {
+    if (eggCache) return eggCache;
+    try {
+      eggCache = JSON.parse(localStorage.getItem(EGG_STORE_KEY) || "[]");
+    } catch (e) { eggCache = []; }
+    if (!Array.isArray(eggCache)) eggCache = [];
+    return eggCache;
+  }
+
+  function eggDone(name) {
+    return loadEggs().indexOf(name) !== -1;
+  }
+
+  function markEgg(name) {
+    if (!name || eggDone(name)) return;
+    var list = loadEggs();
+    list.push(name);
+    eggCache = list;
+    try { localStorage.setItem(EGG_STORE_KEY, JSON.stringify(list)); } catch (e) {}
+  }
   /* 不含 HTML 敏感字符（尖括号 / 与号 / 双引号 / 单引号 / 空格），确保 span 文本可安全内联渲染 */
   var GARBLE_CHARS = "abcdefghijklmnopqrstuvwxyz0123456789!@#$%^*-_=+[];:,.?\\/";
 
@@ -137,6 +170,15 @@
       rest = m[3];
     }
     return out;
+  }
+
+  /* 版本文本渲染：彩蛋行（egg 字段）对应彩蛋已触发 → 显示真实版本日志
+     （.history-declassified 明文，不再滚动）；未触发 → 渲染乱码口令。 */
+  function renderVersionText(ver) {
+    if (ver.egg && ver.secret && eggDone(ver.egg)) {
+      return '<span class="history-declassified">' + ver.secret + "</span>";
+    }
+    return replaceGarble(ver.text);
   }
 
   /* 弹窗打开期间：每个乱码 <span> 每 0.3s 从第 1 位到最后一位依次刷新一个乱码字符 */
@@ -327,6 +369,17 @@
 
     renderStages();
 
+    // 监听全站彩蛋触发：登记彩蛋 id；若弹窗正开着，即时重渲染解密对应行
+    document.addEventListener("site-egg", function (e) {
+      if (!e || !e.detail || !e.detail.name) return;
+      markEgg(e.detail.name);
+      if (overlay.classList.contains("is-open")) {
+        stopGarble();
+        renderStages();
+        startGarble();
+      }
+    });
+
     if (trigger) trigger.addEventListener("click", open);
     if (closeBtn) closeBtn.addEventListener("click", close);
     overlay.addEventListener("click", onOverlayClick);
@@ -344,7 +397,7 @@
           '<li class="history-item">' +
             '<span class="history-ver">' + ver.v + '</span>' +
             '<span class="history-date">' + ver.date + '</span>' +
-            '<span class="history-text">' + replaceGarble(ver.text) + '</span>' +
+            '<span class="history-text">' + renderVersionText(ver) + '</span>' +
           '</li>';
       }
       html +=
@@ -369,6 +422,9 @@
   function open() {
     overlay.classList.add("is-open");
     overlay.setAttribute("aria-hidden", "false");
+    // 每次打开按最新彩蛋登记重渲染：彩蛋在弹窗关闭期间被触发（site-egg 只
+    // 登记未刷新）时，重开弹窗仍能正确解密对应行。
+    renderStages();
     // 先注册弹窗级 keydown（Esc 处理），再播动画（动画注册自己的 onBootKey）。
     // 顺序保证 Esc 时先走 onKeydown：动画未结束先跳过（finish），结束则关闭弹窗。
     if (onKeydown) window.removeEventListener("keydown", onKeydown);

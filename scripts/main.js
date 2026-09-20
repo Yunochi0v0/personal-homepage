@@ -740,6 +740,7 @@ document.querySelectorAll(".is-placeholder").forEach((link) => {
     if (buffer === UNLOCK_KEYS) {
       buffer = "";
       openEgg();
+      document.dispatchEvent(new CustomEvent("site-egg", { detail: { name: "lycnb" } }));
     }
   });
 
@@ -769,6 +770,7 @@ document.querySelectorAll(".is-placeholder").forEach((link) => {
       if (eggBox) eggBox.classList.add("triggered");
       setHint("✦ 咒语生效，梦想即力量 · 正在进入…");
       if (window.Achievements) window.Achievements.unlock("dream_power"); // 成就：梦想无限大！！！！！
+      document.dispatchEvent(new CustomEvent("site-egg", { detail: { name: "dream-power" } }));
       setTimeout(() => {
         window.location.href = TARGET_URL;
       }, 700);
@@ -1045,7 +1047,7 @@ document.querySelectorAll(".is-placeholder").forEach((link) => {
   }
 
   const LINES = [
-    "DEEPWORKS BIOS v1.42.7",
+    "DEEPWORKS BIOS v1.42.8",
     "MEMTEST 640K ............... <OK>",
     "NEON SHADER LOAD ........... <OK>",
     "SINE WAVE ENGINE ........... <OK>",
@@ -1519,6 +1521,7 @@ document.querySelectorAll(".is-placeholder").forEach((link) => {
     }
     if (idleOpen) return;
     openIdleEgg();
+    document.dispatchEvent(new CustomEvent("site-egg", { detail: { name: "idle" } }));
   }
 
   function onActivity() {

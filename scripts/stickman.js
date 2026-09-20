@@ -434,6 +434,8 @@
     var b = getBubble();
     if (!b) return;
     var rare = Math.random() < 0.1; // 稀有台词低概率触发
+    document.dispatchEvent(new CustomEvent("site-egg", { detail: { name: "stickman" } }));
+    if (rare) document.dispatchEvent(new CustomEvent("site-egg", { detail: { name: "rare-line" } }));
     var pool = rare ? RARE_LINES : LINES;
     var pick;
     var guard = 0;
@@ -602,6 +604,7 @@
     if (buffer === COPY_KEYS) {
       buffer = "";
       spawnClone();
+      document.dispatchEvent(new CustomEvent("site-egg", { detail: { name: "copy" } }));
     }
   });
 })();

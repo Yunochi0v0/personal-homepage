@@ -4738,6 +4738,14 @@ textarea.feedback-message {
   white-space: nowrap;
 }
 
+/* 已解密的版本日志：对应彩蛋触发后由乱码口令还原为明文（亮绿色等宽发光，
+   与青色乱码形成「解密成功」的视觉区分） */
+.history-declassified {
+  font-family: "Courier New", ui-monospace, monospace;
+  color: #7dffa0;
+  text-shadow: 0 0 8px rgba(125, 255, 160, 0.45);
+}
+
 /* ==========================================================================
    10. 弹窗开启动画：档案解密终端序列
    AI-generated: 与彩蛋 egg-boot 同语言（终端逐行打印 + 乱码滚动 +
