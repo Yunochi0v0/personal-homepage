@@ -10,7 +10,33 @@
 
 ---
 
-## [v1.42.5] 多语言切换：左上角 EN / 中 按钮(当前)
+## [v1.42.6] 英文态像素字体：Press Start 2P(当前)
+
+- **日期**：2026-09-20
+- **作者**：katzegott
+- **类型**：`修改`
+
+### 修改
+- 用户需求：英语文本字体做出像素风（与页脚「Powered by Vibe Coding」的 8-bit 点阵字体一致）。
+- 实现（[AI-GEN]）：
+  - `styles/style.css` 追加第 17 节：`html[lang="en"]` 下全站文本 `font-family` 统一切换为 `var(--pixel-font)`（Press Start 2P），含按钮 / 输入框 / 占位符；像素字形偏大，英文态基字收窄至 13px、行距放宽至 2，并对小号辅助文案（.text-muted / .tag / .badge / .dock-tip / .music-pop-title / .card-desc / .ach-desc 等）做放大补偿。
+  - 作用域：仅语言切换为英文（`<html lang="en">`，由 i18n.js 设置）时生效，中文态字体栈完全不受影响；Press Start 2P 由 index.html 既有 Google Fonts 引入，无新增外链。
+- **版本**：主页版本号 → 1.42.6，`style.css` 引用 `?v=1.42.6` 刷新；`main.js` BIOS → v1.42.6；`history.js` 新增 V3.42.6 条目并迁移「当前版本」标记。
+
+### 涉及文件
+| 文件 | 类型 | 说明 |
+| --- | --- | --- |
+| `styles/style.css` | 修改 | 追加第 17 节：英文态全站像素字体 + 可读性补偿 |
+| `index.html` | 修改 | 版本号 1.42.6，style.css 引用 `?v=1.42.6` |
+| `scripts/main.js` | 修改 | BIOS → v1.42.6 |
+| `scripts/history.js` | 修改 | 新增 V3.42.6 条目并迁移「当前版本」标记 |
+
+### 验证方式
+- CDP 浏览器实测：切换 EN 后正文 / 段落 / 按钮 / 输入框计算样式均为 Press Start 2P，页面截图呈 8-bit 点阵效果；切换回中文后字体栈恢复原样。
+
+---
+
+## [v1.42.5] 多语言切换：左上角 EN / 中 按钮(历史)
 
 - **日期**：2026-09-20
 - **作者**：katzegott

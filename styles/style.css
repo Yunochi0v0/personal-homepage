@@ -5540,3 +5540,53 @@ textarea.feedback-message {
     font-size: 14px;
   }
 }
+
+/* 17. 英文态像素字体（html[lang="en"] 由 i18n 切换，v1.42.6 · AI-GEN）：
+   英文文本全站切换为 8-bit 像素字体（Press Start 2P），
+   仅作用于语言切换为英文时的 <html lang="en">，中文态不受影响。
+   像素字字形偏大，故英文态收窄基字并加宽行距以保证可读性。 */
+html[lang="en"] body,
+html[lang="en"] body * {
+  font-family: var(--pixel-font) !important;
+}
+
+html[lang="en"] body {
+  font-size: 13px;
+  line-height: 2;
+  letter-spacing: 0.4px;
+}
+
+/* 继承 body 基字的正文容器行距再放宽一档 */
+html[lang="en"] p,
+html[lang="en"] li,
+html[lang="en"] dd,
+html[lang="en"] td,
+html[lang="en"] blockquote {
+  line-height: 2.05;
+}
+
+/* 输入框占位符与小型标签在像素字下偏小，稍作放大补偿 */
+html[lang="en"] input,
+html[lang="en"] textarea,
+html[lang="en"] select,
+html[lang="en"] button {
+  font-family: var(--pixel-font) !important;
+  letter-spacing: 0.5px;
+}
+
+html[lang="en"] ::placeholder {
+  font-size: 0.82em;
+  line-height: 1.6;
+}
+
+/* 像素字下极小的辅助文案放大一点，避免糊成点阵 */
+html[lang="en"] .text-muted,
+html[lang="en"] .hint,
+html[lang="en"] .tag,
+html[lang="en"] .badge,
+html[lang="en"] .dock-tip,
+html[lang="en"] .music-pop-title,
+html[lang="en"] .card-desc,
+html[lang="en"] .ach-desc {
+  font-size: 0.92em;
+}
