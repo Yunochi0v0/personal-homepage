@@ -2385,6 +2385,21 @@ html.is-booting .cursor-trail {
   opacity: 0 !important;
 }
 
+/* 1c. 诗云传送过场动画期间隐藏鼠标指针。
+   AI-generated: 与 is-booting 同模式——原生指针与自定义霓虹光标一并隐藏，
+   让「染红→乱码→黑屏→舷窗→星空→变焦→跳转」全程无箭头干扰；
+   状态类由 shiyun.js start() 加上，页面跳转离开后自动失效。 */
+html.is-shiyun-warp,
+html.is-shiyun-warp * {
+  cursor: none !important;
+}
+
+html.is-shiyun-warp .cursor-dot,
+html.is-shiyun-warp .cursor-ring,
+html.is-shiyun-warp .cursor-trail {
+  opacity: 0 !important;
+}
+
 /* 2. 全屏黑场。
    animation 为纯 CSS 兜底：即使脚本异常未能移除该层，8 秒后也会自动隐藏。 */
 .boot {
@@ -3987,9 +4002,21 @@ textarea.feedback-message {
   }
 }
 
-/* ============ 11. 赛博火柴人彩蛋（v1.24 · AI-GEN） ============
+/* ============ 11. 赛博火柴人彩蛋（v1.33 · AI-GEN） ============
    右下角待机呼吸的可拖动彩蛋；拖动时切换「挣扎奔跑」四肢摆动动画；
    松手停在原地（不自动归位），恢复呼吸。
+   变形解耦（防 transform 属性冲突）：
+     外层 .stickman        ← JS 只写 translate3d（拖动定位）
+     SVG 内部躯干单元      ← JS 把躯干当作弹性绳子：一串 Verlet 弹簧质点节点
+                             重写为平滑曲线 path（d 属性）；头/手臂容器/腿容器
+                             分别跟随绳子脖子端/肩部节点/胯端节点（translate）
+                             抓取点感知：抓头 → 脖子端刚度大领先（头先动，下半身
+                             滞后跟随）；抓下半身 → 胯端领先（下半身先动，头滞后）
+                             松手回弹由 JS 弹簧动画帧承担（欠阻尼过冲 Q 弹）
+     内层 .stickman-inner  ← 只由 CSS @keyframes 驱动（待机呼吸 + 拖拽奔跑四肢摆动）
+   四肢动画为嵌套 <g> 关节链 + CSS transform（transform-box: view-box /
+   transform-origin 关节坐标）：父 <g> 旋转带动子 <g> → 「前臂随上臂绕肩、
+   小腿随大腿绕胯」组合旋转，不再由 JS 逐帧计算 SVG 坐标。
    定位：fixed 右下角、按钮列上方（桌面按钮列 bottom:26 + 40*3 + 16*2 = 178）。 */
 .stickman {
   position: fixed;
@@ -4008,7 +4035,71 @@ textarea.feedback-message {
   cursor: grabbing; /* [AI-GEN] 拖动中光标变为抓取态 */
 }
 
-/* 内层容器：承载待机呼吸动画，与 JS 的 translate3d（外层）分离，互不覆盖 */
+/* 中层容器（v1.30 起仅作结构占位，JS 不再写它）：
+   弹性绳子变形在 SVG 内部完成：
+     .stick-body  → 绳子节点重写为贝塞尔 path（d 属性）
+     .stick-head  → translate 跟随绳子脖子端
+     .stick-arms  → translate 跟随绳子肩部节点
+     .stick-lower → translate 跟随胯端节点
+   抓取点感知：抓头时头端领先、抓下半身时胯端领先（弹簧刚度差）。
+   弹簧驱动 → 松手欠阻尼过冲回稳（Q 弹）。
+   v1.37 起：中层闲置 transform 被复用为「落地 Q 弹挤压」动画挂载点
+   （.squashing 临时 class → squashAndStretch 关键帧），仍不写常驻 transform */
+.stickman-scale {
+  width: 100%;
+  height: 100%;
+}
+
+/* Q 弹落地挤压（v1.37 · AI-GEN）：松手/点击触发（JS 临时加 .squashing class）。
+   squashAndStretch 关键帧：瞬间压扁(1.12,0.86) → 弹起拉长(0.92,1.12) →
+   二次小挤压(1.06,0.94) → 衰减恢复(1,1)，0.6s 过冲缓动（0.5-0.8s 区间内）。
+   只作用于中层 → 外层 translate3d、内层呼吸/四肢动画互不干扰；
+   动画结束后 JS 移除 class 回到无 transform 常态。 */
+.stickman-scale.squashing {
+  animation: stickman-squash 0.6s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+}
+/* 挤压期间发光增强：模拟弹性形变产生的能量（回弹时 drop-shadow 更亮） */
+.stickman-scale.squashing .stickman-svg {
+  filter: drop-shadow(0 0 14px rgba(255, 215, 0, 1));
+}
+@keyframes stickman-squash {
+  0%   { transform: scale(1, 1); }
+  30%  { transform: scale(1.12, 0.86); } /* 落地瞬间压扁 */
+  55%  { transform: scale(0.92, 1.12); } /* 弹起拉长 */
+  75%  { transform: scale(1.06, 0.94); } /* 二次小挤压 */
+  100% { transform: scale(1, 1); }       /* 衰减恢复 */
+}
+
+/* 躯干（v1.32 弹性绳子）：不再是单条可 scaleY 的线，而是由一串弹簧质点节点
+   （Verlet 积分）组成的绳子——脖子端固定，胯端被拖动目标拉动，中间节点带惯性
+   和相邻距离约束 → 拖拽时绳子被甩出波浪、松手时波动回弹。JS 每帧把节点重写为
+   平滑曲线 path（d 属性），不再使用 transform 缩放（锚点/transform-origin 不需要） */
+.stickman-svg .stick-body {
+  will-change: auto; /* d 属性每帧重写，无 GPU transform 可提升 */
+}
+
+/* 下半身容器：JS 写 translate(x,y) 使腿跟随胯端节点的实际位置（含摆动） */
+.stickman-svg .stick-lower {
+  will-change: transform;
+}
+
+/* 头圆：JS 写 translate 跟随绳子脖子端节点（抓头时头先动） */
+.stickman-svg .stick-head {
+  will-change: transform;
+}
+
+/* 双臂容器（v1.36 软连接）：JS 写 translate + rotate——
+   rotate 绕肩(22,22) 跟随绳子切线（躯干弯弧时手臂顺弧倾斜），
+   translate 定位肩部到绳子节点（弹性滞后，甩动时手臂拖尾）；
+   子 g（上臂/前臂）的关节旋转动画在各自元素上，父 g 变换不干扰
+   （子 g transform-origin 用 view-box 绝对坐标，天然叠加） */
+.stickman-svg .stick-arms {
+  transform-box: view-box;
+  transform-origin: 22px 22px; /* 旋转锚点 = 肩关节 */
+  will-change: transform;
+}
+
+/* 内层容器：承载待机呼吸动画，与 JS 的 translate3d（外层）/scale（中层）分离，互不覆盖 */
 .stickman-inner {
   width: 100%;
   height: 100%;
@@ -4027,7 +4118,8 @@ textarea.feedback-message {
 }
 
 .stickman-svg line,
-.stickman-svg circle {
+.stickman-svg circle,
+.stickman-svg path {
   stroke: #ffd700;
   stroke-width: 4; /* 加粗（放大后仍清晰） */
   stroke-linecap: round;
@@ -4040,12 +4132,51 @@ textarea.feedback-message {
   stroke: none;
 }
 
-/* 拖动中：停止呼吸 → 上下弹跳模拟奔跑起伏（四肢旋转由 stickman.js
-   直接驱动 SVG transform 属性，绕关节旋转，100% 渲染，不依赖 CSS
-   transform-box/origin 对 SVG 元素的支持） */
+/* 四肢关节链（v1.26 · AI-GEN）：嵌套 <g> + CSS transform 驱动奔跑摆动。
+   transform-box: view-box + transform-origin: 关节坐标 → 父 <g>（上臂/大腿）
+   绕肩/髋摆动，内嵌子 <g>（前臂/小腿）绕肘/膝屈曲；父变换会带动子坐标系，
+   天然实现「前臂随上臂、小腿随大腿」组合旋转（等价于原 JS 世界坐标渲染）。
+   摆动角度与原 JS 数学一致：臂 ±45° / 腿 ±40° / 前臂 100~130° / 小腿屈膝。 */
+.stickman-svg .stick-arm-g-l,
+.stickman-svg .stick-arm-g-r,
+.stickman-svg .stick-leg-g-l,
+.stickman-svg .stick-leg-g-r {
+  transform-box: view-box;
+  transform-origin: 22px 22px; /* 肩（arm）/ 胯（leg）：躯干两端关节 */
+}
+.stickman-svg .stick-leg-g-l,
+.stickman-svg .stick-leg-g-r {
+  transform-origin: 22px 36px; /* 胯关节（覆盖上面的肩值） */
+}
+.stickman-svg .stick-forearm-g-l { transform-box: view-box; transform-origin: 14px 31px; }
+.stickman-svg .stick-forearm-g-r { transform-box: view-box; transform-origin: 30px 31px; }
+.stickman-svg .stick-shin-g-l    { transform-box: view-box; transform-origin: 15px 47px; }
+.stickman-svg .stick-shin-g-r    { transform-box: view-box; transform-origin: 29px 47px; }
+
+/* 拖动中（内层 .running）：停止呼吸 → 上下弹跳模拟奔跑起伏 + 四肢快速交替摆动
+   （四肢由 CSS @keyframes 驱动，0.15s 单程/0.3s 往返，与原 JS 的 PERIOD=0.30 同节奏） */
 .stickman.dragging .stickman-inner {
   animation: stickman-run-bounce 0.30s linear infinite alternate; /* 与四肢同节奏弹跳（v1.24.3+ 放慢 0.22→0.30） */
 }
+
+/* 四肢摆动关键帧（v1.26）：左右肢相位差 π → 方向相反即交替；alternate 来回摆 */
+.stickman-inner.running .stick-arm-g-l     { animation: stickman-arm-l     0.15s linear infinite alternate; }
+.stickman-inner.running .stick-arm-g-r     { animation: stickman-arm-r     0.15s linear infinite alternate; }
+.stickman-inner.running .stick-forearm-g-l { animation: stickman-forearm-l 0.15s linear infinite alternate; }
+.stickman-inner.running .stick-forearm-g-r { animation: stickman-forearm-r 0.15s linear infinite alternate; }
+.stickman-inner.running .stick-leg-g-l     { animation: stickman-leg-l     0.15s linear infinite alternate; }
+.stickman-inner.running .stick-leg-g-r     { animation: stickman-leg-r     0.15s linear infinite alternate; }
+.stickman-inner.running .stick-shin-g-l    { animation: stickman-shin-l    0.15s linear infinite alternate; }
+.stickman-inner.running .stick-shin-g-r    { animation: stickman-shin-r    0.15s linear infinite alternate; }
+
+@keyframes stickman-arm-l { from { transform: rotate(-45deg); } to { transform: rotate(45deg); } }
+@keyframes stickman-arm-r { from { transform: rotate(45deg); }  to { transform: rotate(-45deg); } }
+@keyframes stickman-forearm-l { from { transform: rotate(100deg); } to { transform: rotate(130deg); } }
+@keyframes stickman-forearm-r { from { transform: rotate(130deg); } to { transform: rotate(100deg); } }
+@keyframes stickman-leg-l { from { transform: rotate(-40deg); } to { transform: rotate(40deg); } }
+@keyframes stickman-leg-r { from { transform: rotate(40deg); }  to { transform: rotate(-40deg); } }
+@keyframes stickman-shin-l { from { transform: rotate(-78deg); } to { transform: rotate(-12deg); } }
+@keyframes stickman-shin-r { from { transform: rotate(12deg); }  to { transform: rotate(78deg); } }
 
 /* 待机呼吸：极轻微上下浮动（0 ↔ -4px），舒缓循环 */
 @keyframes stickman-idle {
@@ -4135,6 +4266,1006 @@ textarea.feedback-message {
     animation: none;
   }
   .eq-bars i {
+    animation: none;
+  }
+}
+
+/* ============ 12. 音游展示区（v1.25 · AI-GEN） ============
+   世界计划（Project SEKAI）MASTER 全连截图展示。
+   局部中二节奏风：卡片 clip-path 斜切角（平行四边形）+ 深色毛玻璃 + 黄细边框微光，
+   曲名左下角倾斜等宽字体；hover 图片放大、边框变亮、底部黄色扫描线快速滑过。
+   板块整体套毛玻璃面板（.arcade-frame，与 music-pop 同款黄黑玻璃风格）。
+   严格沿用主页黄黑配色（--accent: #ffd700 / 黑），不动任何现有样式。 */
+
+/* 板块毛玻璃面板边框：深色半透明玻璃 + 黄边斜切角 + 微光 + 内侧顶部高光，
+   左上/右下斜切角呼应音乐浮窗（music-pop）与整体 HUD 语言 */
+.arcade-frame {
+  position: relative;
+  margin-top: 26px;
+  padding: 30px 26px 20px;
+  background:
+    linear-gradient(160deg, rgba(255, 255, 255, 0.06) 0%, rgba(255, 255, 255, 0) 55%),
+    rgba(8, 8, 8, 0.62);
+  -webkit-backdrop-filter: blur(14px) saturate(160%);
+  backdrop-filter: blur(14px) saturate(160%);
+  border: 1px solid rgba(255, 232, 26, 0.45);
+  box-shadow:
+    0 0 22px rgba(255, 232, 26, 0.14),
+    inset 0 1px 0 rgba(255, 255, 255, 0.10);
+  clip-path: polygon(14px 0, 100% 0, 100% calc(100% - 14px), calc(100% - 14px) 100%, 0 100%, 0 14px);
+}
+/* HUD 角标：面板左上角黄色小角标，强化斜切毛玻璃框的科幻质感 */
+.arcade-frame::before {
+  content: "ARCADE.SYS";
+  position: absolute;
+  top: 6px;
+  left: 22px;
+  z-index: 1;
+  font-family: "Courier New", ui-monospace, monospace;
+  font-size: 10px;
+  letter-spacing: 2px;
+  color: rgba(255, 232, 26, 0.7);
+  text-shadow: 0 0 6px rgba(255, 232, 26, 0.5);
+  pointer-events: none;
+}
+/* 手机：面板留白收窄 */
+@media (max-width: 640px) {
+  .arcade-frame {
+    margin-top: 20px;
+    padding: 22px 14px 14px;
+  }
+}
+
+/* 音游卡片横向滑动区：所有卡片同一行，左右滑动浏览（触屏原生滑动 / 桌面鼠标拖拽）。
+   隐藏滚动条，保留键盘与触控板横向滚动能力。 */
+.arcade-grid {
+  display: flex;
+  gap: 22px;
+  margin-top: 26px;
+  padding: 6px 4px 14px;
+  overflow-x: auto;
+  overflow-y: hidden;
+  -webkit-overflow-scrolling: touch;
+  scroll-snap-type: x proximity;
+  scroll-behavior: smooth;
+  overscroll-behavior-x: contain;
+  cursor: grab;
+  scrollbar-width: none; /* Firefox 隐藏滚动条 */
+}
+.arcade-grid::-webkit-scrollbar {
+  display: none; /* Chrome/Safari 隐藏滚动条 */
+}
+.arcade-grid:active {
+  cursor: grabbing;
+}
+/* 拖拽进行中：暂停 hover 视觉（缩放/扫描线/变亮），避免拖过时卡片误触发 */
+.arcade-grid.arcade-dragging .arcade-card {
+  filter: none;
+}
+.arcade-grid.arcade-dragging .arcade-card img,
+.arcade-grid.arcade-dragging .arcade-card::before,
+.arcade-grid.arcade-dragging .arcade-card .arcade-title {
+  pointer-events: none;
+}
+
+/* 手机：间距与顶部留白略收窄 */
+@media (max-width: 640px) {
+  .arcade-grid {
+    gap: 16px;
+    margin-top: 20px;
+    padding-bottom: 10px;
+  }
+}
+
+/* 卡片：平行四边形斜切角（上下各斜切 16px，互为反向）。
+   固定宽度横向排列（flex 子项不收缩），整行可左右滑动。
+   边框实现：clip-path 会裁掉 border，故用「底层黄色面 + 图片 clip 内缩 1px」露出 1px 黄边；
+   box-shadow 同样会被 clip 裁掉，发光用 filter: drop-shadow（跟随斜切形状）。 */
+.arcade-card {
+  position: relative;
+  flex: 0 0 340px;
+  width: 340px;
+  scroll-snap-align: start;
+  display: block;
+  overflow: hidden;
+  /* 斜切角平行四边形：顶部左切 16px、底部右切 16px */
+  clip-path: polygon(16px 0, 100% 0, calc(100% - 16px) 100%, 0 100%);
+  background: rgba(0, 0, 0, 0.6);
+  -webkit-backdrop-filter: blur(12px);
+  backdrop-filter: blur(12px);
+  filter: drop-shadow(0 0 8px rgba(255, 215, 0, 0.22));
+  transition: filter 0.25s ease;
+  text-decoration: none;
+  cursor: pointer;
+}
+/* 手机：卡片宽度接近屏幕宽度，单张浏览更舒适 */
+@media (max-width: 640px) {
+  .arcade-card {
+    flex-basis: 78vw;
+    width: 78vw;
+  }
+}
+/* 相邻卡片交错倾斜：轻微 rotate 制造节奏错落（hover 时扶正） */
+.arcade-card-tilted {
+  transform: translateY(6px) rotate(0.6deg);
+  transition: transform 0.25s ease;
+}
+
+/* 底层黄色面：完整覆盖卡片，作为 1px 黄色斜切边框（被图片层遮住主体，仅边缘露出） */
+.arcade-card::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  background: #ffd700;
+  opacity: 0.55;
+  transition: opacity 0.25s ease;
+}
+
+.arcade-card img {
+  position: relative;
+  z-index: 1;
+  display: block;
+  width: 100%;
+  aspect-ratio: 16 / 9;
+  object-fit: cover;
+  /* 图片层整体比卡片内缩 1px，露出底层黄面 → 斜切黄细边框 */
+  clip-path: polygon(17px 0, calc(100% - 1px) 0, calc(100% - 17px) 100%, 1px 100%);
+  transform: scale(1.02);
+  transform-origin: center;
+  transition: transform 0.4s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+/* hover：图片放大 + 黄框变亮 + 微光增强 */
+.arcade-card:hover img {
+  transform: scale(1.05);
+}
+.arcade-card:hover {
+  filter: drop-shadow(0 0 16px rgba(255, 215, 0, 0.5));
+}
+.arcade-card:hover::before {
+  opacity: 1;
+}
+.arcade-card-tilted:hover {
+  transform: translateY(2px) rotate(0deg);
+}
+
+/* 曲名：图片左下角，倾斜等宽字体，黄色荧光 */
+.arcade-title {
+  position: absolute;
+  left: 18px;
+  bottom: 10px;
+  z-index: 2;
+  max-width: calc(100% - 36px);
+  padding: 4px 8px;
+  font-family: "Courier New", ui-monospace, monospace;
+  font-size: 13px;
+  font-style: italic;
+  letter-spacing: 0.5px;
+  color: #ffd700;
+  background: rgba(0, 0, 0, 0.72);
+  border-left: 2px solid #ffd700;
+  text-shadow: 0 0 6px rgba(255, 215, 0, 0.8);
+  transform: skewX(-8deg);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* 底部黄色扫描线：hover 时自左向右快速滑过 */
+.arcade-scanline {
+  position: absolute;
+  left: 0;
+  bottom: 0;
+  z-index: 3;
+  width: 100%;
+  height: 2px;
+  background: linear-gradient(90deg, transparent, #ffd700 50%, transparent);
+  box-shadow: 0 0 8px rgba(255, 215, 0, 0.9);
+  transform: translateX(-100%);
+  opacity: 0;
+  pointer-events: none;
+}
+.arcade-card:hover .arcade-scanline {
+  animation: arcadeScan 0.55s ease-out forwards;
+}
+
+@keyframes arcadeScan {
+  0%   { transform: translateX(-100%); opacity: 0; }
+  15%  { opacity: 1; }
+  100% { transform: translateX(100%); opacity: 0; }
+}
+
+/* 加载失败提示（黄黑主题小字） */
+.arcade-error {
+  font-family: "Courier New", ui-monospace, monospace;
+  font-size: 12px;
+  color: rgba(255, 215, 0, 0.8);
+  padding: 10px 0;
+}
+
+/* reduced-motion：关闭扫描线与放大过渡（卡片仍可点开原图） */
+@media (prefers-reduced-motion: reduce) {
+  .arcade-scanline {
+    display: none;
+  }
+  .arcade-card img {
+    transition: none;
+  }
+}
+
+/* ============================================================================
+   13. 开发历程弹窗（v1.41 · AI-GEN）
+   AI-generated: 项目板块「本个人主页」行右侧的 LOG 按钮 → 点击弹出开发历程。
+   视觉沿用站内 HUD 语言：黄/青双色像素框、bevel 内阴影、全息投影质感、
+   Press Start 2P 标题字；关闭方式：× / 遮罩 / Esc。
+   层级：遮罩 z-index 9996（反馈弹层 9995 之上、开机动画 9999 之下）。
+   内容由 scripts/history.js 的 STAGES 数据注入，样式只负责呈现。
+   ============================================================================ */
+
+/* 1. MISSION_01 行内 LOG 按钮：像素徽章，与状态标签同族 */
+.mission-log-btn {
+  flex: none;
+  padding: 4px 10px;
+  font-family: var(--pixel-font, "Press Start 2P", monospace);
+  font-size: 0.6rem;
+  letter-spacing: 1px;
+  color: var(--accent);
+  background: #0a0a0a;
+  border: 2px solid rgba(0, 240, 255, 0.55);
+  border-radius: 0;
+  cursor: pointer;
+  box-shadow:
+    inset 2px 2px 0 rgba(0, 240, 255, 0.12),
+    inset -2px -2px 0 rgba(0, 0, 0, 0.6);
+  transition: background 0.2s, color 0.2s, border-color 0.2s, box-shadow 0.2s;
+}
+
+.mission-log-btn:hover,
+.mission-log-btn:focus-visible {
+  color: #050505;
+  background: var(--accent);
+  border-color: var(--accent);
+  box-shadow: 0 0 12px rgba(0, 240, 255, 0.35);
+  outline: none;
+}
+
+/* 2. 遮罩：全屏暗化 + 模糊，点击关闭 */
+.history-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 9996;
+  display: none;
+  place-items: center;
+  padding: 24px;
+  background: rgba(3, 3, 3, 0.82);
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+}
+
+.history-overlay.is-open {
+  display: grid;
+  animation: historyMaskIn 0.22s ease-out both;
+}
+
+@keyframes historyMaskIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+/* 3. 弹层面板：黄黑像素框 + bevel + 硬投影，内部纵向滚动 */
+.history-modal {
+  position: relative;          /* boot 终端层 / 关闭按钮的定位锚点 */
+  width: min(820px, 100%);
+  max-height: min(88vh, 720px);
+  overflow-y: auto;
+  padding: 22px 22px 20px;
+  background:
+    repeating-linear-gradient(
+      0deg,
+      rgba(0, 240, 255, 0.028) 0 1px,
+      transparent 1px 3px
+    ),
+    #0b0d0d;
+  border: 3px solid var(--primary);
+  box-shadow:
+    0 0 0 4px rgba(3, 3, 3, 0.6),
+    inset 3px 3px 0 rgba(255, 232, 26, 0.14),
+    inset -3px -3px 0 rgba(0, 0, 0, 0.7),
+    0 18px 60px rgba(0, 0, 0, 0.6);
+  animation: historyPop 0.24s ease-out both;
+}
+
+@keyframes historyPop {
+  from { opacity: 0; transform: translateY(14px) scale(0.97); }
+  to { opacity: 1; transform: none; }
+}
+
+/* 4. 头部：标题 + 关闭按钮 */
+.history-head {
+  position: sticky;
+  top: -22px;               /* 吸附面板顶内边距，滚动时标题行悬浮 */
+  z-index: 2;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin: -22px -22px 14px;  /* 反扣 padding，让标题行铺满整宽 */
+  padding: 14px 22px;
+  background: #0b0d0d;
+  border-bottom: 2px solid rgba(255, 232, 26, 0.35);
+}
+
+.history-title {
+  margin: 0;
+  font-family: var(--pixel-font, "Press Start 2P", monospace);
+  font-size: 0.8rem;
+  letter-spacing: 1.5px;
+  color: var(--primary);
+  text-shadow: 0 0 10px rgba(255, 232, 26, 0.35);
+}
+
+.history-close {
+  width: 30px;
+  height: 30px;
+  flex: 0 0 30px;
+  border: 2px solid rgba(255, 232, 26, 0.45);
+  background: #101010;
+  color: var(--primary);
+  font-size: 1rem;
+  line-height: 1;
+  cursor: pointer;
+  box-shadow: inset 2px 2px 0 rgba(0, 0, 0, 0.6);
+}
+
+.history-close:hover,
+.history-close:focus-visible {
+  background: var(--primary);
+  color: #000;
+  outline: none;
+}
+
+/* 5. 三阶段版本列表 */
+.history-stages {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+
+/* 6. 单个阶段：全息投影卡片（青色描边 + 半透明青玻璃，同 .mission-holo 语言） */
+.history-stage {
+  padding: 14px 16px 10px;
+  background: rgba(4, 14, 18, 0.55);
+  border: 2px solid rgba(0, 240, 255, 0.35);
+  box-shadow:
+    inset 2px 2px 0 rgba(0, 240, 255, 0.08),
+    inset -2px -2px 0 rgba(0, 0, 0, 0.5);
+}
+
+/* 7. 阶段头部：大徽章 + 主题 + 版本区间 */
+.history-stage-head {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.history-stage-badge {
+  flex: none;
+  padding: 6px 12px;
+  font-family: var(--pixel-font, "Press Start 2P", monospace);
+  font-size: 0.95rem;
+  letter-spacing: 1px;
+  color: #050505;
+  background: var(--accent);
+  border: 2px solid var(--accent);
+  box-shadow: 0 0 14px rgba(0, 240, 255, 0.4);
+}
+
+.history-stage-titles {
+  min-width: 0;
+}
+
+.history-stage-theme {
+  margin: 0;
+  font-size: 1.02rem;
+  font-weight: 900;
+  letter-spacing: 1px;
+  color: var(--text);
+}
+
+.history-stage-meta {
+  margin: 3px 0 0;
+  font-family: var(--pixel-font, "Press Start 2P", monospace);
+  font-size: 0.58rem;
+  letter-spacing: 0.5px;
+  color: var(--text-muted);
+}
+
+/* 8. 阶段概述 */
+.history-stage-desc {
+  margin: 10px 0 8px;
+  font-size: 0.88rem;
+  line-height: 1.7;
+  color: var(--text-muted);
+}
+
+/* 9. 小版本列表 */
+.history-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+.history-item {
+  display: flex;
+  align-items: baseline;
+  gap: 10px;
+  padding: 6px 2px;
+  border-top: 1px dashed rgba(0, 240, 255, 0.16);
+  font-size: 0.86rem;
+  line-height: 1.5;
+}
+
+.history-ver {
+  flex: 0 0 52px;
+  font-family: var(--pixel-font, "Press Start 2P", monospace);
+  font-size: 0.6rem;
+  letter-spacing: 0.5px;
+  color: var(--primary);
+  text-shadow: 0 0 8px rgba(255, 232, 26, 0.3);
+}
+
+.history-date {
+  flex: 0 0 92px;
+  font-family: "Courier New", ui-monospace, monospace;
+  font-size: 0.72rem;
+  color: var(--text-muted);
+}
+
+.history-text {
+  min-width: 0;
+  color: var(--text);
+}
+
+/* 动态乱码口令：青色等宽，微微发光，与彩蛋「密钥解密」主题呼应 */
+.history-garble {
+  font-family: "Courier New", ui-monospace, monospace;
+  letter-spacing: 2px;
+  color: var(--accent);
+  text-shadow: 0 0 8px rgba(0, 240, 255, 0.45);
+  white-space: nowrap;
+}
+
+/* ==========================================================================
+   10. 弹窗开启动画：档案解密终端序列
+   AI-generated: 与彩蛋 egg-boot 同语言（终端逐行打印 + 乱码滚动 +
+   百分比进度条 + ACCESS GRANTED 闪烁 + 扫描线扫过），但主题改为
+   「开发历程档案解密」（青色 → 黄色渐变收尾）。弹窗打开时 boot 层覆盖
+   面板内部，播完或跳过后才淡出并显示版本列表，总时长约 3 秒。
+   ========================================================================== */
+
+/* 10.1 内容区：动画期间隐藏，动画结束后淡入 */
+.history-stages {
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity 0.4s ease, visibility 0s linear 0.4s;
+}
+
+.history-overlay.history-ready .history-stages {
+  opacity: 1;
+  visibility: visible;
+  transition: opacity 0.4s ease;
+}
+
+/* 关闭按钮始终可点，层级高于终端层 */
+.history-close {
+  z-index: 3;
+}
+
+/* 10.2 终端层：覆盖面板内部 */
+.history-boot {
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 14px;
+  padding: 26px 22px;
+  background: #050505;
+  font-family: var(--pixel-font, "Press Start 2P", monospace);
+  font-size: 8px;
+  line-height: 2;
+  text-align: left;
+  color: var(--accent);
+}
+
+.history-boot.is-done {
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.3s linear;
+}
+
+.history-boot-log {
+  margin: 0;
+  min-height: 8em;
+  white-space: pre-wrap;
+  word-break: break-all;
+  font: inherit;
+  color: var(--accent);
+  text-shadow: 0 0 7px rgba(0, 240, 255, 0.45);
+}
+
+/* 10.3 进度条：由 JS 逐帧推进（区别于开启动画的纯 CSS 跳格条） */
+.history-boot-bar {
+  height: 10px;
+  border: 2px solid rgba(0, 240, 255, 0.5);
+  background: #0a0a0a;
+  box-shadow: inset 2px 2px 0 rgba(0, 0, 0, 0.85);
+}
+
+.history-boot-bar i {
+  display: block;
+  width: 0;
+  height: 100%;
+  background: var(--accent);
+  box-shadow: 0 0 10px rgba(0, 240, 255, 0.6);
+}
+
+.history-boot-status {
+  margin: 0;
+  min-height: 1.4em;
+  letter-spacing: 2px;
+  color: rgba(0, 240, 255, 0.75);
+}
+
+/* 10.4 结尾：ACCESS GRANTED 闪烁 + 轻微故障抖动，主色由青转黄 */
+.history-boot-status.is-granted {
+  font-size: 1.5em;
+  letter-spacing: 3px;
+  color: var(--primary);
+  text-shadow:
+    0 0 10px rgba(255, 232, 26, 0.7),
+    0 0 26px rgba(255, 232, 26, 0.25);
+  animation: historyGranted 0.28s steps(2, end) 3, historyGlitch 0.42s linear 3;
+}
+
+@keyframes historyGranted {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.25; }
+}
+
+@keyframes historyGlitch {
+  0%, 100% { transform: translate(0, 0); }
+  25% { transform: translate(-2px, 1px); }
+  50% { transform: translate(2px, -1px); }
+  75% { transform: translate(-1px, -1px); }
+}
+
+/* 10.5 收尾：扫描线自上而下扫过终端区 */
+.history-boot.is-sweeping::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  height: 46px;
+  background: linear-gradient(
+    180deg,
+    rgba(0, 240, 255, 0),
+    rgba(255, 232, 26, 0.16),
+    rgba(0, 240, 255, 0)
+  );
+  animation: historySweep 0.5s linear;
+}
+
+@keyframes historySweep {
+  from { top: -46px; }
+  to { top: 100%; }
+}
+
+/* 10.6 减弱动态效果：去掉闪烁、抖动与扫描，直接显示内容 */
+@media (prefers-reduced-motion: reduce) {
+  .history-boot {
+    display: none;
+  }
+  .history-boot-status.is-granted {
+    animation: none;
+  }
+  .history-boot.is-sweeping::after {
+    content: none;
+    animation: none;
+  }
+  .history-stages,
+  .history-overlay.history-ready .history-stages {
+    opacity: 1;
+    visibility: visible;
+    transition: none;
+  }
+}
+
+/* 10.7 移动端：面板占满可用宽度，字号略收 */
+@media (max-width: 640px) {
+  .history-overlay {
+    padding: 12px;
+  }
+  .history-modal {
+    padding: 16px 14px 14px;
+  }
+  .history-head {
+    margin: -16px -14px 12px;
+    padding: 12px 14px;
+  }
+  .history-title {
+    font-size: 0.66rem;
+    letter-spacing: 1px;
+  }
+  .history-stage-badge {
+    font-size: 0.8rem;
+    padding: 5px 9px;
+  }
+  .history-stage-theme {
+    font-size: 0.92rem;
+  }
+  .history-item {
+    flex-wrap: wrap;
+    gap: 3px 8px;
+  }
+  .history-ver {
+    flex-basis: auto;
+  }
+  .history-date {
+    flex-basis: auto;
+  }
+}
+
+/* 11. reduced-motion：禁用动画（遮罩淡入 / 面板弹出），内容静态呈现 */
+@media (prefers-reduced-motion: reduce) {
+  .history-overlay.is-open {
+    animation: none;
+  }
+  .history-modal {
+    animation: none;
+  }
+}
+
+/* ==========================================================================
+   12. 诗云传送动画遮罩（v1.42 · AI-GEN）
+   彩蛋输入「诗云」回车后整站覆盖：全站染红 → 乱码/报错指数爆炸 →
+   黑屏 → 舷窗窗框缓缓浮现 → 星空在窗内渐渐透出（硬核深空冷色调）→
+   跳转 shiyun.html 无缝续接。
+   层级：10001（盖过 CRT 质感 10000 / 开机 9999 / 彩蛋 9998 / 历史弹窗 9996），
+   自定义光标 10002 保持可见。
+   ========================================================================== */
+
+.shiyun-warp {
+  position: fixed;
+  inset: 0;
+  z-index: 10001;
+  overflow: hidden;
+  background: #000;
+  pointer-events: auto;
+  cursor: default;
+  visibility: hidden;
+  opacity: 0;
+}
+
+.shiyun-warp.is-running {
+  visibility: visible;
+  opacity: 1;
+}
+
+/* 12.1 阶段一：全站染红（mix-blend-mode 保留亮度，只把色相转为红色调） */
+.warp-red {
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  background: #ff2222;
+  mix-blend-mode: color;
+  opacity: 0;
+}
+
+/* 红色调上叠一层半透明红，强化「警报」感 */
+.shiyun-warp.is-running::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  background: radial-gradient(ellipse at center, rgba(255, 40, 40, 0) 0%, rgba(180, 0, 0, 0.55) 100%);
+  animation: warpPulse 0.6s ease-in-out infinite alternate;
+}
+
+@keyframes warpPulse {
+  from { opacity: 0.35; }
+  to { opacity: 0.9; }
+}
+
+/* 12.2 阶段二：乱码字符块（指数级增多） */
+.warp-glitch {
+  position: absolute;
+  inset: 0;
+  z-index: 3;
+}
+
+.warp-glyph {
+  position: absolute;
+  font-family: "Courier New", ui-monospace, monospace;
+  font-weight: 700;
+  color: #ff4d4d;
+  text-shadow: 0 0 6px rgba(255, 60, 60, 0.8);
+  white-space: nowrap;
+  letter-spacing: 1px;
+  animation: warpGlitchShake 0.18s steps(2, end) infinite;
+  user-select: none;
+  pointer-events: none;
+}
+
+.warp-glyph-w {
+  color: #ffe9e9;
+  text-shadow: 0 0 8px rgba(255, 220, 220, 0.9);
+}
+
+@keyframes warpGlitchShake {
+  0%, 100% { transform: translate(0, 0); }
+  25% { transform: translate(-2px, 1px); }
+  50% { transform: translate(2px, -1px); }
+  75% { transform: translate(-1px, -2px); }
+}
+
+/* 12.3 阶段二：报错弹窗（指数级增多，红色故障窗） */
+.warp-errors {
+  position: absolute;
+  inset: 0;
+  z-index: 4;
+}
+
+.warp-alert {
+  position: absolute;
+  width: 128px;
+  background: #1a0505;
+  border: 1px solid #ff3b3b;
+  box-shadow: 0 0 14px rgba(255, 40, 40, 0.55), inset 0 0 8px rgba(255, 40, 40, 0.15);
+  font-family: "Courier New", ui-monospace, monospace;
+  font-size: 9px;
+  line-height: 1.4;
+  color: #ffd9d9;
+  animation: warpAlertPop 0.22s ease-out, warpAlertJitter 0.16s steps(2, end) infinite;
+  user-select: none;
+  pointer-events: none;
+}
+
+@keyframes warpAlertPop {
+  from { transform: scale(0.3); opacity: 0; }
+  to { transform: scale(1); opacity: 1; }
+}
+
+@keyframes warpAlertJitter {
+  0%, 100% { transform: translate(0, 0); }
+  25% { transform: translate(1px, -1px); }
+  75% { transform: translate(-1px, 1px); }
+}
+
+.warp-alert-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 3px 6px;
+  background: #ff2222;
+  color: #fff;
+  font-weight: 700;
+  letter-spacing: 1px;
+}
+
+.warp-alert-head b {
+  font-weight: 400;
+  font-size: 12px;
+  line-height: 1;
+  cursor: default;
+}
+
+.warp-alert-body {
+  padding: 4px 6px 5px;
+  word-break: break-all;
+}
+
+/* 12.4 阶段三：黑屏 */
+.warp-black {
+  position: absolute;
+  inset: 0;
+  z-index: 5;
+  background: #000;
+  opacity: 0;
+}
+
+/* 12.5 阶段四：硬核深空星空（canvas 冷色调，风格独立于本站） */
+.warp-space {
+  position: absolute;
+  inset: 0;
+  z-index: 6;
+  opacity: 0;
+}
+
+.warp-sky {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  display: block;
+}
+
+/* 12.6 阶段五：工业舱门窗框——独立于星空层（z 7 高于 space 6），
+   先自黑屏中缓缓浮现，星空再在窗内透出。硬核工业风：
+   八角大切角金属舱门 + 拉丝纹理 + 内外双层螺栓阵列 + 黄黑警示斜纹 + HUD 角标。 */
+.porthole {
+  position: absolute;
+  inset: 0;
+  z-index: 7;
+  border: 18px solid #171c26;
+  box-shadow:
+    inset 0 0 0 2px #070a10,
+    inset 0 0 0 4px #3a4658,
+    inset 0 0 0 5px #11151f,
+    inset 0 0 130px rgba(1, 2, 6, 0.94),
+    0 0 30px rgba(12, 16, 26, 0.6);
+  opacity: 0;
+  pointer-events: none;
+}
+
+/* 八角大切角：四个遮罩三角形盖住窗框金属四角（不裁剪子元素，
+   螺栓/HUD/警示条可完整伸出框外） */
+.porthole-corner {
+  position: absolute;
+  width: 30px;
+  height: 30px;
+  background: #000;
+  pointer-events: none;
+}
+
+.porthole-corner-tl { top: 0; left: 0; clip-path: polygon(0 0, 100% 0, 0 100%); }
+.porthole-corner-tr { top: 0; right: 0; clip-path: polygon(100% 0, 0 0, 100% 100%); }
+.porthole-corner-bl { bottom: 0; left: 0; clip-path: polygon(0 100%, 0 0, 100% 100%); }
+.porthole-corner-br { bottom: 0; right: 0; clip-path: polygon(100% 100%, 100% 0, 0 100%); }
+
+/* 金属拉丝纹理：垂直磨砂条纹铺满窗框 */
+.porthole::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: repeating-linear-gradient(
+    90deg,
+    rgba(255, 255, 255, 0.035) 0 1px,
+    rgba(0, 0, 0, 0.06) 1px 2px,
+    transparent 2px 5px
+  );
+  pointer-events: none;
+}
+
+/* 玻璃反光：斜向细高光条 */
+.porthole::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(118deg, rgba(180, 198, 228, 0.09) 0%, rgba(180, 198, 228, 0) 24%);
+  pointer-events: none;
+}
+
+/* 缓缓浮现：从纯黑中描出金属轮廓（约 1.4s） */
+.porthole.is-in {
+  opacity: 1;
+  animation: portholeIn 1.4s ease-out;
+}
+
+@keyframes portholeIn {
+  0% {
+    opacity: 0;
+    transform: scale(0.988);
+    box-shadow:
+      inset 0 0 0 2px #070a10,
+      inset 0 0 0 4px rgba(58, 70, 88, 0),
+      inset 0 0 0 5px rgba(17, 21, 31, 0),
+      inset 0 0 130px rgba(1, 2, 6, 0.94),
+      0 0 30px rgba(12, 16, 26, 0);
+  }
+  55% {
+    opacity: 0.65;
+    transform: scale(0.996);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1);
+    box-shadow:
+      inset 0 0 0 2px #070a10,
+      inset 0 0 0 4px #3a4658,
+      inset 0 0 0 5px #11151f,
+      inset 0 0 130px rgba(1, 2, 6, 0.94),
+      0 0 30px rgba(12, 16, 26, 0.6);
+  }
+}
+
+/* 黄黑警示斜纹条：嵌在舱门金属带内侧（避开八角切角） */
+.porthole-warn {
+  position: absolute;
+  left: 34px;
+  right: 34px;
+  height: 10px;
+  opacity: 0.85;
+  background: repeating-linear-gradient(
+    45deg,
+    rgba(18, 20, 24, 0.95) 0 9px,
+    rgba(255, 176, 58, 0.7) 9px 18px
+  );
+  pointer-events: none;
+}
+
+.porthole-warn-top { top: 5px; }
+.porthole-warn-bottom { bottom: 5px; }
+
+/* 内六角螺栓（硬核工业）：四角 + 四边中央共 8 颗 */
+.porthole-rivet {
+  position: absolute;
+  width: 17px;
+  height: 15px;
+  clip-path: polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%);
+  background: linear-gradient(165deg, #8a94a8, #3d4656 58%, #1f2530);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.85);
+}
+
+.porthole-rivet::after {
+  content: "";
+  position: absolute;
+  inset: 4px 7px;
+  border-radius: 2px;
+  background: #070a10;
+  box-shadow: inset 0 0 2px rgba(0, 0, 0, 0.9);
+}
+
+.porthole-rivet-tl { top: -10px; left: 42px; }
+.porthole-rivet-tr { top: -10px; right: 42px; }
+.porthole-rivet-bl { bottom: -10px; left: 42px; }
+.porthole-rivet-br { bottom: -10px; right: 42px; }
+.porthole-rivet-mt { top: -10px; left: 50%; margin-left: -9px; }
+.porthole-rivet-mb { bottom: -10px; left: 50%; margin-left: -9px; }
+.porthole-rivet-ml { left: -10px; top: 50%; margin-top: -8px; }
+.porthole-rivet-mr { right: -10px; top: 50%; margin-top: -8px; }
+
+/* HUD 角标：舱门四角的仪表小字（琥珀警示橙，等宽字体） */
+.porthole-hud {
+  position: absolute;
+  font-family: "Courier New", ui-monospace, monospace;
+  font-size: 10px;
+  letter-spacing: 2px;
+  color: #ffb03a;
+  text-shadow: 0 0 7px rgba(255, 176, 58, 0.55);
+  background: rgba(7, 9, 15, 0.6);
+  border: 1px solid rgba(255, 176, 58, 0.4);
+  padding: 3px 7px;
+  clip-path: polygon(7px 0, 100% 0, 100% calc(100% - 7px), calc(100% - 7px) 100%, 0 100%, 0 7px);
+  opacity: 0;
+  pointer-events: none;
+}
+
+.porthole.is-in .porthole-hud {
+  animation: hudIn 0.7s ease 0.5s forwards;
+}
+
+@keyframes hudIn {
+  from { opacity: 0; transform: translateY(4px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.porthole-hud-tl { top: 16px; left: 50px; }
+.porthole-hud-tr { top: 16px; right: 50px; }
+.porthole-hud-bl { bottom: 16px; left: 50px; }
+.porthole-hud-br { bottom: 16px; right: 50px; }
+
+/* 12.7 reduced-motion：不播动画，由脚本直接跳转（脚本内已处理） */
+@media (prefers-reduced-motion: reduce) {
+  .shiyun-warp.is-running::before,
+  .warp-glyph,
+  .warp-alert,
+  .porthole.is-in,
+  .porthole.is-in .porthole-hud {
     animation: none;
   }
 }

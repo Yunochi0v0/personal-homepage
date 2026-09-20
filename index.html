@@ -7,7 +7,7 @@
   <title>刘聿宸 · 个人主页</title>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@700;900&family=Press+Start+2P&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="styles/style.css?v=1.24.0" />
+  <link rel="stylesheet" href="styles/style.css?v=1.41.0" />
   <!-- 开启动画：提前锁定页面滚动，避免动画播放期间背景被滚动。
        若脚本异常或未执行，则由 CSS 兜底动画与 <noscript> 保证页面仍可正常显示。 -->
   <script>
@@ -29,7 +29,7 @@
   </script>
   <noscript><style>.boot { display: none !important; }</style></noscript>
 </head>
-<body data-version="1.24.0">
+<body data-version="1.41.0">
   <!-- 开启动画（复古 CRT 开机自检） -->
   <div class="boot" id="bootScreen" aria-hidden="true">
     <span class="boot-dot"></span>
@@ -74,6 +74,14 @@
           <span class="dock-icon">🚀</span>
         </a>
       </li>
+      <li class="dock-sep" aria-hidden="true"></li>
+      <li class="dock-item">
+        <a class="dock-link" href="#arcade">
+          <span class="dock-tip">音游</span>
+          <span class="dock-icon">🎮</span>
+        </a>
+      </li>
+      <li class="dock-sep" aria-hidden="true"></li>
       <li class="dock-item">
         <a class="dock-link" href="#contact">
           <span class="dock-tip">联系</span>
@@ -206,6 +214,8 @@
               <span class="mission-id">[MISSION_01]</span>
               <span class="mission-name">本个人主页</span>
               <span class="mission-status is-active">进行中</span>
+              <button class="mission-log-btn" id="historyTrigger" type="button"
+                      aria-haspopup="dialog" title="查看本个人主页的开发历程">LOG</button>
               <div class="mission-holo">
                 <p class="holo-head">// MISSION BRIEF</p>
                 <p class="holo-desc">
@@ -216,6 +226,7 @@
                   <li><em>技术栈</em><span>HTML / CSS / JS</span></li>
                   <li><em>状态</em><span>持续迭代中</span></li>
                   <li><em>方式</em><span>AI 辅助开发</span></li>
+                  <li><em>成长史</em><span>点击 LOG 查看开发历程</span></li>
                 </ul>
               </div>
             </li>
@@ -254,6 +265,22 @@
               </div>
             </li>
           </ol>
+        </div>
+      </div>
+    </section>
+
+    <!-- 4.5 Arcade 音游展示区（v1.25 · AI-GEN）：世界计划（Project SEKAI）MASTER 全连截图，
+         数据分离：卡片由 scripts/arcade.js 读取 arcade.json 动态渲染（新增/改曲目不碰 HTML）。
+         面板毛玻璃边框见 style.css 第 12 节 .arcade-frame（与 music-pop 同款黄黑风格）。 -->
+    <section id="arcade" class="section">
+      <div class="container">
+        <div class="arcade-frame">
+          <h2 class="section-title reveal glitch" data-text="音游">音游<span class="title-en" aria-hidden="true">ARCADE</span></h2>
+          <p class="section-sub reveal">世界计划 缤纷舞台 · MASTER 全连记录</p>
+          <!-- AI-generated: 音游卡片横向滑动区。样式见 style.css 第 12 节；数据见 arcade.json。 -->
+          <div class="arcade-grid" id="arcadeGrid" aria-live="polite">
+            <!-- arcade.js 注入卡片 -->
+          </div>
         </div>
       </div>
     </section>
@@ -482,32 +509,94 @@
     </div>
   </div>
 
-  <!-- 赛博火柴人彩蛋（v1.24 · AI-GEN）：右下角待机呼吸，按住拖动切换「真实奔跑」动画，
-       松手停在原地（不自动归位）。内联 SVG 火柴人，两段式四肢（肩/髋摆动 + 肘/膝屈曲），
-       荧光黄 #FFD700 + drop-shadow 发光。v1.24.6：轻点（非拖动）弹出科幻对话气泡彩蛋。 -->
+  <!-- 开发历程弹窗（v1.41 · AI-GEN）：点击项目板块「本个人主页」行的 LOG 按钮弹出，
+       按三大阶段（V1.0 更改光标之前 / V2.0 光标→发布 GitHub / V3.0 GitHub 之后）展示
+       本网站开发历程。内容由 scripts/history.js 的 STAGES 数据动态渲染（数据分离），
+       新增版本只改数据不碰结构；关闭方式：× / 遮罩 / Esc。 -->
+  <div class="history-overlay" id="historyOverlay" aria-hidden="true">
+    <div class="history-modal" id="historyModal" role="dialog" aria-modal="true" aria-labelledby="historyTitle">
+      <div class="history-head">
+        <h3 class="history-title" id="historyTitle">// DEV HISTORY · 本个人主页开发历程</h3>
+        <button class="history-close" id="historyClose" type="button" aria-label="关闭">×</button>
+      </div>
+      <!-- 开启动画：档案解密终端序列（与隐藏关卡 egg-boot 同语言，主题为
+           开发历程档案解密：逐行打印 + 乱码滚动 + 百分比进度条 +
+           ACCESS GRANTED + 扫描线，总时长约 3 秒，点击或 Esc 可跳过） -->
+      <div class="history-boot" id="historyBoot" aria-hidden="true">
+        <pre class="history-boot-log" id="historyBootLog"></pre>
+        <div class="history-boot-bar"><i id="historyBootBarFill"></i></div>
+        <p class="history-boot-status" id="historyBootStatus"></p>
+      </div>
+      <div class="history-stages" id="historyStages">
+        <!-- history.js 注入三阶段版本列表 -->
+      </div>
+    </div>
+  </div>
+
+  <!-- 赛博火柴人彩蛋（v1.30 · AI-GEN）：右下角待机呼吸，按住拖动切换「真实奔跑」动画，
+       松手停在原地（不自动归位）。变形解耦：
+         外层 .stickman        ← JS 只写 translate3d（拖动定位，GPU 加速）
+         SVG 躯干单元         ← JS 只写 .stick-body scaleY + .stick-lower translateY
+                                （v1.30 橡皮管「只拉伸躯干」：头、手臂不动，腿跟随
+                                   胯部下移；弹簧驱动 → 松手欠阻尼过冲回弹 Q 弹）
+         内层 .stickman-inner  ← 只由 CSS @keyframes 驱动（待机呼吸 + 拖拽奔跑四肢摆动）
+       四肢动画改为嵌套 <g> 关节链 + CSS transform（旋转锚点用 view-box 坐标系的关节坐标），
+       父 <g> 旋转带动子 <g> → 天然实现「前臂随上臂绕肩、小腿随大腿绕胯」组合旋转，
+       不再依赖 JS 逐帧计算世界坐标（旋转样式全在 style.css 中，HTML 内联不写）。荧光黄 #FFD700 + drop-shadow 发光。
+       v1.24.6：轻点（非拖动）弹出科幻对话气泡彩蛋。 -->
   <div class="stickman" id="stickman" role="img" aria-label="赛博火柴人（可拖动，可点击说话）" title="拖动我！点我说话！">
-    <div class="stickman-inner">
-      <svg class="stickman-svg" viewBox="0 0 44 64" aria-hidden="true">
-        <circle class="stick-head" cx="22" cy="9" r="6.5"></circle>
-        <line class="stick-body" x1="22" y1="15.5" x2="22" y2="36"></line>
-        <!-- 左臂：上臂 肩→肘，前臂 肘→手 -->
-        <line class="stick-arm stick-arm-l" x1="22" y1="22" x2="14" y2="31"></line>
-        <line class="stick-forearm stick-forearm-l" x1="14" y1="31" x2="10" y2="40"></line>
-        <!-- 右臂 -->
-        <line class="stick-arm stick-arm-r" x1="22" y1="22" x2="30" y2="31"></line>
-        <line class="stick-forearm stick-forearm-r" x1="30" y1="31" x2="34" y2="40"></line>
-        <!-- 左腿：大腿 胯→膝，小腿 膝→脚 -->
-        <line class="stick-leg stick-leg-l" x1="22" y1="36" x2="15" y2="47"></line>
-        <line class="stick-shin stick-shin-l" x1="15" y1="47" x2="11" y2="58"></line>
-        <!-- 右腿 -->
-        <line class="stick-leg stick-leg-r" x1="22" y1="36" x2="29" y2="47"></line>
-        <line class="stick-shin stick-shin-r" x1="29" y1="47" x2="33" y2="58"></line>
-        <!-- 肘/膝关节圆点（弯曲视觉锚点） -->
-        <circle class="stick-joint stick-joint-el-l" cx="14" cy="31" r="1.6"></circle>
-        <circle class="stick-joint stick-joint-el-r" cx="30" cy="31" r="1.6"></circle>
-        <circle class="stick-joint stick-joint-kn-l" cx="15" cy="47" r="1.6"></circle>
-        <circle class="stick-joint stick-joint-kn-r" cx="29" cy="47" r="1.6"></circle>
-      </svg>
+    <div class="stickman-scale">
+      <div class="stickman-inner">
+        <svg class="stickman-svg" viewBox="0 0 44 64" aria-hidden="true">
+          <circle class="stick-head" cx="22" cy="9" r="6.5"></circle>
+          <!-- 躯干（v1.33 弹性绳子）：一串弹簧质点节点（Verlet 积分 + 距离约束），
+               脖子端/胯端各自被拖动目标拉动（速度差由抓取点决定）→ 拖拽时绳子
+               被甩出波浪、松手波动回弹。JS 每帧把节点重写为平滑曲线 path（d 属性）。
+               头（.stick-head）、手臂（外包 .stick-arms）、腿（.stick-lower）分别
+               跟随对应绳子节点 → 抓头时头先动、抓下半身时下半身先动，不脱节 -->
+          <path class="stick-body" d="M 22 15.5 C 22 21, 22 30, 22 36"></path>
+          <!-- 双臂容器（v1.36 软连接）：JS 写 translate + rotate 跟随绳子肩部节点
+               （rotate 绕肩跟随绳子切线，弹性滞后 → 甩动时手臂拖尾、躯干弯弧时
+               手臂顺弧倾斜，连接处柔软）；子 g 的 CSS 关节旋转动画不受父 g 影响 -->
+          <g class="stick-arms">
+          <!-- 左臂：上臂 g 绕肩(22,22) 摆动，前臂 g 内嵌绕肘(14,31) 屈曲（随上臂联动） -->
+          <g class="stick-arm-g stick-arm-g-l">
+            <line class="stick-arm stick-arm-l" x1="22" y1="22" x2="14" y2="31"></line>
+            <g class="stick-forearm-g stick-forearm-g-l">
+              <line class="stick-forearm stick-forearm-l" x1="14" y1="31" x2="10" y2="40"></line>
+              <circle class="stick-joint stick-joint-el-l" cx="14" cy="31" r="1.6"></circle>
+            </g>
+          </g>
+          <!-- 右臂：上臂 g 绕肩(22,22)，前臂 g 绕肘(30,31) -->
+          <g class="stick-arm-g stick-arm-g-r">
+            <line class="stick-arm stick-arm-r" x1="22" y1="22" x2="30" y2="31"></line>
+            <g class="stick-forearm-g stick-forearm-g-r">
+              <line class="stick-forearm stick-forearm-r" x1="30" y1="31" x2="34" y2="40"></line>
+              <circle class="stick-joint stick-joint-el-r" cx="30" cy="31" r="1.6"></circle>
+            </g>
+          </g>
+          </g>
+          <!-- 下半身容器（v1.30）：JS 写 translate 让腿整体跟随胯端节点（含摆动） -->
+          <g class="stick-lower">
+            <!-- 左腿：大腿 g 绕胯(22,36) 摆动，小腿 g 内嵌绕膝(15,47) 屈曲（随大腿联动） -->
+            <g class="stick-leg-g stick-leg-g-l">
+              <line class="stick-leg stick-leg-l" x1="22" y1="36" x2="15" y2="47"></line>
+              <g class="stick-shin-g stick-shin-g-l">
+                <line class="stick-shin stick-shin-l" x1="15" y1="47" x2="11" y2="58"></line>
+                <circle class="stick-joint stick-joint-kn-l" cx="15" cy="47" r="1.6"></circle>
+              </g>
+            </g>
+            <!-- 右腿：大腿 g 绕胯(22,36)，小腿 g 绕膝(29,47) -->
+            <g class="stick-leg-g stick-leg-g-r">
+              <line class="stick-leg stick-leg-r" x1="22" y1="36" x2="29" y2="47"></line>
+              <g class="stick-shin-g stick-shin-g-r">
+                <line class="stick-shin stick-shin-r" x1="29" y1="47" x2="33" y2="58"></line>
+                <circle class="stick-joint stick-joint-kn-r" cx="29" cy="47" r="1.6"></circle>
+              </g>
+            </g>
+          </g>
+        </svg>
+      </div>
     </div>
     <!-- 对话气泡（v1.24.6 · AI-GEN）：点击火柴人随机台词；4s 自动消失或点别处关闭。
          定位在火柴人头顶，随火柴人一起拖动移动。 -->
@@ -516,10 +605,55 @@
     </div>
   </div>
 
-  <script src="scripts/main.js?v=1.24.0"></script>
+  <!-- ==========================================================================
+       11. 诗云传送动画遮罩（v1.42 · AI-GEN）
+       彩蛋浮层输入暗语「诗云」并回车后触发：整站如飞船舷窗上的全息显示，
+       颜色转红 → 乱码与报错弹窗指数级暴增 → 屏幕黑屏 → 全息影像消失、
+       露出舷窗与星空星体（蓝紫主色调，风格独立于本站）→ 跳转 shiyun.html。
+       遮罩常驻 hidden，由 scripts/shiyun.js 控制各阶段显隐。
+       ========================================================================== -->
+  <div class="shiyun-warp" id="shiyunWarp" aria-hidden="true">
+    <!-- 阶段一：全站染红（mix-blend-mode 保留亮度只改色相） -->
+    <div class="warp-red" id="warpRed"></div>
+    <!-- 阶段二：乱码字符块（JS 生成）与报错弹窗（JS 生成），数量 2^n 指数增长 -->
+    <div class="warp-glitch" id="warpGlitch"></div>
+    <div class="warp-errors" id="warpErrors"></div>
+    <!-- 阶段三：黑屏 -->
+    <div class="warp-black" id="warpBlack"></div>
+    <!-- 阶段四：星空（canvas 星云/星星/大星体） -->
+    <div class="warp-space" id="warpSpace">
+      <canvas class="warp-sky" id="warpSky"></canvas>
+    </div>
+    <!-- 阶段五：工业舱门窗框——独立于星空层，先自黑屏中缓缓浮现，星空再在窗内透出 -->
+    <div class="porthole" aria-hidden="true">
+      <span class="porthole-warn porthole-warn-top"></span>
+      <span class="porthole-warn porthole-warn-bottom"></span>
+      <span class="porthole-corner porthole-corner-tl"></span>
+      <span class="porthole-corner porthole-corner-tr"></span>
+      <span class="porthole-corner porthole-corner-bl"></span>
+      <span class="porthole-corner porthole-corner-br"></span>
+      <span class="porthole-rivet porthole-rivet-tl"></span>
+      <span class="porthole-rivet porthole-rivet-tr"></span>
+      <span class="porthole-rivet porthole-rivet-bl"></span>
+      <span class="porthole-rivet porthole-rivet-br"></span>
+      <span class="porthole-rivet porthole-rivet-mt"></span>
+      <span class="porthole-rivet porthole-rivet-mr"></span>
+      <span class="porthole-rivet porthole-rivet-mb"></span>
+      <span class="porthole-rivet porthole-rivet-ml"></span>
+      <span class="porthole-hud porthole-hud-tl">SHIYUN-7</span>
+      <span class="porthole-hud porthole-hud-tr">WINDOW OK</span>
+      <span class="porthole-hud porthole-hud-bl">POS 07°12'34"</span>
+      <span class="porthole-hud porthole-hud-br">SCAN ACTIVE</span>
+    </div>
+  </div>
+
+  <script src="scripts/main.js?v=1.41.0"></script>
+  <script src="scripts/shiyun.js?v=1.44.3"></script>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.49.4/dist/umd/supabase.min.js"></script>
-  <script src="scripts/feedback.js?v=1.24.0"></script>
-  <script src="scripts/music.js?v=1.24.0"></script>
-  <script src="scripts/stickman.js?v=1.24.0"></script>
+  <script src="scripts/feedback.js?v=1.41.0"></script>
+  <script src="scripts/music.js?v=1.41.0"></script>
+  <script src="scripts/stickman.js?v=1.41.0"></script>
+  <script src="scripts/arcade.js?v=1.41.0"></script>
+  <script src="scripts/history.js?v=1.41.0"></script>
 </body>
 </html>

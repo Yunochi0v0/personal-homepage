@@ -322,6 +322,7 @@ document.querySelectorAll(".is-placeholder").forEach((link) => {
 
   const MAGIC = "梦想即力量";
   const TARGET_URL = "https://anime.bang-dream.com/yumemita/";
+  const SHIYUN = "诗云"; // 站内暗语：输入后进入全新页面 shiyun.html
   const UNLOCK_KEYS = "lycnb"; // 隐藏关卡口令
   const BUFFER_TTL = 1500; // 口令缓冲的空闲有效期（毫秒）
 
@@ -573,7 +574,21 @@ document.querySelectorAll(".is-placeholder").forEach((link) => {
     e.preventDefault();
     const value = eggInput.value.trim();
 
-    if (value === MAGIC) {
+    if (value === SHIYUN) {
+      // 新暗语「诗云」：整站化为飞船舷窗全息显示，驶向全新星空页面
+      // 过场动画从按下回车键即开始：立即隐藏光标（原生 + 霓虹），
+      // 500ms 后才进入 start() 动画主流程，期间由该 class 兜底
+      if (eggBox) eggBox.classList.add("triggered");
+      setHint("✦ 暗语生效 · 正在驶向诗云…");
+      document.documentElement.classList.add("is-shiyun-warp");
+      setTimeout(() => {
+        if (window.ShiyunWarp && window.ShiyunWarp.start) {
+          window.ShiyunWarp.start(); // 红色警报 → 乱码指数爆炸 → 黑屏 → 舷窗星空 → 跳转
+        } else {
+          window.location.href = "shiyun.html"; // 降级：动画脚本未加载时直接跳转
+        }
+      }, 500);
+    } else if (value === MAGIC) {
       // 命中暗号：发光提示后跳转
       if (eggBox) eggBox.classList.add("triggered");
       setHint("✦ 咒语生效，梦想即力量 · 正在进入…");
@@ -853,7 +868,7 @@ document.querySelectorAll(".is-placeholder").forEach((link) => {
   }
 
   const LINES = [
-    "DEEPWORKS BIOS v1.24.0",
+    "DEEPWORKS BIOS v1.41.0",
     "MEMTEST 640K ............... <OK>",
     "NEON SHADER LOAD ........... <OK>",
     "SINE WAVE ENGINE ........... <OK>",

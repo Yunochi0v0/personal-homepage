@@ -1,0 +1,10 @@
+[
+  { "title": "ベノム (Venom)", "image": "assets/arcade/venom.jpg" },
+  { "title": "アイディスマイル (Id Smile)", "image": "assets/arcade/id-smile.jpg" },
+  { "title": "はぐ (Hagu)", "image": "assets/arcade/hagu.jpg" },
+  { "title": "アスノヨゾラ哨戒班", "image": "assets/arcade/asu-no-yozora.jpg" },
+  { "title": "NEO", "image": "assets/arcade/neo.jpg" },
+  { "title": "命に嫌われている", "image": "assets/arcade/inochi-ni-kirawareteiru.jpg" },
+  { "title": "8.32 (EXPERT Lv.24)", "image": "assets/arcade/832-exp.jpg" },
+  { "title": "8.32 (MASTER Lv.28)", "image": "assets/arcade/832-mas.jpg" }
+]

@@ -1,0 +1,466 @@
+<!DOCTYPE html>
+<html lang="zh-CN" class="is-shiyun-enter">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="color-scheme" content="dark" />
+  <title>诗云 · 深空静滞</title>
+  <!--
+    诗云（shiyun.html · v1.44 · AI-GEN · 动态星空）
+    由主页彩蛋输入暗语「诗云」并回车后跳转至此。
+    无缝过渡设计：主页动画最后一帧为「镜头穿过舷窗后的变焦定格星空」
+    （zoom 2.4，窗框已滑出视口），本页加载后立即以同一变焦画面续接
+    （深空底色防白闪、同款 canvas 星空、同款变焦倍数），随后内容分层渐显。
+    画风：硬核深空终端——近黑铁灰 + 冷钢 + 冰青 HUD 点缀，
+    等宽终端字、HUD 数据轨、终端日志轨、无柔光光晕。
+    舷窗只存在于主页动画中；本页为纯星空画面。
+    正文区为终端式内容占位，后续在此填充正式内容。
+  -->
+  <style>
+    :root {
+      --deck-bg: #050608;      /* 近黑铁灰底（防白闪，与星空背景连续） */
+      --panel: #0c0e13;        /* 面板底色 */
+      --steel-1: #232a35;      /* 金属亮面 */
+      --steel-2: #0b0d11;      /* 金属暗面 */
+      --line: rgba(140, 155, 185, 0.22);
+      --text: #c8cfda;         /* 冷白 */
+      --muted: #6d7686;        /* 铁灰蓝 */
+      --cyan: #6fd8c8;         /* HUD 冰青强调色 */
+      --red: #ff5a3c;          /* 警报红（点缀） */
+      --green: #8fd6a0;        /* 终端绿 */
+    }
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    html {
+      scroll-behavior: smooth;
+    }
+
+    body {
+      min-height: 100vh;
+      overflow-x: hidden;
+      background: var(--deck-bg);
+      color: var(--text);
+      font-family: "PingFang SC", "Microsoft YaHei", "Noto Sans SC", system-ui, sans-serif;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    /* 星空背景层：立现（与主页动画最后一帧同款渲染 + 同款变焦，跳转无缝） */
+    #shiyunSky {
+      position: fixed;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      display: block;
+      z-index: 0;
+    }
+
+    /* 噪点 + 扫描线：工业质感 */
+    .grain {
+      position: fixed;
+      inset: 0;
+      z-index: 1;
+      pointer-events: none;
+      opacity: 0.6;
+      background-image:
+        repeating-linear-gradient(0deg, rgba(255, 255, 255, 0.025) 0 1px, transparent 1px 3px);
+      mix-blend-mode: overlay;
+    }
+
+    .scanlines {
+      position: fixed;
+      inset: 0;
+      z-index: 1;
+      pointer-events: none;
+      background: repeating-linear-gradient(0deg, rgba(0, 0, 0, 0.18) 0 1px, transparent 1px 3px);
+    }
+
+    /* ============ HUD 数据轨（左）+ 终端日志轨（右） ============ */
+    .hud-rail,
+    .log-rail {
+      position: fixed;
+      top: 50%;
+      transform: translateY(-50%);
+      z-index: 3;
+      font-family: "Courier New", ui-monospace, monospace;
+      font-size: 10px;
+      letter-spacing: 1px;
+      pointer-events: none;
+      opacity: 0;
+      animation: riseIn 0.9s ease-out 0.5s forwards;
+    }
+
+    .hud-rail {
+      left: 26px;
+      line-height: 2.2;
+      color: var(--muted);
+    }
+
+    .hud-rail b { color: var(--cyan); font-weight: 400; }
+    .hud-rail .ok { color: var(--green); }
+
+    .log-rail {
+      right: 26px;
+      text-align: right;
+      line-height: 2.0;
+      color: rgba(140, 155, 185, 0.55);
+      animation-delay: 0.7s;
+    }
+
+    .log-rail .warn { color: var(--red); }
+
+    /* ============ 页面内容 ============ */
+    .shiyun-page {
+      position: relative;
+      z-index: 3;
+      max-width: 780px;
+      margin: 0 auto;
+      padding: 96px 34px 74px;
+    }
+
+    .shiyun-kicker {
+      font-family: "Courier New", ui-monospace, monospace;
+      font-size: 0.72rem;
+      letter-spacing: 3px;
+      color: var(--cyan);
+      opacity: 0;
+      animation: riseIn 0.9s ease-out 0.35s forwards;
+    }
+
+    /* 标题铭牌：切割金属板 + 粗壮实色字（无柔光光晕） */
+    .shiyun-titleplate {
+      display: inline-block;
+      margin-top: 18px;
+      padding: 18px 30px 16px;
+      background: linear-gradient(160deg, #1a202c, #0d1017 70%);
+      border: 1px solid rgba(140, 155, 185, 0.3);
+      border-top: 2px solid var(--cyan);
+      box-shadow: 0 14px 34px rgba(0, 0, 0, 0.6);
+      clip-path: polygon(0 0, calc(100% - 16px) 0, 100% 16px, 100% 100%, 16px 100%, 0 calc(100% - 16px));
+      opacity: 0;
+      animation: riseIn 0.9s ease-out 0.5s forwards;
+    }
+
+    .shiyun-unit {
+      font-family: "Courier New", ui-monospace, monospace;
+      font-size: 0.62rem;
+      letter-spacing: 3px;
+      color: var(--muted);
+    }
+
+    .shiyun-title {
+      margin: 8px 0 0;
+      font-size: clamp(2.3rem, 7vw, 3.9rem);
+      font-weight: 900;
+      letter-spacing: 6px;
+      line-height: 1.1;
+      color: #e6ebf2;
+      font-family: "PingFang SC", "Microsoft YaHei", sans-serif;
+    }
+
+    .shiyun-sub {
+      margin: 20px 0 30px;
+      font-family: "Courier New", ui-monospace, monospace;
+      font-size: 0.78rem;
+      letter-spacing: 2px;
+      color: var(--muted);
+      opacity: 0;
+      animation: riseIn 0.9s ease-out 0.65s forwards;
+    }
+
+    .shiyun-sub b { color: var(--cyan); font-weight: 400; }
+
+    @keyframes riseIn {
+      from { opacity: 0; transform: translateY(14px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    /* 正文终端面板：近黑底 + 等宽终端字 + 闪烁光标 */
+    .shiyun-body {
+      position: relative;
+      padding: 20px 22px;
+      background: #06070a;
+      border: 1px solid rgba(140, 155, 185, 0.2);
+      border-left: 3px solid var(--cyan);
+      box-shadow: inset 0 0 40px rgba(0, 0, 0, 0.85);
+      font-family: "Courier New", ui-monospace, monospace;
+      font-size: 0.85rem;
+      line-height: 1.9;
+      color: var(--text);
+      min-height: 150px;
+      opacity: 0;
+      animation: riseIn 0.9s ease-out 0.8s forwards;
+    }
+
+    /* 终端光标（内容后常亮闪烁） */
+    .shiyun-body::after {
+      content: "";
+      display: inline-block;
+      width: 9px;
+      height: 1.05em;
+      background: var(--cyan);
+      margin-left: 5px;
+      vertical-align: text-bottom;
+      animation: blink 1.1s steps(2, start) infinite;
+    }
+
+    @keyframes blink {
+      to { visibility: hidden; }
+    }
+
+    /* 空面板占位提示 */
+    .shiyun-body:empty::before {
+      content: "> SYS.AWAIT // 诗云记录区（内容待写入）";
+      color: var(--muted);
+    }
+
+    .shiyun-back {
+      display: inline-block;
+      margin-top: 30px;
+      padding: 11px 26px;
+      background: #0c0e13;
+      border: 1px solid rgba(111, 216, 200, 0.55);
+      color: var(--cyan);
+      text-decoration: none;
+      font-family: "Courier New", ui-monospace, monospace;
+      font-size: 0.78rem;
+      letter-spacing: 3px;
+      clip-path: polygon(9px 0, 100% 0, 100% calc(100% - 9px), calc(100% - 9px) 100%, 0 100%, 0 9px);
+      transition: all 0.25s ease;
+      opacity: 0;
+      animation: riseIn 0.9s ease-out 0.95s forwards;
+    }
+
+    .shiyun-back:hover {
+      background: rgba(111, 216, 200, 0.12);
+      transform: translateY(-2px);
+    }
+
+    /* 底部系统状态栏 */
+    .sys-bar {
+      position: fixed;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      z-index: 4;
+      height: 26px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 0 16px;
+      background: rgba(5, 6, 9, 0.92);
+      border-top: 1px solid rgba(140, 155, 185, 0.18);
+      font-family: "Courier New", ui-monospace, monospace;
+      font-size: 10px;
+      letter-spacing: 1px;
+      color: var(--muted);
+      opacity: 0;
+      animation: riseIn 0.9s ease-out 1.1s forwards;
+    }
+
+    .sys-bar b { color: var(--green); font-weight: 400; }
+
+    /* 移动端：侧轨隐藏、边距收窄 */
+    @media (max-width: 720px) {
+      .hud-rail, .log-rail { display: none; }
+      .shiyun-page { padding: 60px 18px 50px; }
+    }
+
+    /* ============ HUD 准星光标（新页面） ============ */
+    /* AI-generated: 深空终端风——冰青圆环 + 中心点，悬停可交互元素时
+       圆环放大；仅在桌面精确指针且允许动效时由 JS 启用（html.is-hud-cursor）。
+       原生指针的隐藏同样推迟到用户第一次移动鼠标，脚本未运行时不产生影响。 */
+    .hud-ring,
+    .hud-dot {
+      position: fixed;
+      top: 0;
+      left: 0;
+      z-index: 10000;
+      pointer-events: none;
+      opacity: 0;
+    }
+
+    .hud-ring {
+      width: 24px;
+      height: 24px;
+      margin: -12px 0 0 -12px;
+      border: 1px solid rgba(111, 216, 200, 0.85);
+      border-radius: 50%;
+      box-shadow:
+        0 0 6px rgba(111, 216, 200, 0.25),
+        inset 0 0 6px rgba(111, 216, 200, 0.15);
+      transition: width 0.18s ease, height 0.18s ease,
+        margin 0.18s ease, opacity 0.3s ease;
+    }
+
+    .hud-dot {
+      width: 3px;
+      height: 3px;
+      margin: -1.5px 0 0 -1.5px;
+      background: var(--cyan);
+      border-radius: 50%;
+      box-shadow: 0 0 4px rgba(111, 216, 200, 0.9);
+    }
+
+    .hud-ring.is-hover {
+      width: 34px;
+      height: 34px;
+      margin: -17px 0 0 -17px;
+    }
+
+    html.is-hud-cursor,
+    html.is-hud-cursor * {
+      cursor: none;
+    }
+
+    /* 入场过场动画期间（星空续接 + 内容分层渐显）隐藏一切光标，
+       过渡完成后由 JS 移除 is-shiyun-enter 恢复 */
+    html.is-shiyun-enter,
+    html.is-shiyun-enter * {
+      cursor: none !important;
+    }
+
+    html.is-shiyun-enter .hud-ring,
+    html.is-shiyun-enter .hud-dot {
+      opacity: 0 !important;
+    }
+  </style>
+</head>
+<body>
+  <!-- 星空背景（scripts/shiyun.js 渲染，与主页动画同款 + 同款变焦定格） -->
+  <canvas id="shiyunSky"></canvas>
+  <div class="grain" aria-hidden="true"></div>
+  <div class="scanlines" aria-hidden="true"></div>
+
+  <!-- 左侧 HUD 数据轨 -->
+  <div class="hud-rail" aria-hidden="true">
+    O₂&nbsp;&nbsp;&nbsp;&nbsp;<b>21.9%</b><br>
+    AIR&nbsp;&nbsp;&nbsp;&nbsp;<b>NOM</b><br>
+    TEMP&nbsp;&nbsp;<b>-172°C</b><br>
+    VEL&nbsp;&nbsp;&nbsp;&nbsp;<span class="ok">DRIFT</span><br>
+    LINK&nbsp;&nbsp;&nbsp;<span class="ok">UP</span><br>
+    SCAN&nbsp;&nbsp;<span class="ok">ON</span>
+  </div>
+
+  <!-- 右侧终端日志轨 -->
+  <div class="log-rail" aria-hidden="true">
+    <span class="ok">[OK]</span> BRIDGE LINK<br>
+    <span class="ok">[OK]</span> SIGNAL LOCK<br>
+    <span class="ok">[OK]</span> STARFIELD CAL<br>
+    <span class="ok">[OK]</span> DEEP SPACE<br>
+    <span class="warn">[!]</span> ORBIT DRIFT
+  </div>
+
+  <!-- 页面内容：诗云正文占位区（后续填充） -->
+  <main class="shiyun-page">
+    <p class="shiyun-kicker">// UNIT-07 · 深空静滞 · DEEP SPACE DRIFT</p>
+    <div class="shiyun-titleplate">
+      <p class="shiyun-unit">VESSEL LOG — 飞船航行日志</p>
+      <h1 class="shiyun-title">诗 云</h1>
+    </div>
+    <p class="shiyun-sub">&gt; 暗语「<b>诗云</b>」已确认。当前坐标：轨道远点 07，静滞区。</p>
+    <section class="shiyun-body" id="shiyunBody"></section>
+    <a class="shiyun-back" href="index.html">&lt;- 返回主页</a>
+  </main>
+
+  <!-- 底部系统状态栏 -->
+  <div class="sys-bar" aria-hidden="true">
+    <span>SYS: <b>NOMINAL</b></span>
+    <span>DOCK: SHIYUN-7</span>
+    <span>UTC 07:12:34</span>
+    <span>v1.44</span>
+  </div>
+
+  <script src="scripts/shiyun.js?v=1.44.3"></script>
+  <script>
+    // 复用主页遮罩动画的星空渲染，以动画尾帧的同款变焦（zoom 2.4）
+    // 定格显示，两页画面无缝衔接（立现、无入场淡出、无舷窗）
+    (function () {
+      var sky = document.getElementById("shiyunSky");
+      if (window.ShiyunWarp && window.ShiyunWarp.renderSky) {
+        window.ShiyunWarp.renderSky(sky, { zoom: 2.4 });
+      }
+    })();
+  </script>
+  <script>
+    // 入场过场：星空续接 + 内容分层渐显期间隐藏光标。
+    // 过场动画 = 从主页按下回车键 → 本页完全弹出；最晚的 sys-bar
+    // 为 1.1s delay + 0.9s 动画（共 2.0s），故保持隐藏至 2.1s 才恢复
+    (function () {
+      var enterEnd = 2100; // 对齐最晚的 sys-bar riseIn（0.9s + 1.1s delay）
+      setTimeout(function () {
+        document.documentElement.classList.remove("is-shiyun-enter");
+      }, enterEnd);
+    })();
+
+    // HUD 准星光标：冰青圆环 + 中心点（新页面专属图案）
+    // 仅在桌面精确指针且允许动效时启用；首次移动鼠标才隐藏原生指针
+    (function () {
+      var finePointer = window.matchMedia("(hover: hover) and (pointer: fine)").matches;
+      var reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+      if (!finePointer || reduceMotion || !document.body) return;
+
+      var root = document.documentElement;
+      var ring = document.createElement("div");
+      var dot = document.createElement("div");
+      ring.className = "hud-ring";
+      dot.className = "hud-dot";
+      ring.setAttribute("aria-hidden", "true");
+      dot.setAttribute("aria-hidden", "true");
+      document.body.appendChild(ring);
+      document.body.appendChild(dot);
+
+      var HOVER_SELECTOR = "a, button, input, textarea, select, .shiyun-back, .shiyun-titleplate";
+
+      var mx = window.innerWidth / 2;
+      var my = window.innerHeight / 2;
+      var rx = mx;
+      var ry = my;
+      var started = false;
+
+      function onMove(e) {
+        mx = e.clientX;
+        my = e.clientY;
+        if (!started) {
+          started = true;
+          rx = mx;
+          ry = my;
+          root.classList.add("is-hud-cursor");
+          ring.style.opacity = "1";
+          dot.style.opacity = "1";
+        }
+      }
+
+      function tick() {
+        rx += (mx - rx) * 0.22;
+        ry += (my - ry) * 0.22;
+        dot.style.transform = "translate(" + mx + "px, " + my + "px)";
+        ring.style.transform = "translate(" + rx.toFixed(2) + "px, " + ry.toFixed(2) + "px)";
+        requestAnimationFrame(tick);
+      }
+
+      window.addEventListener("mousemove", onMove, { passive: true });
+
+      document.addEventListener("mouseover", function (e) {
+        if (e.target && e.target.closest && e.target.closest(HOVER_SELECTOR)) {
+          ring.classList.add("is-hover");
+        }
+      });
+      document.addEventListener("mouseout", function (e) {
+        if (e.target && e.target.closest && e.target.closest(HOVER_SELECTOR)) {
+          var to = e.relatedTarget;
+          if (!to || !to.closest || !to.closest(HOVER_SELECTOR)) {
+            ring.classList.remove("is-hover");
+          }
+        }
+      });
+
+      requestAnimationFrame(tick);
+    })();
+  </script>
+</body>
+</html>
