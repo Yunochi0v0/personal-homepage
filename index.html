@@ -29,7 +29,10 @@
   </script>
   <noscript><style>.boot { display: none !important; }</style></noscript>
 </head>
-<body data-version="1.41.2">
+<body data-version="1.42.5">
+
+  <!-- 多语言切换按钮（v1.42.5 · AI-GEN）：左上角悬浮，点击中英切换 -->
+  <button id="langSwitch" class="lang-switch" type="button" aria-label="切换语言 / Switch language">EN</button>
   <!-- 开启动画（复古 CRT 开机自检） -->
   <div class="boot" id="bootScreen" aria-hidden="true">
     <span class="boot-dot"></span>
@@ -51,46 +54,46 @@
     <ul class="dock-list">
       <li class="dock-item">
         <a class="dock-link" href="#hero">
-          <span class="dock-tip">首页</span>
+          <span class="dock-tip" data-i18n="首页">首页</span>
           <span class="dock-icon">🏠</span>
         </a>
       </li>
       <li class="dock-sep" aria-hidden="true"></li>
       <li class="dock-item">
         <a class="dock-link" href="#about">
-          <span class="dock-tip">关于我</span>
+          <span class="dock-tip" data-i18n="关于我">关于我</span>
           <span class="dock-icon">👤</span>
         </a>
       </li>
       <li class="dock-item">
         <a class="dock-link" href="#skills">
-          <span class="dock-tip">技能</span>
+          <span class="dock-tip" data-i18n="技能">技能</span>
           <span class="dock-icon">⚡</span>
         </a>
       </li>
       <li class="dock-item">
         <a class="dock-link" href="#projects">
-          <span class="dock-tip">项目</span>
+          <span class="dock-tip" data-i18n="项目">项目</span>
           <span class="dock-icon">🚀</span>
         </a>
       </li>
       <li class="dock-sep" aria-hidden="true"></li>
       <li class="dock-item">
         <a class="dock-link" href="#arcade">
-          <span class="dock-tip">音游</span>
+          <span class="dock-tip" data-i18n="音游">音游</span>
           <span class="dock-icon">🎮</span>
         </a>
       </li>
       <li class="dock-sep" aria-hidden="true"></li>
       <li class="dock-item">
         <a class="dock-link" href="#contact">
-          <span class="dock-tip">联系</span>
+          <span class="dock-tip" data-i18n="联系">联系</span>
           <span class="dock-icon">✉️</span>
         </a>
       </li>
       <li class="dock-item">
         <a class="dock-link" href="#twin">
-          <span class="dock-tip">数字孪生</span>
+          <span class="dock-tip" data-i18n="数字孪生">数字孪生</span>
           <span class="dock-icon">🤖</span>
         </a>
       </li>
@@ -126,25 +129,25 @@
             <p class="hero-status-head" aria-hidden="true">// CURRENT STATUS</p>
             <ul class="hero-status-list">
               <li class="hero-status-row">
-                <span class="hero-status-key">当前位置</span>
-                <span class="hero-status-val">深圳</span>
+                <span class="hero-status-key" data-i18n="当前位置">当前位置</span>
+                <span class="hero-status-val" data-i18n="深圳">深圳</span>
               </li>
               <li class="hero-status-row">
-                <span class="hero-status-key">状态</span>
-                <span class="hero-status-val"><span class="hero-status-dot" aria-hidden="true"></span>持续迭代中</span>
+                <span class="hero-status-key" data-i18n="状态">状态</span>
+                <span class="hero-status-val"><span class="hero-status-dot" aria-hidden="true"></span><span data-i18n="持续迭代中">持续迭代中</span></span>
               </li>
             </ul>
           </div>
         </div>
-        <p class="hero-name">你好，我是 <strong>刘聿宸</strong> · 18 岁</p>
-        <h1 class="hero-slogan"><span class="typewriter" id="typewriter">梦想即力量</span><span class="caret"></span></h1>
-        <p class="hero-sub">大一新生 · 编程与人工智能初学者 · 正在用 AI 辅助开发记录我的成长</p>
+        <p class="hero-name"><span data-i18n="你好，我是 ">你好，我是 </span><strong>刘聿宸</strong><span data-i18n=" · 18 岁"> · 18 岁</span></p>
+        <h1 class="hero-slogan"><span class="typewriter" id="typewriter" data-i18n="梦想即力量">梦想即力量</span><span class="caret"></span></h1>
+        <p class="hero-sub" data-i18n="大一新生 · 编程与人工智能初学者 · 正在用 AI 辅助开发记录我的成长">大一新生 · 编程与人工智能初学者 · 正在用 AI 辅助开发记录我的成长</p>
         <div class="hero-actions">
-          <a class="btn btn-primary" href="#contact">联系我</a>
-          <a class="btn btn-ghost" href="#about">了解我</a>
+          <a class="btn btn-primary" href="#contact" data-i18n="联系我">联系我</a>
+          <a class="btn btn-ghost" href="#about" data-i18n="了解我">了解我</a>
         </div>
       </div>
-      <a class="scroll-hint" href="#about" aria-label="向下滚动">
+      <a class="scroll-hint" href="#about" aria-label="向下滚动" data-i18n-aria="向下滚动">
         <span class="mouse"><span class="wheel"></span></span>
       </a>
     </section>
@@ -152,20 +155,20 @@
     <!-- 2. About -->
     <section id="about" class="section">
       <div class="container">
-        <h2 class="section-title reveal glitch" data-text="关于我">关于我<span class="title-en" aria-hidden="true">ABOUT</span></h2>
-        <p class="section-sub reveal">一点关于我的介绍</p>
+        <h2 class="section-title reveal glitch" data-text="关于我"><span data-i18n="关于我">关于我</span><span class="title-en" aria-hidden="true">ABOUT</span></h2>
+        <p class="section-sub reveal" data-i18n="一点关于我的介绍">一点关于我的介绍</p>
         <div class="about-card reveal">
-          <p>
+          <p data-i18n-html="我是刘聿宸，18 岁，目前就读于天津大学香港理工大学深圳未来技术学院，学习计算机科学与技术专业。">
             我是刘聿宸，18 岁，目前就读于<strong>天津大学香港理工大学深圳未来技术学院</strong>，
             学习<strong>计算机科学与技术</strong>专业。
           </p>
-          <p>
+          <p data-i18n="关于本站：这里是我利用 vibe coding 制作的第一个计算机项目，包含了我的一些基本信息、项目和小巧思，今后也会持续迭代。如果你对本站有什么意见和看法，欢迎点击网站右下角的「聊天泡」图标给我发送你的反馈。当然啦，你也可以打开右下角的「音符」图标，听听音乐，亦或者是玩玩本网站的吉祥物（我认为挺好玩的）。总之希望你能在我的网站里玩得开心。=）">
             关于本站：这里是我利用 vibe coding 制作的第一个计算机项目，包含了我的一些基本信息、项目和小巧思，
             今后也会持续迭代。如果你对本站有什么意见和看法，欢迎点击网站右下角的「聊天泡」图标给我发送你的反馈。
             当然啦，你也可以打开右下角的「音符」图标，听听音乐，亦或者是玩玩本网站的吉祥物（我认为挺好玩的）。
             总之希望你能在我的网站里玩得开心。=）
           </p>
-          <p>
+          <p data-i18n="关于我：实际上没什么可介绍的，本质是远离所有不必要社交的绝对 i 人。平时会打打音游（phigros、pjsk），听听歌（主要是 J-ROCK 和 J-POP），看看番（我是小资历……）。不过，我还是欢迎你来通过我的邮箱来联系我的👍">
             关于我：实际上没什么可介绍的，本质是远离所有不必要社交的绝对 i 人。平时会打打音游（phigros、pjsk），
             听听歌（主要是 J-ROCK 和 J-POP），看看番（我是小资历……）。不过，我还是欢迎你来通过我的邮箱来联系我的👍
           </p>
@@ -176,24 +179,24 @@
     <!-- 3. Skills -->
     <section id="skills" class="section section-alt">
       <div class="container">
-        <h2 class="section-title reveal glitch" data-text="技能">技能<span class="title-en" aria-hidden="true">SKILLS</span></h2>
-        <p class="section-sub reveal">我掌握与正在学习的内容</p>
+        <h2 class="section-title reveal glitch" data-text="技能"><span data-i18n="技能">技能</span><span class="title-en" aria-hidden="true">SKILLS</span></h2>
+        <p class="section-sub reveal" data-i18n="我掌握与正在学习的内容">我掌握与正在学习的内容</p>
         <div class="skills-grid">
           <!-- AI-generated: 技能条目，进度为占位，请按实际情况调整 -->
           <div class="skill-item reveal">
-            <div class="skill-head"><span>前端基础 HTML / CSS / JS</span><span class="skill-value">75%</span></div>
+            <div class="skill-head"><span data-i18n="前端基础 HTML / CSS / JS">前端基础 HTML / CSS / JS</span><span class="skill-value">75%</span></div>
             <div class="skill-bar"><span data-target="75"></span></div>
           </div>
           <div class="skill-item reveal">
-            <div class="skill-head"><span>Python 编程</span><span class="skill-value">65%</span></div>
+            <div class="skill-head"><span data-i18n="Python 编程">Python 编程</span><span class="skill-value">65%</span></div>
             <div class="skill-bar"><span data-target="65"></span></div>
           </div>
           <div class="skill-item reveal">
-            <div class="skill-head"><span>AI 辅助开发（Vibe Coding）</span><span class="skill-value">50%</span></div>
+            <div class="skill-head"><span data-i18n="AI 辅助开发（Vibe Coding）">AI 辅助开发（Vibe Coding）</span><span class="skill-value">50%</span></div>
             <div class="skill-bar"><span data-target="50"></span></div>
           </div>
           <div class="skill-item reveal">
-            <div class="skill-head"><span>Git 版本控制</span><span class="skill-value">学习中</span></div>
+            <div class="skill-head"><span data-i18n="Git 版本控制">Git 版本控制</span><span class="skill-value" data-i18n="学习中">学习中</span></div>
             <div class="skill-bar"><span data-target="40"></span></div>
           </div>
         </div>
@@ -203,63 +206,63 @@
     <!-- 4. Projects -->
     <section id="projects" class="section">
       <div class="container">
-        <h2 class="section-title reveal glitch" data-text="项目">项目<span class="title-en" aria-hidden="true">PROJECTS</span></h2>
-        <p class="section-sub reveal">正在完成与计划中的作品 · 悬停查看任务简报</p>
+        <h2 class="section-title reveal glitch" data-text="项目"><span data-i18n="项目">项目</span><span class="title-en" aria-hidden="true">PROJECTS</span></h2>
+        <p class="section-sub reveal" data-i18n="正在完成与计划中的作品 · 悬停查看任务简报">正在完成与计划中的作品 · 悬停查看任务简报</p>
         <!-- AI-generated: 任务列表。悬停（或键盘聚焦）条目时，右侧浮出「全息投影」详情面板。
              面板为纯 CSS 驱动，无需脚本；详细文案仍为占位，请按实际情况调整。 -->
         <div class="missions">
           <ol class="mission-list">
             <li class="mission reveal" data-delay="0">
               <span class="mission-id">[MISSION_01]</span>
-              <span class="mission-name">本个人主页</span>
-              <span class="mission-status is-active">进行中</span>
+              <span class="mission-name" data-i18n="本个人主页">本个人主页</span>
+              <span class="mission-status is-active" data-i18n="进行中">进行中</span>
               <button class="mission-log-btn" id="historyTrigger" type="button"
-                      aria-haspopup="dialog" title="查看本个人主页的开发历程">LOG</button>
+                      aria-haspopup="dialog" data-i18n-title="查看本个人主页的开发历程" title="查看本个人主页的开发历程">LOG</button>
               <div class="mission-holo">
                 <p class="holo-head">// MISSION BRIEF</p>
-                <p class="holo-desc">
+                <p class="holo-desc" data-i18n="用于记录学习与成长的个人主页 MVP。纯 HTML / CSS / JavaScript 手写，无框架、无构建步骤；包含自我介绍、技能进度、项目档案与数字孪生问答。">
                   用于记录学习与成长的个人主页 MVP。纯 HTML / CSS / JavaScript 手写，
                   无框架、无构建步骤；包含自我介绍、技能进度、项目档案与数字孪生问答。
                 </p>
                 <ul class="holo-meta">
-                  <li><em>技术栈</em><span>HTML / CSS / JS</span></li>
-                  <li><em>状态</em><span>持续迭代中</span></li>
-                  <li><em>方式</em><span>AI 辅助开发</span></li>
-                  <li><em>成长史</em><span>点击 LOG 查看开发历程</span></li>
+                  <li><em data-i18n="技术栈">技术栈</em><span>HTML / CSS / JS</span></li>
+                  <li><em data-i18n="状态">状态</em><span data-i18n="持续迭代中">持续迭代中</span></li>
+                  <li><em data-i18n="方式">方式</em><span>AI 辅助开发</span></li>
+                  <li><em data-i18n="成长史">成长史</em><span data-i18n="点击 LOG 查看开发历程">点击 LOG 查看开发历程</span></li>
                 </ul>
               </div>
             </li>
             <li class="mission reveal" data-delay="100">
               <span class="mission-id">[MISSION_02]</span>
-              <span class="mission-name">课程项目</span>
-              <span class="mission-status">待填充</span>
+              <span class="mission-name" data-i18n="课程项目">课程项目</span>
+              <span class="mission-status" data-i18n="待填充">待填充</span>
               <div class="mission-holo">
                 <p class="holo-head">// MISSION BRIEF</p>
-                <p class="holo-desc">
+                <p class="holo-desc" data-i18n="课程里的真实项目，会在这里记录目标、过程与收获。目前尚未开工，欢迎回来查看更新。">
                   课程里的真实项目，会在这里记录目标、过程与收获。
                   目前尚未开工，欢迎回来查看更新。
                 </p>
                 <ul class="holo-meta">
-                  <li><em>技术栈</em><span>待定</span></li>
+                  <li><em data-i18n="技术栈">技术栈</em><span data-i18n="待定">待定</span></li>
                   <li><em>状态</em><span>计划中</span></li>
-                  <li><em>方式</em><span>AI 辅助开发</span></li>
+                  <li><em data-i18n="方式">方式</em><span>AI 辅助开发</span></li>
                 </ul>
               </div>
             </li>
             <li class="mission reveal" data-delay="200">
               <span class="mission-id">[MISSION_03]</span>
-              <span class="mission-name">我的下一个想法</span>
-              <span class="mission-status">待填充</span>
+              <span class="mission-name" data-i18n="我的下一个想法">我的下一个想法</span>
+              <span class="mission-status" data-i18n="待填充">待填充</span>
               <div class="mission-holo">
                 <p class="holo-head">// MISSION BRIEF</p>
-                <p class="holo-desc">
+                <p class="holo-desc" data-i18n="正在酝酿中的小点子，等它成型后我会写下完整的设计与实现。如果你有想看我做的东西，也欢迎写信告诉我。">
                   正在酝酿中的小点子，等它成型后我会写下完整的设计与实现。
                   如果你有想看我做的东西，也欢迎写信告诉我。
                 </p>
                 <ul class="holo-meta">
-                  <li><em>技术栈</em><span>待定</span></li>
-                  <li><em>状态</em><span>构思中</span></li>
-                  <li><em>方式</em><span>Vibe Coding</span></li>
+                  <li><em data-i18n="技术栈">技术栈</em><span data-i18n="待定">待定</span></li>
+                  <li><em data-i18n="状态">状态</em><span data-i18n="构思中">构思中</span></li>
+                  <li><em data-i18n="方式">方式</em><span>Vibe Coding</span></li>
                 </ul>
               </div>
             </li>
@@ -274,8 +277,8 @@
     <section id="arcade" class="section">
       <div class="container">
         <div class="arcade-frame">
-          <h2 class="section-title reveal glitch" data-text="音游">音游<span class="title-en" aria-hidden="true">ARCADE</span></h2>
-          <p class="section-sub reveal">世界计划 缤纷舞台 · MASTER 全连记录</p>
+          <h2 class="section-title reveal glitch" data-text="音游"><span data-i18n="音游">音游</span><span class="title-en" aria-hidden="true">ARCADE</span></h2>
+          <p class="section-sub reveal" data-i18n="世界计划 缤纷舞台 · MASTER 全连记录">世界计划 缤纷舞台 · MASTER 全连记录</p>
           <!-- AI-generated: 音游卡片横向滑动区。样式见 style.css 第 12 节；数据见 arcade.json。
                下方内联数据为 file:// 直开（fetch 被浏览器拦截）时的兜底，线上仍优先读取 arcade.json。 -->
           <script type="application/json" id="arcadeData">
@@ -300,14 +303,14 @@
     <!-- 5. Contact -->
     <section id="contact" class="section section-alt">
       <div class="container">
-        <h2 class="section-title reveal glitch" data-text="联系我">联系我<span class="title-en" aria-hidden="true">CONTACT</span></h2>
-        <p class="section-sub reveal">欢迎交流，期待认识你</p>
+        <h2 class="section-title reveal glitch" data-text="联系我"><span data-i18n="联系我">联系我</span><span class="title-en" aria-hidden="true">CONTACT</span></h2>
+        <p class="section-sub reveal" data-i18n="欢迎交流，期待认识你">欢迎交流，期待认识你</p>
         <div class="contact-grid">
           <a class="contact-card reveal" href="mailto:319008328@qq.com">
             <div class="contact-icon">
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="m3 7 9 6 9-6"/></svg>
             </div>
-            <div class="contact-label">邮箱</div>
+            <div class="contact-label" data-i18n="邮箱">邮箱</div>
             <div class="contact-value">319008328@qq.com</div>
           </a>
           <a class="contact-card reveal" data-delay="100" href="https://github.com/Yunochi0v0" target="_blank" rel="noopener noreferrer" title="GitHub：Yunochi0v0">
@@ -322,11 +325,22 @@
     </section>
   </main>
 
+  <!-- 5.5 成就（v1.42 · 记录浏览本站达成的成就，已解锁点亮；达成时右下角弹出提示） -->
+  <section id="achievements" class="section">
+    <div class="container">
+      <h2 class="section-title reveal glitch" data-text="成就"><span data-i18n="成就">成就</span><span class="title-en" aria-hidden="true">ACHIEVEMENTS</span></h2>
+      <p class="section-sub reveal"><span data-i18n="探索本站，解锁成就 · 已解锁">探索本站，解锁成就 · 已解锁</span> <span id="achievementCounter">0 / 0</span></p>
+      <div class="achievement-grid" id="achievementGrid">
+        <!-- achievements.js 数据驱动注入成就卡片 -->
+      </div>
+    </div>
+  </section>
+
   <!-- 6. 数字孪生（虚拟的我 · 基于个人简介问答） -->
   <section id="twin" class="section twin-section">
     <div class="container">
-      <h2 class="section-title reveal glitch" data-text="数字孪生">数字孪生<span class="title-en" aria-hidden="true">DIGITAL TWIN</span></h2>
-      <p class="section-sub reveal">虚拟的我 · 基于个人简介与你对话，认识一个「程序化的刘聿宸」</p>
+      <h2 class="section-title reveal glitch" data-text="数字孪生"><span data-i18n="数字孪生">数字孪生</span><span class="title-en" aria-hidden="true">DIGITAL TWIN</span></h2>
+      <p class="section-sub reveal" data-i18n="虚拟的我 · 基于个人简介与你对话，认识一个「程序化的刘聿宸」">虚拟的我 · 基于个人简介与你对话，认识一个「程序化的刘聿宸」</p>
 
       <div class="twin-card reveal">
         <!-- 头部：数字孪生身份 -->
@@ -334,7 +348,7 @@
           <div class="twin-avatar"><img src="assets/avatar.jpg" alt="数字孪生头像" /></div>
           <div class="twin-meta">
             <span class="twin-name">AI · 刘聿宸</span>
-            <span class="twin-status"><span class="twin-dot"></span>在线 · 数字孪生</span>
+            <span class="twin-status"><span class="twin-dot"></span><span data-i18n="在线 · 数字孪生">在线 · 数字孪生</span></span>
           </div>
           <span class="twin-badge">BETA</span>
         </div>
@@ -344,16 +358,16 @@
 
         <!-- 快捷问题 -->
         <div class="twin-suggests" id="twinSuggests">
-          <button type="button" data-q="你是谁？">你是谁？</button>
-          <button type="button" data-q="你的 slogan 是什么？">你的 slogan？</button>
-          <button type="button" data-q="你在哪个学校？">你在哪个学校？</button>
-          <button type="button" data-q="你有什么爱好？">你有什么爱好？</button>
+          <button type="button" data-q="你是谁？" data-i18n="你是谁？">你是谁？</button>
+          <button type="button" data-q="你的 slogan 是什么？" data-i18n="你的 slogan 是什么？">你的 slogan？</button>
+          <button type="button" data-q="你在哪个学校？" data-i18n="你在哪个学校？">你在哪个学校？</button>
+          <button type="button" data-q="你有什么爱好？" data-i18n="你有什么爱好？">你有什么爱好？</button>
         </div>
 
         <!-- 输入区 -->
         <form class="twin-input" id="twinForm" autocomplete="off">
-          <input id="twinInput" type="text" placeholder="向我提问，比如：你会什么技能？" maxlength="80" />
-          <button type="submit" aria-label="发送"><span></span></button>
+          <input id="twinInput" type="text" placeholder="向我提问，比如：你会什么技能？" maxlength="80" data-i18n-ph="向我提问，比如：你会什么技能？" />
+          <button type="submit" aria-label="发送" data-i18n-aria="发送"><span></span></button>
         </form>
       </div>
     </div>
@@ -363,8 +377,13 @@
 
   <footer class="footer">
     <div class="container">
-      <p>© <span id="year"></span> 刘聿宸 · 梦想即力量</p>
+      <p>© <span id="year"></span> <span data-i18n="刘聿宸 · 梦想即力量">刘聿宸 · 梦想即力量</span></p>
       <p class="footer-note">Powered by Vibe Coding</p>
+      <!-- 了解更多（v1.42.2 · 跳转 B 站视频） -->
+      <p class="footer-more">
+        <a class="btn btn-more" href="https://www.bilibili.com/video/BV1UT42167xb/?spm_id_from=333.337.search-card.all.click"
+           target="_blank" rel="noopener noreferrer" data-i18n="了解更多">了解更多</a>
+      </p>
     </div>
   </footer>
 
@@ -424,17 +443,17 @@
        图标统一为黄色细线线性 SVG（stroke 跟随 currentColor，hover 点亮为纯黄底黑字）。 -->
   <div class="side-btns" id="sideBtns">
     <!-- 音乐播放器徽章（v1.23 · AI-GEN）：点击弹出「赛博随身听」浮窗 -->
-    <button class="music-badge" id="musicBadge" type="button" aria-label="打开音乐播放器" aria-expanded="false" aria-haspopup="dialog">
+    <button class="music-badge" id="musicBadge" type="button" aria-label="打开音乐播放器" data-i18n-aria="打开音乐播放器" aria-expanded="false" aria-haspopup="dialog">
       <svg class="side-icon" viewBox="0 0 24 24" width="22" height="22" aria-hidden="true" focusable="false"><path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/></svg>
     </button>
 
     <!-- 访客反馈徽章（v1.22 · AI-GEN）：点击弹出反馈表单 -->
-    <button class="feedback-badge" id="feedbackBadge" type="button" aria-label="留个反馈" aria-haspopup="dialog">
+    <button class="feedback-badge" id="feedbackBadge" type="button" aria-label="留个反馈" data-i18n-aria="留个反馈" aria-haspopup="dialog">
       <svg class="side-icon" viewBox="0 0 24 24" width="22" height="22" aria-hidden="true" focusable="false"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
     </button>
 
     <!-- 返回顶部（v1.20 · AI-GEN）：滚动超 500px 后由 main.js 切换 .show 显示 -->
-    <button class="back-top" id="backTop" type="button" aria-label="返回顶部">
+    <button class="back-top" id="backTop" type="button" aria-label="返回顶部" data-i18n-aria="返回顶部">
       <svg class="side-icon" viewBox="0 0 24 24" width="22" height="22" aria-hidden="true" focusable="false"><path d="M12 19V5"/><path d="m5 12 7-7 7 7"/></svg>
     </button>
   </div>
@@ -444,10 +463,10 @@
        首次打开时才动态加载 iframe（懒加载，见 scripts/music.js）。 -->
   <div class="music-pop" id="musicPop" aria-hidden="true">
     <div class="music-pop-head">
-      <span class="music-pop-title">🎧 赛博随身听</span>
+      <span class="music-pop-title" data-i18n="🎧 赛博随身听">🎧 赛博随身听</span>
       <!-- [AI-GEN] 播放中均衡器：打开浮窗时黄色细柱波动（纯 CSS 驱动，见 style.css eq-bars） -->
       <span class="eq-bars" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i></span>
-      <button class="music-pop-close" id="musicClose" type="button" aria-label="关闭播放器">×</button>
+      <button class="music-pop-close" id="musicClose" type="button" aria-label="关闭播放器" data-i18n-aria="关闭播放器">×</button>
     </div>
     <!-- [MANUAL] 网易云外链 iframe（单曲 1935705479，v1.23）：
          外链生成器不可用时手工拼装，标准格式为
@@ -473,50 +492,50 @@
   <div class="feedback-overlay" id="feedbackOverlay" aria-hidden="true">
     <div class="feedback-modal" id="feedbackModal" role="dialog" aria-modal="true" aria-labelledby="feedbackTitle">
       <div class="feedback-head">
-        <h3 class="feedback-title" id="feedbackTitle">留个反馈</h3>
-        <button class="feedback-close" id="feedbackClose" type="button" aria-label="关闭">×</button>
+        <h3 class="feedback-title" id="feedbackTitle" data-i18n="留个反馈">留个反馈</h3>
+        <button class="feedback-close" id="feedbackClose" type="button" aria-label="关闭" data-i18n-aria="关闭">×</button>
       </div>
-      <p class="feedback-note">反馈不会公开，只有我能看到。</p>
+      <p class="feedback-note" data-i18n="反馈不会公开，只有我能看到。">反馈不会公开，只有我能看到。</p>
       <form class="feedback-form" id="feedbackForm" novalidate>
         <label class="feedback-field">
-          <span class="feedback-label">昵称（可选）</span>
-          <input class="feedback-input" id="fbName" type="text" maxlength="40" placeholder="怎么称呼你？" autocomplete="nickname" />
+          <span class="feedback-label" data-i18n="昵称（可选）">昵称（可选）</span>
+          <input class="feedback-input" id="fbName" type="text" maxlength="40" placeholder="怎么称呼你？" autocomplete="nickname" data-i18n-ph="怎么称呼你？" />
         </label>
         <label class="feedback-field">
-          <span class="feedback-label">关系</span>
+          <span class="feedback-label" data-i18n="关系">关系</span>
           <select class="feedback-input" id="fbRelation" required>
-            <option value="" disabled selected>请选择</option>
-            <option>同学</option>
-            <option>老师</option>
-            <option>家人</option>
-            <option>朋友</option>
-            <option>同事</option>
-            <option>其他</option>
-            <option>不便透露</option>
+            <option value="" disabled selected data-i18n="请选择">请选择</option>
+            <option data-i18n="同学">同学</option>
+            <option data-i18n="老师">老师</option>
+            <option data-i18n="家人">家人</option>
+            <option data-i18n="朋友">朋友</option>
+            <option data-i18n="同事">同事</option>
+            <option data-i18n="其他">其他</option>
+            <option data-i18n="不便透露">不便透露</option>
           </select>
         </label>
         <label class="feedback-field">
-          <span class="feedback-label">设备</span>
+          <span class="feedback-label" data-i18n="设备">设备</span>
           <select class="feedback-input" id="fbDevice" required>
-            <option value="" disabled selected>请选择</option>
-            <option>电脑</option>
-            <option>手机</option>
-            <option>平板</option>
-            <option>其他</option>
+            <option value="" disabled selected data-i18n="请选择">请选择</option>
+            <option data-i18n="电脑">电脑</option>
+            <option data-i18n="手机">手机</option>
+            <option data-i18n="平板">平板</option>
+            <option data-i18n="其他">其他</option>
           </select>
         </label>
         <label class="feedback-field">
-          <span class="feedback-label">反馈内容 *</span>
-          <textarea class="feedback-input feedback-message" id="fbMessage" maxlength="1000" rows="5" placeholder="想对我说点什么？"></textarea>
+          <span class="feedback-label" data-i18n="反馈内容 *">反馈内容 *</span>
+          <textarea class="feedback-input feedback-message" id="fbMessage" maxlength="1000" rows="5" placeholder="想对我说点什么？" data-i18n-ph="想对我说点什么？"></textarea>
           <span class="feedback-counter" id="fbCounter">0 / 1000</span>
         </label>
         <p class="feedback-error" id="fbError" role="alert" hidden></p>
-        <button class="feedback-submit" id="fbSubmit" type="submit">提交反馈</button>
+        <button class="feedback-submit" id="fbSubmit" type="submit" data-i18n="提交反馈">提交反馈</button>
       </form>
       <div class="feedback-success" id="fbSuccess" hidden>
         <p class="feedback-success-icon">✓</p>
-        <p class="feedback-success-text">已收到，谢谢你的反馈！</p>
-        <button class="feedback-submit" id="fbDone" type="button">知道了</button>
+        <p class="feedback-success-text" data-i18n="已收到，谢谢你的反馈！">已收到，谢谢你的反馈！</p>
+        <button class="feedback-submit" id="fbDone" type="button" data-i18n="知道了">知道了</button>
       </div>
     </div>
   </div>
@@ -528,7 +547,7 @@
   <div class="history-overlay" id="historyOverlay" aria-hidden="true">
     <div class="history-modal" id="historyModal" role="dialog" aria-modal="true" aria-labelledby="historyTitle">
       <div class="history-head">
-        <h3 class="history-title" id="historyTitle">// DEV HISTORY · 本个人主页开发历程</h3>
+        <h3 class="history-title" id="historyTitle" data-i18n="// DEV HISTORY · 本个人主页开发历程">// DEV HISTORY · 本个人主页开发历程</h3>
         <button class="history-close" id="historyClose" type="button" aria-label="关闭">×</button>
       </div>
       <!-- 开启动画：档案解密终端序列（与隐藏关卡 egg-boot 同语言，主题为
@@ -659,13 +678,18 @@
     </div>
   </div>
 
-  <script src="scripts/main.js?v=1.41.2"></script>
+  <!-- 成就提示容器（右下角 Steam 风格，achievements.js 注入） -->
+  <div class="achievement-toasts" id="achievementToasts" aria-live="polite"></div>
+
+  <script src="scripts/i18n.js?v=1.42.5"></script>
+  <script src="scripts/main.js?v=1.42.5"></script>
   <script src="scripts/shiyun.js?v=1.44.3"></script>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.49.4/dist/umd/supabase.min.js"></script>
-  <script src="scripts/feedback.js?v=1.41.2"></script>
-  <script src="scripts/music.js?v=1.41.2"></script>
-  <script src="scripts/stickman.js?v=1.41.2"></script>
-  <script src="scripts/arcade.js?v=1.41.2"></script>
-  <script src="scripts/history.js?v=1.41.2"></script>
+  <script src="scripts/feedback.js?v=1.42.5"></script>
+  <script src="scripts/music.js?v=1.42.5"></script>
+  <script src="scripts/stickman.js?v=1.42.5"></script>
+  <script src="scripts/arcade.js?v=1.42.5"></script>
+  <script src="scripts/history.js?v=1.42.5"></script>
+  <script src="scripts/achievements.js?v=1.42.5"></script>
 </body>
 </html>

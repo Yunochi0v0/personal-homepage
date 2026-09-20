@@ -5285,3 +5285,258 @@ textarea.feedback-message {
   60%  { transform: scale(1.12); opacity: 1; } /* 弹出轻微过冲 */
   100% { transform: scale(1); opacity: 1; }
 }
+
+/* ============================================================
+   14. 成就系统（v1.42.0 · AI-GEN）
+   Steam 风格成就：成就栏卡片（未解锁暗色 / 解锁点亮）+ 右下角
+   成就提示（滑入滑出、可排队）。配色沿用黑黄赛博主题变量。
+   ============================================================ */
+.achievement-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  gap: 14px;
+  margin-top: 34px;
+}
+
+.ach-card {
+  position: relative;
+  padding: 18px 16px 14px;
+  background: var(--card);
+  border: 1px solid var(--card-border);
+  border-radius: var(--radius);
+  transition: transform 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease;
+  overflow: hidden;
+}
+
+/* 未解锁：整体压暗去饱和，保持可读但不醒目 */
+.ach-card.is-locked {
+  opacity: 0.55;
+  filter: grayscale(0.65) brightness(0.75);
+}
+.ach-card.is-locked .ach-card-icon {
+  font-size: 30px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 10px;
+}
+
+/* 解锁：黄色点亮 + 外发光 + 一次闪光动画（render 重建时播放一次） */
+.ach-card.is-unlocked {
+  background: linear-gradient(160deg, rgba(255, 232, 26, 0.10), rgba(255, 232, 26, 0.03) 55%, transparent);
+  border-color: var(--primary);
+  box-shadow: 0 0 18px rgba(255, 232, 26, 0.22);
+  animation: ach-card-glow 0.6s ease-out;
+}
+.ach-card.is-unlocked:hover {
+  transform: translateY(-3px);
+  border-color: var(--primary-hover);
+  box-shadow: 0 0 24px rgba(255, 232, 26, 0.35);
+}
+@keyframes ach-card-glow {
+  0%   { box-shadow: 0 0 0 rgba(255, 232, 26, 0); }
+  45%  { box-shadow: 0 0 30px rgba(255, 232, 26, 0.55); }
+  100% { box-shadow: 0 0 18px rgba(255, 232, 26, 0.22); }
+}
+
+.ach-card-icon {
+  font-size: 34px;
+  line-height: 1;
+  text-align: center;
+  margin-bottom: 10px;
+}
+
+.ach-card-title {
+  font-size: 15px;
+  font-weight: 700;
+  letter-spacing: 0.5px;
+  color: var(--text);
+  text-align: center;
+  margin-bottom: 6px;
+}
+
+.ach-card-desc {
+  font-size: 12px;
+  line-height: 1.6;
+  color: var(--text-muted);
+  text-align: center;
+  min-height: 38px;
+}
+
+.ach-card-time {
+  margin-top: 10px;
+  padding-top: 8px;
+  border-top: 1px dashed rgba(255, 232, 26, 0.25);
+  font-size: 11px;
+  color: var(--primary);
+  text-align: center;
+  font-family: ui-monospace, "SFMono-Regular", Menlo, monospace;
+}
+
+.ach-card-locked-tag {
+  margin-top: 10px;
+  padding-top: 8px;
+  border-top: 1px dashed rgba(154, 154, 154, 0.25);
+  font-size: 11px;
+  color: var(--text-muted);
+  text-align: center;
+  letter-spacing: 2px;
+}
+
+/* ---------- 右下角成就提示（Steam 风格） ---------- */
+.achievement-toasts {
+  position: fixed;
+  right: 18px;
+  bottom: 18px;
+  z-index: 9999;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  max-width: min(340px, calc(100vw - 36px));
+  pointer-events: none;
+}
+
+.ach-toast {
+  pointer-events: auto;
+  display: flex;
+  gap: 12px;
+  align-items: flex-start;
+  padding: 12px 14px;
+  background: rgba(16, 16, 20, 0.96);
+  border: 1px solid var(--card-border);
+  border-left: 4px solid var(--primary);
+  border-radius: 12px;
+  box-shadow: var(--shadow), 0 0 20px rgba(255, 232, 26, 0.18);
+  transform: translateX(130%);
+  opacity: 0;
+}
+
+.ach-toast.is-in { animation: ach-toast-in 0.35s cubic-bezier(0.18, 0.89, 0.32, 1.18) forwards; }
+.ach-toast.is-leaving { animation: ach-toast-out 0.28s ease forwards; }
+.ach-toast.is-static { transform: none; opacity: 1; }
+
+@keyframes ach-toast-in {
+  from { transform: translateX(130%); opacity: 0; }
+  to   { transform: translateX(0); opacity: 1; }
+}
+@keyframes ach-toast-out {
+  from { transform: translateX(0); opacity: 1; }
+  to   { transform: translateX(130%); opacity: 0; }
+}
+
+.ach-toast-icon {
+  font-size: 28px;
+  line-height: 1;
+  width: 44px;
+  height: 44px;
+  flex: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(255, 232, 26, 0.12);
+  border: 1px solid rgba(255, 232, 26, 0.35);
+  border-radius: 10px;
+}
+
+.ach-toast-body { min-width: 0; }
+.ach-toast-head {
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 2px;
+  color: var(--primary);
+  margin: 0 0 3px;
+}
+.ach-toast-title {
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--text);
+  margin: 0 0 2px;
+}
+.ach-toast-desc {
+  font-size: 12px;
+  line-height: 1.5;
+  color: var(--text-muted);
+  margin: 0;
+}
+
+/* 系统「减弱动态效果」：提示直接显示/移除，不做滑入动画 */
+@media (prefers-reduced-motion: reduce) {
+  .ach-toast.is-in,
+  .ach-toast.is-leaving,
+  .ach-card.is-unlocked {
+    animation: none;
+  }
+  .ach-toast.is-in,
+  .ach-toast.is-leaving {
+    transform: none;
+    opacity: 1;
+  }
+  .ach-toast.is-leaving { display: none; }
+}
+
+/* ============================================================
+   15. Footer「了解更多」按钮（v1.42.2）
+   复用第 8 节液态玻璃 .btn 基础样式，此处仅收窄尺寸与间距。
+   ============================================================ */
+.footer-more {
+  margin-top: 18px;
+}
+
+.btn-more {
+  padding: 9px 26px;
+  font-size: 0.85rem;
+  letter-spacing: 3px;
+}
+
+/* ============================================================
+   16. 多语言切换按钮（v1.42.5 · AI-GEN）
+   左上角悬浮，黑黄赛博风格：液态玻璃底 + 霓虹黄描边，
+   悬停时青色反光，与站点整体视觉一致。
+   ============================================================ */
+.lang-switch {
+  position: fixed;
+  top: 18px;
+  left: 18px;
+  z-index: 9000;
+  min-width: 52px;
+  height: 34px;
+  padding: 0 14px;
+  font-family: var(--font-pixel, "Zpix", monospace);
+  font-size: 15px;
+  font-weight: 700;
+  letter-spacing: 2px;
+  color: var(--primary, #ffe81a);
+  background: rgba(12, 12, 14, 0.82);
+  border: 1px solid rgba(255, 232, 26, 0.45);
+  border-radius: 8px;
+  cursor: pointer;
+  -webkit-backdrop-filter: blur(8px);
+  backdrop-filter: blur(8px);
+  box-shadow: 0 0 12px rgba(255, 225, 77, 0.18), inset 0 0 10px rgba(255, 225, 77, 0.08);
+  transition: all 0.25s ease;
+  user-select: none;
+  -webkit-user-select: none;
+}
+
+.lang-switch:hover {
+  color: #7ef3ff;
+  border-color: rgba(126, 243, 255, 0.7);
+  box-shadow: 0 0 18px rgba(126, 243, 255, 0.35), inset 0 0 12px rgba(126, 243, 255, 0.12);
+  transform: translateY(-1px);
+}
+
+.lang-switch:active {
+  transform: translateY(0) scale(0.96);
+}
+
+/* 小屏：避免遮挡 Dock */
+@media (max-width: 768px) {
+  .lang-switch {
+    top: 12px;
+    left: 12px;
+    min-width: 46px;
+    height: 32px;
+    padding: 0 10px;
+    font-size: 14px;
+  }
+}

@@ -10,7 +10,193 @@
 
 ---
 
-## [v1.41.2] 第三个键盘彩蛋：输入 copy 复制火柴人（当前）
+## [v1.42.5] 多语言切换：左上角 EN / 中 按钮(当前)
+
+- **日期**：2026-09-20
+- **作者**：katzegott
+- **类型**：`新增`
+
+### 新增
+- 用户需求：在网站左上角添加一个「EN」按钮，点击后将整站翻译为英文。
+- 实现（[AI-GEN]）：
+  - 新增 `scripts/i18n.js`：多语言模块（字典映射 + 元素级标注），支持 `data-i18n`（textContent）/ `data-i18n-html`（innerHTML，仅英文态）/ `data-i18n-ph`（placeholder）/ `data-i18n-aria` / `data-i18n-title` 五种标注；语言持久化到 `localStorage`（key: `personal-homepage-lang`）；切换时派发 `i18n:changed` 事件供动态模块协作；页面标题与 meta 描述随语言切换。
+  - `index.html`：左上角新增悬浮 `#langSwitch` 按钮（EN / 中）；全站静态中文文本逐一标注 data-i18n（导航 / Hero / 关于 / 技能 / 项目 / 音游 / 联系 / 成就副标题 / 数字孪生 / 页脚 / 音乐与反馈弹窗 / 开发历程标题）。
+  - `scripts/achievements.js`：11 项成就新增 `titleEn` / `descEn`；成就栏渲染、Steam 风格 Toast、解锁时间等随语言切换；监听 `i18n:changed` 重渲染。
+  - `scripts/main.js`：数字孪生知识库 25 条新增 `replyEn`，新增 `FALLBACK_EN` 与英文提问别名映射（`EN_ALIASES`）使英文问句也能命中知识库；欢迎语按语言输出；打字机 slogan 重打支持 token 防叠并监听 `i18n:changed`；BIOS → v1.42.5。
+- 设计决策：彩蛋内容（隐藏关卡 / 待机警报 / 终端动画 / 诗云暗语）与开发 LOG 条目为站点彩蛋玩法，刻意保持中文原文，不参与翻译。
+- **版本**：主页版本号 → 1.42.5，脚本引用 `?v=1.42.5` 刷新（含新增 `scripts/i18n.js`）；`history.js` 新增 V3.42.5 条目并迁移「当前版本」标记。
+
+### 涉及文件
+| 文件 | 类型 | 说明 |
+| --- | --- | --- |
+| `scripts/i18n.js` | 新增 | 多语言模块（字典 + 应用器 + API + 初始化） |
+| `index.html` | 修改 | `#langSwitch` 按钮 + 全站静态文本 data-i18n 标注 + 引入 i18n.js + 版本 1.42.5 |
+| `scripts/achievements.js` | 修改 | 成就 titleEn / descEn 双语 + 渲染 / Toast / 时间文案按语言 |
+| `scripts/main.js` | 修改 | twin 知识库 replyEn + EN_ALIASES + FALLBACK_EN + 欢迎语双语 + typewriter 重打 + BIOS 1.42.5 |
+| `styles/style.css` | 修改 | 追加第 16 节 `.lang-switch` 悬浮按钮样式 |
+| `scripts/history.js` | 修改 | 新增 V3.42.5 条目并迁移「当前版本」标记 |
+
+### 验证方式
+- jsc 语法检查（i18n / achievements / main）全部通过。
+- CDP 浏览器实测：点击 EN → 静态文本 / 成就栏 / Toast / 数字孪生回答 / 打字机 slogan / 页面标题全部切换为英文；刷新后语言保持；点击「中」恢复中文原文。
+
+---
+
+## [v1.42.4] 新增成就「你被骗了」(历史)
+
+- **日期**：2026-09-20
+- **作者**：katzegott
+- **类型**：`新增`
+
+### 新增
+- 用户需求：新增成就「你被骗了」，达成条件为点击页脚「了解更多」按钮。
+- 实现（[AI-GEN]）：
+  - `scripts/achievements.js` ACHIEVEMENTS 数组新增 `more_clicked`（🪤 / 你被骗了 / 点击页脚「了解更多」按钮），位于 kksk 之后、成就收藏家之前；`init()` 中为页脚 `.btn-more` 绑定 click 事件即时 `unlock("more_clicked")`（按钮为 `target="_blank"` 外链，主页面不跳转，可即时解锁）。
+  - 「成就收藏家」检测逻辑通用（`n === ACHIEVEMENTS.length - 1`），自动扩展为其余 10 项全解锁，无需改动。
+- **版本**：主页版本号 → 1.42.4，脚本引用 `?v=1.42.4` 刷新；`history.js` 新增 V3.42.4 条目并迁移「当前版本」标记。
+
+### 涉及文件
+| 文件 | 类型 | 说明 |
+| --- | --- | --- |
+| `scripts/achievements.js` | 修改 | 新增 `more_clicked` 成就 + `.btn-more` click 事件绑定 |
+| `index.html` | 修改 | 版本号 → 1.42.4 |
+| `scripts/main.js` | 修改 | BIOS 版本号 → 1.42.4 |
+| `scripts/history.js` | 修改 | 新增 V3.42.4 条目并迁移「当前版本」标记 |
+
+### 验证方式
+- CDP 浏览器实测：成就栏渲染 11 张卡片；模拟点击页脚「了解更多」→ 即时解锁「你被骗了」并弹出 Toast；其余未解锁简介仍为「???」。
+
+---
+
+## [v1.42.3] 成就简介保密：未解锁一律「???」(历史)
+
+- **日期**：2026-09-20
+- **作者**：katzegott
+- **类型**：`修改`
+
+### 修改
+- 用户需求：成就未解锁时不得显示其简介，一律用「???」代替。
+- 实现（[AI-GEN]）：`scripts/achievements.js` 成就栏渲染中，简介 `<div class="ach-card-desc">` 改为 `isUnlocked ? a.desc : "???"`——未解锁的成就无论是否隐藏，简介一律显示「???」，不再展示达成条件；标题逻辑保持不变（仅隐藏成就未解锁时显示「???」）。
+- **版本**：主页版本号 → 1.42.3，脚本引用 `?v=1.42.3` 刷新；`history.js` 新增 V3.42.3 条目并迁移「当前版本」标记。
+
+### 涉及文件
+| 文件 | 类型 | 说明 |
+| --- | --- | --- |
+| `scripts/achievements.js` | 修改 | 未解锁成就简介一律渲染为「???」 |
+| `index.html` | 修改 | 版本号 → 1.42.3 |
+| `scripts/main.js` | 修改 | BIOS 版本号 → 1.42.3 |
+| `scripts/history.js` | 修改 | 新增 V3.42.3 条目并迁移「当前版本」标记 |
+
+### 验证方式
+- CDP 浏览器实测：未解锁成就卡片简介均为「???」，无任何真实简介泄漏；解锁后恢复显示真实简介。
+
+---
+
+## [v1.42.2] 页脚新增「了解更多」按钮（历史）
+
+- **日期**：2026-09-20
+- **作者**：katzegott
+- **类型**：`新增`
+
+### 新增
+- 用户需求：网站最底部（页脚）增加「了解更多」按钮，点击跳转 B 站视频 `https://www.bilibili.com/video/BV1UT42167xb/`。
+- 实现（[AI-GEN]）：
+  - `index.html` 页脚新增 `.footer-more`，内嵌 `a.btn.btn-more` 外链（`target="_blank" rel="noopener noreferrer"`，新标签页打开）。
+  - `styles/style.css` 新增第 15 节：按钮复用液态玻璃 `.btn` 基础样式，仅收窄尺寸（`9px 26px`、字号 0.85rem、字距 3px）。
+  - **版本**：主页版本号 → 1.42.2，脚本引用 `?v=1.42.2` 刷新；`history.js` 新增 V3.42.2 条目并迁移「当前版本」标记。
+
+### 涉及文件
+| 文件 | 类型 | 说明 |
+| --- | --- | --- |
+| `index.html` | 修改 | 页脚新增「了解更多」外链按钮；版本号 → 1.42.2 |
+| `styles/style.css` | 修改 | 新增第 15 节 `.footer-more` / `.btn-more` 样式 |
+| `scripts/main.js` | 修改 | BIOS 版本号 → 1.42.2 |
+| `scripts/history.js` | 修改 | 新增 V3.42.2 条目并迁移「当前版本」标记 |
+
+### 验证方式
+- CDP 浏览器实测：页脚渲染「了解更多」按钮，`href` 为 B 站视频链接、`target=_blank`、`rel=noopener noreferrer`；点击不覆盖当前页（新标签打开）。
+
+---
+
+## [v1.42.1] 成就系统 10 项成就正式落地（历史）
+
+- **日期**：2026-09-20
+- **作者**：katzegott
+- **类型**：`新增`
+
+### 新增
+- 用户需求：提供 10 项具体成就清单，替换框架期的 5 条演示成就。
+- 实现（全部 [AI-GEN]）：
+  - **成就数据更新**（`scripts/achievements.js`）：10 项成就，其中 8 项轮询检测：
+    - 初来乍到：首次访问自动解锁；
+    - 档案解密：打开开发历程 LOG 弹窗（`#historyOverlay.is-open`）；
+    - 好多小人：输入 copy 复制满 9 个克隆体（本体 1 + 9 = 10 个，即上限）；
+    - 还有人类吗：待机彩蛋触发（`#idleEgg` 进入 `revealed`）；
+    - lyc确实nb：键盘输入 lycnb 打开隐藏关卡（`#easterEgg.revealed`）；
+    - 我爱反馈：反馈提交成功（`#fbSuccess` 显示）；
+    - kksk：首次访问时间戳持久化，累计停留满 10 分钟自动解锁（关闭再打开不重置计时）；
+    - 成就收藏家（`hidden` 隐藏成就）：其余 9 项全部解锁后自动获得（unlock 时即时检查 + 轮询兜底）。
+  - **事件触发 2 项**（`scripts/main.js` 挂接）：
+    - 梦想无限大！！！！！：彩蛋页面输入「梦想即力量」提交时即时解锁（另有 `triggered` 状态轮询兜底）；
+    - 这诗人吗？：彩蛋页面输入暗语「诗云」提交时即时解锁。
+  - **版本**：主页版本号 → 1.42.1，全站脚本 `?v=1.42.1` 缓存刷新（诗云 1.44.3 独立线不动）；`history.js` 新增 V3.42.1 条目并迁移「当前版本」标记。
+
+### 涉及文件
+| 文件 | 类型 | 说明 |
+| --- | --- | --- |
+| `scripts/achievements.js` | 修改 | 成就定义更新为 10 项；新增 kksk 首次访问计时与「成就收藏家」即时检查 |
+| `scripts/main.js` | 修改 | 「梦想即力量」「诗云」分支挂接事件解锁；BIOS 版本号 → 1.42.1 |
+| `index.html` | 修改 | 版本号 → 1.42.1；脚本引用 `?v=1.42.1` |
+| `scripts/history.js` | 修改 | 新增 V3.42.1 条目并迁移「当前版本」标记 |
+
+### 验证方式
+- 各脚本经 jsc 语法检查 OK。
+- CDP 浏览器实测：成就栏渲染 10 张卡片；首次访问自动解锁「初来乍到」；模拟待机彩蛋触发解锁「还有人类吗」；输入 lycnb 解锁「lyc确实nb」；copy 复制满 10 个解锁「好多小人」；打开 LOG 解锁「档案解密」；模拟反馈成功解锁「我爱反馈」；彩蛋页输入「诗云」解锁「这诗人吗？」、输入「梦想即力量」解锁「梦想无限大！！！！！」（跳转前经 localStorage 确认）；将首次访问时间戳回拨 10 分钟解锁「kksk」；9 项齐全后「成就收藏家」自动点亮；刷新后持久化保持。
+
+---
+
+## [v1.42.0] 新增成就系统：成就栏 + Steam 风格解锁提示（历史）
+
+- **日期**：2026-09-20
+- **作者**：katzegott
+- **类型**：`新增`
+
+### 新增
+- 用户需求：主页加入「成就」板块，记录浏览本站达成的成就；达成时对应成就卡片点亮，同时网页右下角弹出 Steam 风格的成就解锁提示；本轮先搭建框架，具体成就内容后续逐条补充。
+- 实现（全部 [AI-GEN]）：
+  - **新脚本 `scripts/achievements.js`**：数据驱动成就框架，IIFE + 挂载 `window.Achievements`。
+    - 成就定义：`ACHIEVEMENTS` 数组，每项含 `id / title / desc / icon / hidden / check`；`hidden` 表示解锁前隐藏名称与描述（显示 `???`）；`check` 为可选轮询检测函数。
+    - 持久化：解锁进度存入 `localStorage`（`personal-homepage-achievements-v1`），刷新后保持点亮。
+    - 渲染：成就栏网格数据驱动生成；未解锁卡片压暗去饱和 + 锁定图标，解锁卡片黄色点亮 + 外发光 + 一次闪光动画 + 「解锁于 时间」。
+    - Toast：右下角 Steam 风格提示（图标 + 「成就解锁 · ACHIEVEMENT UNLOCKED」+ 标题 + 描述），滑入滑出动画、多条自动排队播放；`prefers-reduced-motion` 下降级为直接显示。
+    - 检测器：每 2 秒轮询所有 `check()`，满足条件自动解锁；另有 `window.Achievements.unlock(id)` 供其他模块事件触发（如反馈提交成功后调用）。
+  - **示例成就 5 条（框架演示占位，后续按用户需求替换）**：初来乍到（首次访问自动解锁，演示 Toast）/ 深入探索（滚动至页脚）/ 档案解密（打开开发历程 LOG 弹窗）/ 复制者（隐藏，输入 copy 出现 ≥2 复制火柴人）/ 发声者（隐藏，成功提交访客反馈）。
+  - **页面结构**：`index.html` 在 Contact 与 Twin 之间新增「成就 ACHIEVEMENTS」板块（`#achievements` + `#achievementGrid` + `#achievementCounter`），body 末尾新增右下角提示容器 `#achievementToasts`。
+  - **样式**：`style.css` 新增第 14 节——成就卡网格、锁定/点亮/闪光动画、右下角 Toast 滑入滑出关键帧、reduced-motion 降级；配色沿用黑黄赛博变量。
+  - **版本**：主页版本号 → 1.42.0，全站脚本 `?v=1.42.0` 缓存刷新（`shiyun.js` 独立版本线 1.44.3 不动）。
+
+### 涉及文件
+| 文件 | 类型 | 说明 |
+| --- | --- | --- |
+| `scripts/achievements.js` | 新增 | 成就框架：数据模型 / 持久化 / 成就栏渲染 / Toast 队列 / 检测器 / API |
+| `index.html` | 修改 | 新增成就板块与 Toast 容器；版本号 → 1.42.0；脚本引用更新 |
+| `styles/style.css` | 修改 | 新增第 14 节成就卡与 Toast 样式、关键帧 |
+| `scripts/main.js` | 修改 | BIOS 版本号 → 1.42.0 |
+| `scripts/history.js` | 修改 | 新增 V3.42 条目并迁移「当前版本」标记 |
+
+### 验证方式
+- `achievements.js` / `history.js` / `main.js` 均经 jsc 语法检查 OK；页面与脚本 HTTP 200。
+- CDP 浏览器实测：
+  - 成就栏渲染 5 张卡片，计数「0 / 5」→ 首次访问自动解锁「初来乍到」，右下角弹出 Steam 风格 Toast；
+  - 滚动到底 → 轮询检测解锁「深入探索」，Toast 与前面提示自动排队依次播放；
+  - 打开 LOG 弹窗（`#historyOverlay.is-open`）→ 解锁「档案解密」；
+  - 输入 copy 复制 2 个火柴人 → 隐藏成就「复制者」解锁，解锁前卡片显示 `???`、解锁后显示真实名称与图标；
+  - 模拟反馈成功提示显示（`#fbSuccess` 显示）→ 轮询检测解锁「发声者」；`window.Achievements.unlock(id)` API 触发正常；
+  - 刷新页面后已解锁卡片保持点亮（localStorage 持久化），计数一致。
+
+---
+
+## [v1.41.2] 第三个键盘彩蛋：输入 copy 复制火柴人（历史）
 
 - **日期**：2026-09-20
 - **作者**：katzegott

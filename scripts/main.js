@@ -75,9 +75,13 @@ backTop.addEventListener("click", () => {
 });
 
 /* ---------- 4. 打字机 slogan ---------- */
+/* v1.42.5：token 防叠——语言切换触发重打时，取消进行中的旧打字序列；
+   slogan 文案由 i18n.js 的 data-i18n 标注更新，这里只负责"打字"效果。 */
+let typeToken = 0;
 function typeWriter() {
   const el = document.getElementById("typewriter");
   if (!el) return;
+  const myToken = ++typeToken; // 取消旧序列
   const text = el.textContent;
   el.textContent = "";
   let i = 0;
@@ -85,15 +89,16 @@ function typeWriter() {
   const speed = 140;
 
   function type() {
+    if (myToken !== typeToken) return; // 已有更新的打字任务接管
     if (i < text.length) {
       el.textContent += text.charAt(i);
       i++;
       // 中文按字、英文按词停顿
       setTimeout(type, isCJK(text.charAt(i - 1)) ? speed : 60);
     } else {
-      // 打字完成：为 slogan 启用故障抖动（不与打字过程冲突）
+      // 打字完成：为 slogan 启用故障抖动（重打时更新 data-text 保证抖动文案与语言一致）
       const hs = el.closest(".hero-slogan");
-      if (hs && !hs.classList.contains("glitch")) {
+      if (hs) {
         hs.setAttribute("data-text", text);
         hs.classList.add("glitch");
       }
@@ -102,6 +107,8 @@ function typeWriter() {
   setTimeout(type, 400);
 }
 typeWriter();
+// 语言切换后按新语言重新打字（v1.42.5）
+document.addEventListener("i18n:changed", typeWriter);
 
 /* ---------- 5. 导航栏 active 高亮 ---------- */
 const sections = document.querySelectorAll("section[id]");
@@ -194,130 +201,190 @@ document.querySelectorAll(".is-placeholder").forEach((link) => {
     /* ---------- 身份 ---------- */
     {
       keys: ["你是谁", "介绍你", "介绍一下", "你叫什么", "叫什么名字", "名字", "姓名"],
-      reply:
-        "你好！我是刘聿宸，18 岁，一名大一新生，就读于天津大学香港理工大学深圳未来技术学院，主攻计算机科学与技术。我的 slogan 是「梦想即力量」——相信怀揣梦想的人，脚下最有力量。想了解哪方面，尽管问我～",
+      reply: "你好！我是刘聿宸，18 岁，一名大一新生，就读于天津大学香港理工大学深圳未来技术学院，主攻计算机科学与技术。我的 slogan 是「梦想即力量」——相信怀揣梦想的人，脚下最有力量。想了解哪方面，尽管问我～",
+      replyEn: "Hi! I'm Liu Yuchen, 18, a freshman majoring in Computer Science & Technology at the Shenzhen Future Technology Institute of Tianjin University & The Hong Kong Polytechnic University. My slogan is 'Dreams Are Power' — I believe those who carry dreams walk with the most strength. What would you like to know?",
     },
-    { keys: ["年龄", "多大", "几岁"], reply: "我今年 18 岁，是一名刚刚踏入大学生活的大一新生。" },
+    { keys: ["年龄", "多大", "几岁"],
+      reply: "我今年 18 岁，是一名刚刚踏入大学生活的大一新生。",
+      replyEn: "I'm 18, a freshman just starting college life."
+    },
     {
       keys: ["学校", "大学", "学院", "天院", "港理工", "在哪里读书"],
-      reply:
-        "我目前就读于天津大学香港理工大学深圳未来技术学院，主攻计算机科学与技术专业。两所学校的氛围让我对工程与创新充满期待。",
+      reply: "我目前就读于天津大学香港理工大学深圳未来技术学院，主攻计算机科学与技术专业。两所学校的氛围让我对工程与创新充满期待。",
+      replyEn: "I'm currently studying Computer Science & Technology at the Shenzhen Future Technology Institute of Tianjin University & The Hong Kong Polytechnic University. The atmosphere of both universities makes me excited about engineering and innovation.",
     },
-    { keys: ["专业", "学什么", "专业是什么"], reply: "我的专业是计算机科学与技术，现在正处于大一的起点，正在一步步打基础。" },
+    { keys: ["专业", "学什么", "专业是什么"],
+      reply: "我的专业是计算机科学与技术，现在正处于大一的起点，正在一步步打基础。",
+      replyEn: "My major is Computer Science & Technology. I'm at the very beginning of freshman year, building my foundations step by step."
+    },
     {
       keys: ["slogan", "格言", "座右铭", "梦想", "口号"],
-      reply:
-        "我的 slogan 是「梦想即力量」。我相信，怀揣梦想的人，脚下最有力量——这也是我学习和创作时的信念。",
+      reply: "我的 slogan 是「梦想即力量」。我相信，怀揣梦想的人，脚下最有力量——这也是我学习和创作时的信念。",
+      replyEn: "My slogan is 'Dreams Are Power'. I believe those who carry dreams walk with the most strength — it's also my belief when studying and creating.",
     },
     {
       keys: ["哪里人", "家乡", "在哪个城市", "坐标", "位置", "深圳"],
-      reply:
-        "我目前坐标深圳，主页的状态面板也写着「当前位置：深圳 · 持续迭代中」。欢迎来我的网站逛逛～",
+      reply: "我目前坐标深圳，主页的状态面板也写着「当前位置：深圳 · 持续迭代中」。欢迎来我的网站逛逛～",
+      replyEn: "I'm currently based in Shenzhen — the status panel on the homepage says 'Location: Shenzhen · Constantly Iterating'. Welcome to browse my site!",
     },
     {
       keys: ["i人", "i 人", "内向", "社交", "性格"],
-      reply:
-        "我本质是个远离不必要社交的绝对 i 人。不过还是很欢迎你来我的网站逛逛，或者写信给我～",
+      reply: "我本质是个远离不必要社交的绝对 i 人。不过还是很欢迎你来我的网站逛逛，或者写信给我～",
+      replyEn: "I'm an absolute introvert who stays away from all unnecessary socializing. But you're still very welcome to browse my site or write to me!",
     },
 
     /* ---------- 爱好 ---------- */
     {
       keys: ["爱好", "兴趣", "喜欢", "课余", "平时", "日常"],
-      reply:
-        "平时我喜欢打音游（phigros、世界计划 pjsk）、听歌（主要是 J-ROCK 和 J-POP），也会看看番——虽然自认只是小资历。总之是个宅味十足的 i 人。",
+      reply: "平时我喜欢打音游（phigros、世界计划 pjsk）、听歌（主要是 J-ROCK 和 J-POP），也会看看番——虽然自认只是小资历。总之是个宅味十足的 i 人。",
+      replyEn: "In my spare time I like playing rhythm games (phigros, Project SEKAI), listening to music (mostly J-ROCK and J-POP), and watching anime — though I'm still a junior fan. All in all, a full-fledged otaku introvert.",
     },
     {
       keys: ["音游", "phigros", "pjsk", "世界计划", "sekai", "全连", "arcade", "游戏", "玩什么"],
-      reply:
-        "我平时会打 phigros 和 Project SEKAI（世界计划 缤纷舞台）。主页的「音游」板块记录了世界计划 MASTER 全连战绩，比如ベノム、アイディスマイル、はぐ、アスノヨゾラ哨戒班、NEO、命に嫌われている，还有 8.32 的 EXPERT 与 MASTER 难度。",
+      reply: "我平时会打 phigros 和 Project SEKAI（世界计划 缤纷舞台）。主页的「音游」板块记录了世界计划 MASTER 全连战绩，比如ベノム、アイディスマイル、はぐ、アスノヨゾラ哨戒班、NEO、命に嫌われている，还有 8.32 的 EXPERT 与 MASTER 难度。",
+      replyEn: "I play phigros and Project SEKAI in my spare time. The 'Arcade' section records my Project SEKAI MASTER full-combos, like ベノム, アイディスマイル, はぐ, アスノヨゾラ哨戒班, NEO, 命に嫌われている, plus 8.32 EXPERT and MASTER difficulty.",
     },
     {
       keys: ["音乐", "听歌", "歌单", "j-rock", "j-pop", "网易云", "播放器", "随身听"],
-      reply:
-        "我主要听 J-ROCK 和 J-POP。网站右下角有个 🎵 音符按钮，点开是「赛博随身听」网易云播放器，可以边逛网站边听歌～",
+      reply: "我主要听 J-ROCK 和 J-POP。网站右下角有个 🎵 音符按钮，点开是「赛博随身听」网易云播放器，可以边逛网站边听歌～",
+      replyEn: "I mostly listen to J-ROCK and J-POP. There's a 🎵 music note button at the bottom right of the site — open it for the 'Cyber Walkman' NetEase player, so you can listen while browsing!",
     },
     {
       keys: ["番", "动漫", "动画", "看番"],
       reply: "我会看番，不过自认只是小资历～欢迎给我推荐好看的。",
+      replyEn: "I do watch anime, though I admit I'm just a junior fan — feel free to recommend me something good!",
     },
 
     /* ---------- 技能 ---------- */
     {
       keys: ["技能", "会什么", "会哪些", "特长", "能力", "水平"],
-      reply:
-        "主页技能栏的进度是：前端基础 HTML/CSS/JS 75%、Python 编程 65%、AI 辅助开发（Vibe Coding）50%、Git 版本控制学习中。作为编程与 AI 的初学者，我还在一步步积累。",
+      reply: "主页技能栏的进度是：前端基础 HTML/CSS/JS 75%、Python 编程 65%、AI 辅助开发（Vibe Coding）50%、Git 版本控制学习中。作为编程与 AI 的初学者，我还在一步步积累。",
+      replyEn: "My skill bar progress: Frontend basics HTML/CSS/JS 75%, Python 65%, AI-assisted development (Vibe Coding) 50%, Git version control still learning. As a beginner in programming & AI, I'm still accumulating bit by bit.",
     },
     {
       keys: ["ai", "课程", "vibe", "编码", "在做", "目标"],
-      reply:
-        "我正在通过 Vibe Coding 实践，学着把模糊的想法拆解成清晰的需求，再逐步搭建、验证和迭代。这个个人主页就是我的第一个作品，我会用它记录学习、项目与成长。",
+      reply: "我正在通过 Vibe Coding 实践，学着把模糊的想法拆解成清晰的需求，再逐步搭建、验证和迭代。这个个人主页就是我的第一个作品，我会用它记录学习、项目与成长。",
+      replyEn: "I'm practicing with Vibe Coding — learning to break vague ideas into clear requirements, then build, verify and iterate step by step. This homepage is my first work, and I'll use it to document my learning, projects and growth.",
     },
 
     /* ---------- 项目 ---------- */
     {
       keys: ["项目", "作品", "做了什么", "mission"],
-      reply:
-        "目前在做这个个人主页（MISSION_01，进行中）——纯 HTML/CSS/JS 手写、无框架、无构建步骤，包含自我介绍、技能进度、项目档案与数字孪生问答，全程 Vibe Coding。课程项目（MISSION_02）计划中，「我的下一个想法」（MISSION_03）还在构思。以后完成的课程项目也会记录在这里。",
+      reply: "目前在做这个个人主页（MISSION_01，进行中）——纯 HTML/CSS/JS 手写、无框架、无构建步骤，包含自我介绍、技能进度、项目档案与数字孪生问答，全程 Vibe Coding。课程项目（MISSION_02）计划中，「我的下一个想法」（MISSION_03）还在构思。以后完成的课程项目也会记录在这里。",
+      replyEn: "Right now I'm working on this homepage (MISSION_01, in progress) — handwritten in plain HTML/CSS/JS, no framework, no build step, with self-intro, skill progress, project archive and a digital twin Q&A, all via Vibe Coding. Course projects (MISSION_02) are planned, and 'My Next Idea' (MISSION_03) is still brewing. Finished course projects will be recorded here too.",
     },
 
     /* ---------- 联系与反馈 ---------- */
     {
       keys: ["联系", "邮箱", "怎么找你", "联系方式", "写信", "github"],
-      reply:
-        "可以通过邮箱联系我：319008328@qq.com；GitHub 账号是 Yunochi0v0。网页右下角还有「聊天泡」反馈按钮，想说的话可以直接留给我～",
+      reply: "可以通过邮箱联系我：319008328@qq.com；GitHub 账号是 Yunochi0v0。网页右下角还有「聊天泡」反馈按钮，想说的话可以直接留给我～",
+      replyEn: "You can reach me by email: 319008328@qq.com; GitHub: Yunochi0v0. There's also a chat bubble feedback button at the bottom right — leave me a message anytime!",
     },
     {
       keys: ["反馈", "建议", "意见", "聊天泡", "留言"],
-      reply:
-        "网站右下角有个「聊天泡」图标，点开可以提交反馈，填写昵称、关系、设备和内容。反馈不会公开，只有我能看到，期待你的想法！",
+      reply: "网站右下角有个「聊天泡」图标，点开可以提交反馈，填写昵称、关系、设备和内容。反馈不会公开，只有我能看到，期待你的想法！",
+      replyEn: "There's a chat bubble icon at the bottom right — click it to submit feedback: nickname, relationship, device and message. Feedback stays private — only I can see it. Looking forward to your thoughts!",
     },
 
     /* ---------- 网站与彩蛋 ---------- */
     {
       keys: ["网站", "本站", "这个主页", "怎么做的"],
-      reply:
-        "这个个人主页是我的第一个计算机项目，用纯 HTML/CSS/JS 手写、无框架、无构建步骤，靠 Vibe Coding 一点点迭代出来的。主页项目区的「本个人主页」条目上有 LOG 按钮，点开就是完整开发历程。主页当前迭代到 v1.41，诗云页面则独立迭代到 v1.44。",
+      reply: "这个个人主页是我的第一个计算机项目，用纯 HTML/CSS/JS 手写、无框架、无构建步骤，靠 Vibe Coding 一点点迭代出来的。主页项目区的「本个人主页」条目上有 LOG 按钮，点开就是完整开发历程。主页当前迭代到 v1.41，诗云页面则独立迭代到 v1.44。",
+      replyEn: "This homepage is my first computer project — handwritten in plain HTML/CSS/JS, no framework, no build step, iterated bit by bit with Vibe Coding. There's a LOG button on the 'This Personal Homepage' card in the projects section — open it for the full dev history. The homepage is currently at v1.41, while the Shiyun page is iterated independently at v1.44.",
     },
     {
       keys: ["开发历程", "log", "历史", "版本", "v1", "怎么来的"],
-      reply:
-        "主页项目区「本个人主页」条目上有个 LOG 按钮，点开可以看到开发历程弹窗，按三大阶段展示：V1.0 建站期（v1.0~v1.7）、V2.0 光标到发布 GitHub（v1.8~v1.21）、V3.0 发布后的功能迭代（v1.22 至今）——包括访客反馈、音乐播放器、火柴人物理引擎和音游展示区。",
+      reply: "主页项目区「本个人主页」条目上有个 LOG 按钮，点开可以看到开发历程弹窗，按三大阶段展示：V1.0 建站期（v1.0~v1.7）、V2.0 光标到发布 GitHub（v1.8~v1.21）、V3.0 发布后的功能迭代（v1.22 至今）——包括访客反馈、音乐播放器、火柴人物理引擎和音游展示区。",
+      replyEn: "There's a LOG button on the 'This Personal Homepage' card — it opens the dev history popup in three stages: V1.0 site building (v1.0~v1.7), V2.0 from Cursor to GitHub Pages release (v1.8~v1.21), and V3.0 post-release feature iteration (v1.22 onward) — including visitor feedback, music player, stickman physics engine and the arcade showcase.",
     },
     {
       keys: ["彩蛋", "暗号", "暗语", "隐藏", "关卡", "lycnb", "lyc"],
-      reply:
-        "这个网站的彩蛋可多了：键盘依次按下 l-y-c-n-b 会解锁隐藏关卡浮层，输入「梦想即力量」跳转 BanG Dream；输入暗语「诗云」会触发全站传送动画，跳转到深空诗云页；另外 3 分钟无操作会触发待机警报「何意味，你还在吗？」，退出时还会说「不要问何意味，欢迎回来」。",
+      reply: "这个网站的彩蛋可多了：键盘依次按下 l-y-c-n-b 会解锁隐藏关卡浮层，输入「梦想即力量」跳转 BanG Dream；输入暗语「诗云」会触发全站传送动画，跳转到深空诗云页；另外 3 分钟无操作会触发待机警报「何意味，你还在吗？」，退出时还会说「不要问何意味，欢迎回来」。",
+      replyEn: "This site is full of easter eggs: type l-y-c-n-b to unlock the hidden level overlay, enter '梦想即力量' to jump to BanG Dream; type the code '诗云' to trigger the full-site warp to the deep-space Shiyun page; plus after 3 minutes of inactivity the idle alert '何意味，你还在吗？' appears, and on exit it says '不要问何意味，欢迎回来'.",
     },
     {
       keys: ["诗云", "小诗", "相册", "照片", "拾光", "流水", "夜话", "留影", "深空"],
-      reply:
-        "诗云是一个隐藏的深空页面：在主页彩蛋浮层输入「诗云」回车即可传送过去。里面有我写的小诗——古诗板块（卜算子·夕阳故地复巡、采桑子·冬日自叹、沁园春·烟火）和现代诗板块（倚坐舷窗、梦、一个夜）。页面四周还有四个发光粒子，点开分别是四个相册：拾光、流水、夜话、留影，收录我拍的照片。诗云简介写着：「这是我无聊时写的几首小诗，均已上传微信朋友圈=0」。",
+      reply: "诗云是一个隐藏的深空页面：在主页彩蛋浮层输入「诗云」回车即可传送过去。里面有我写的小诗——古诗板块（卜算子·夕阳故地复巡、采桑子·冬日自叹、沁园春·烟火）和现代诗板块（倚坐舷窗、梦、一个夜）。页面四周还有四个发光粒子，点开分别是四个相册：拾光、流水、夜话、留影，收录我拍的照片。诗云简介写着：「这是我无聊时写的几首小诗，均已上传微信朋友圈=0」。",
+      replyEn: "Shiyun is a hidden deep-space page: type '诗云' in the easter egg overlay and press Enter to warp there. It holds my short poems — classical section (卜算子·夕阳故地复巡, 采桑子·冬日自叹, 沁园春·烟火) and modern section (倚坐舷窗, 梦, 一个夜). Around the page are four glowing particles — click them to open four albums: 拾光, 流水, 夜话, 留影, featuring my photos. The Shiyun intro says: 'These are a few poems I wrote when bored, all posted to WeChat Moments =0'.",
     },
     {
       keys: ["火柴人", "吉祥物", "小人", "stickman"],
-      reply:
-        "右下角那个荧光黄的赛博火柴人就是网站的吉祥物：可以按住拖动（躯干是弹性绳子物理，甩起来会 Q 弹），轻点它还会随机说话——比如「感觉lyc有点nb」之类的稀有台词。很好玩的！",
+      reply: "右下角那个荧光黄的赛博火柴人就是网站的吉祥物：可以按住拖动（躯干是弹性绳子物理，甩起来会 Q 弹），轻点它还会随机说话——比如「感觉lyc有点nb」之类的稀有台词。很好玩的！",
+      replyEn: "The fluorescent yellow cyber stickman at the bottom right is the site mascot: press and drag it (the torso is a springy rope physics — swing it and it bounces), and tap it for random lines — including rare ones like '感觉lyc有点nb'. Great fun!",
     },
     {
       keys: ["开机", "启动", "动画", "crt", "扫描线", "像素", "光标"],
-      reply:
-        "这个站走的是黑黄赛博朋克风：复古 CRT 开机自检动画（约 4.6 秒终端解密）、像素字体与台阶切角、CRT 扫描线与噪点、自定义霓虹光标（带轨迹拖尾和四芒星形态——青色是光标，黄色是按钮点亮色）。",
+      reply: "这个站走的是黑黄赛博朋克风：复古 CRT 开机自检动画（约 4.6 秒终端解密）、像素字体与台阶切角、CRT 扫描线与噪点、自定义霓虹光标（带轨迹拖尾和四芒星形态——青色是光标，黄色是按钮点亮色）。",
+      replyEn: "This site has a black-yellow cyberpunk style: retro CRT boot self-check animation (about 4.6s of terminal decryption), pixel fonts and chamfered corners, CRT scanlines and noise, custom neon cursor (with trail and four-pointed star forms — cyan for cursor, yellow for button glow).",
     },
 
     /* ---------- 数字孪生本身 ---------- */
     {
       keys: ["数字孪生", "孪生", "真人", "真人吗", "机器人", "程序"],
-      reply:
-        "我是「数字孪生」——一个程序化的刘聿宸：所有回答都来自刘聿宸的个人简介和这个网站的真实内容，用关键词规则匹配，不虚构。现在是 BETA 版，多多包涵～",
+      reply: "我是「数字孪生」——一个程序化的刘聿宸：所有回答都来自刘聿宸的个人简介和这个网站的真实内容，用关键词规则匹配，不虚构。现在是 BETA 版，多多包涵～",
+      replyEn: "I'm a 'digital twin' — a programmed Liu Yuchen: all my answers come from Liu Yuchen's profile and this site's real content, matched by keyword rules, nothing made up. Currently in BETA, please bear with me!",
     },
 
     /* ---------- 寒暄 ---------- */
-    { keys: ["你好", "嗨", "哈喽", "在吗", "hello", "hi"], reply: "你好！我是数字孪生的刘聿宸，想聊点什么？可以问我爱好、技能、网站的彩蛋，也可以问诗云页面的秘密。" },
-    { keys: ["谢谢", "感谢", "thx"], reply: "不客气！很高兴认识你，还有想了解的吗？" },
+    { keys: ["你好", "嗨", "哈喽", "在吗", "hello", "hi"],
+      reply: "你好！我是数字孪生的刘聿宸，想聊点什么？可以问我爱好、技能、网站的彩蛋，也可以问诗云页面的秘密。",
+      replyEn: "Hi! I'm Liu Yuchen, the digital twin. What would you like to chat about? Ask me about hobbies, skills, the site's easter eggs, or the secrets of the Shiyun page."
+    },
+    { keys: ["谢谢", "感谢", "thx"],
+      reply: "不客气！很高兴认识你，还有想了解的吗？",
+      replyEn: "You're welcome! Nice to meet you — anything else you'd like to know?"
+    },
   ];
 
   const FALLBACK =
     "这个问题我还没想好怎么答（我只能基于我的个人简介和这个网站的内容回答）。你可以问我：你是谁、你的slogan、你在哪个学校、你有什么爱好、你会什么技能，也可以问网站的彩蛋、诗云相册、火柴人或者开发历程。";
+  const FALLBACK_EN =
+    "I haven't figured out how to answer that yet (I can only answer based on my profile and this site's content). Try asking: who are you, your slogan, which school, your hobbies, what skills — or about the site's easter eggs, the Shiyun albums, the stickman, or the dev history.";
+
+  // 英文提问别名 → 中文关键词（v1.42.5：英文态先把问句映射为中文再走知识库匹配）
+  const EN_ALIASES = [
+    ["digital twin", "数字孪生"],
+    ["who are you", "你是谁"],
+    ["what is your name", "名字"],
+    ["your name", "名字"],
+    ["what is your age", "年龄"],
+    ["how old", "年龄"],
+    ["which school", "学校"],
+    ["what do you study", "专业"],
+    ["your major", "专业"],
+    ["hobbies", "爱好"],
+    ["hobby", "爱好"],
+    ["easter egg", "彩蛋"],
+    ["easter", "彩蛋"],
+    ["hidden level", "隐藏"],
+    ["where are you", "哪里人"],
+    ["your slogan", "slogan"],
+    ["motto", "slogan"],
+    ["university", "学校"],
+    ["college", "学校"],
+    ["major", "专业"],
+    ["skills", "技能"],
+    ["skill", "技能"],
+    ["projects", "项目"],
+    ["project", "项目"],
+    ["music", "音乐"],
+    ["anime", "番"],
+    ["email", "邮箱"],
+    ["contact", "联系"],
+    ["feedback", "反馈"],
+    ["shiyun", "诗云"],
+    ["poems", "诗云"],
+    ["poem", "诗云"],
+    ["stickman", "火柴人"],
+    ["mascot", "吉祥物"],
+    ["history", "开发历程"],
+    ["version", "版本"],
+    ["arcade", "音游"],
+    ["games", "游戏"],
+    ["game", "游戏"],
+    ["hello", "你好"],
+    ["thank", "谢谢"],
+  ];
 
   // 兜底随机回复池（v1.41.1 · 站主定制）：第一次无法回答时用上面的现有文本，
   // 之后再遇到无法回答的问题，从中随机抽取
@@ -334,8 +401,18 @@ document.querySelectorAll(".is-placeholder").forEach((link) => {
 
   let fallbackCount = 0; // 无法回答的问题计数：第 1 次用现有兜底文本，之后随机
 
-  // 命中知识库：取命中数最多的条目；没有则返回兜底
+  // 命中知识库：取命中数最多的条目；没有则返回兜底（v1.42.5 双语）
   function matchReply(text) {
+    const en = typeof window.I18n === "object" && window.I18n.lang === "en";
+    // 英文态：把英文问句映射为中文关键词后再匹配（大小写不敏感）
+    if (en) {
+      for (const pair of EN_ALIASES) {
+        if (text.includes(pair[0])) {
+          text = text.replace(new RegExp(pair[0], "ig"), pair[1]);
+          break;
+        }
+      }
+    }
     let best = null;
     let bestScore = 0;
     for (const item of KNOWLEDGE) {
@@ -348,10 +425,10 @@ document.querySelectorAll(".is-placeholder").forEach((link) => {
         best = item;
       }
     }
-    if (best) return best.reply;
+    if (best) return en && best.replyEn ? best.replyEn : best.reply;
     // 无法回答：第一次按现有文本回复，此后从随机池中抽取
     fallbackCount++;
-    if (fallbackCount === 1) return FALLBACK;
+    if (fallbackCount === 1) return en ? FALLBACK_EN : FALLBACK;
     return FALLBACK_RANDOM[(Math.random() * FALLBACK_RANDOM.length) | 0];
   }
 
@@ -396,9 +473,11 @@ document.querySelectorAll(".is-placeholder").forEach((link) => {
     btn.addEventListener("click", () => sendQuestion(btn.dataset.q));
   });
 
-  // 初始欢迎语
+  // 初始欢迎语（v1.42.5：按当前语言）
   addMsg(
-    "嗨，我是数字孪生的刘聿宸。我可以根据我的个人简介回答你关于我的问题，比如学校、专业、slogan、爱好和技能。想从哪里开始？",
+    typeof window.I18n === "object" && window.I18n.lang === "en"
+      ? "Hi, I'm Liu Yuchen, the digital twin. I can answer questions about me based on my profile — like school, major, slogan, hobbies and skills. Where shall we start?"
+      : "嗨，我是数字孪生的刘聿宸。我可以根据我的个人简介回答你关于我的问题，比如学校、专业、slogan、爱好和技能。想从哪里开始？",
     "bot"
   );
 })();
@@ -676,6 +755,7 @@ document.querySelectorAll(".is-placeholder").forEach((link) => {
       // 500ms 后才进入 start() 动画主流程，期间由该 class 兜底
       if (eggBox) eggBox.classList.add("triggered");
       setHint("✦ 暗语生效 · 正在驶向诗云…");
+      if (window.Achievements) window.Achievements.unlock("shiyun_poet"); // 成就：这诗人吗？
       document.documentElement.classList.add("is-shiyun-warp");
       setTimeout(() => {
         if (window.ShiyunWarp && window.ShiyunWarp.start) {
@@ -688,6 +768,7 @@ document.querySelectorAll(".is-placeholder").forEach((link) => {
       // 命中暗号：发光提示后跳转
       if (eggBox) eggBox.classList.add("triggered");
       setHint("✦ 咒语生效，梦想即力量 · 正在进入…");
+      if (window.Achievements) window.Achievements.unlock("dream_power"); // 成就：梦想无限大！！！！！
       setTimeout(() => {
         window.location.href = TARGET_URL;
       }, 700);
@@ -964,7 +1045,7 @@ document.querySelectorAll(".is-placeholder").forEach((link) => {
   }
 
   const LINES = [
-    "DEEPWORKS BIOS v1.41.2",
+    "DEEPWORKS BIOS v1.42.5",
     "MEMTEST 640K ............... <OK>",
     "NEON SHADER LOAD ........... <OK>",
     "SINE WAVE ENGINE ........... <OK>",
