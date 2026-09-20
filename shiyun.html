@@ -119,7 +119,7 @@
       z-index: 3;
       max-width: 780px;
       margin: 0 auto;
-      padding: 96px 34px 74px;
+      padding: 96px 34px 120px;
     }
 
     .shiyun-kicker {
@@ -218,6 +218,61 @@
       color: var(--muted);
     }
 
+    /* 诗云记录 · 词作终端排版（词牌青绿高亮，正文等宽、上下阕分列） */
+    .shiyun-poem-head {
+      margin: 0 0 16px;
+      color: var(--cyan);
+      font-size: 0.95rem;
+      letter-spacing: 4px;
+    }
+    .shiyun-poem {
+      margin: 0;
+      line-height: 2;
+    }
+    /* 词作间分隔线：青色微光细线，呼应终端日志分隔 */
+    .shiyun-poem-sep {
+      margin: 20px 0;
+      border: 0;
+      height: 1px;
+      background: linear-gradient(90deg, transparent, rgba(111, 216, 200, 0.35), transparent);
+    }
+    /* 诗云简介：主句（左侧青绿竖线卡片）+ 其下小字（灰色题注） */
+    .shiyun-intro {
+      margin: 0 0 6px;
+      padding: 10px 14px;
+      color: var(--text);
+      font-size: 0.9rem;
+      letter-spacing: 1px;
+      line-height: 1.8;
+      border-left: 3px solid var(--cyan);
+      background: rgba(111, 216, 200, 0.05);
+    }
+    .shiyun-intro-sub {
+      margin: 0 0 24px;
+      padding-left: 14px;
+      color: var(--muted);
+      font-size: 0.72rem;
+      letter-spacing: 1px;
+      line-height: 1.7;
+    }
+    /* 诗云板块分区：终端分类徽章（古诗 / 现代诗） */
+    .shiyun-cat {
+      display: inline-block;
+      margin: 0 0 18px;
+      padding: 5px 12px;
+      color: var(--cyan);
+      font-size: 0.72rem;
+      letter-spacing: 3px;
+      border: 1px solid rgba(111, 216, 200, 0.35);
+      border-left: 3px solid var(--cyan);
+      background: rgba(111, 216, 200, 0.06);
+    }
+    /* 空板块占位提示（内容待写入） */
+    .shiyun-empty {
+      margin: 6px 0 0;
+      color: var(--muted);
+    }
+
     .shiyun-back {
       display: inline-block;
       margin-top: 30px;
@@ -238,6 +293,414 @@
     .shiyun-back:hover {
       background: rgba(111, 216, 200, 0.12);
       transform: translateY(-2px);
+    }
+
+    /* ============ 板块导航 dock（古诗 / 现代诗 锚点切换） ============
+       主页面同款 macOS 毛玻璃风格；宽屏固定在视口右侧中央（fixed 不随滚动，
+       与正文面板右缘对齐、不遮挡文字）；窄屏（≤1024px）回落为底部水平导航。
+       注意：dock 必须保持 body 直接子级，避免被面板的 riseIn transform 改变定位参照系。 */
+    .shiyun-dock {
+      position: fixed;
+      top: 50%;
+      left: calc(50% + 408px); /* 面板右缘（50%+390px）再外推 18px */
+      transform: translateY(-50%);
+      z-index: 200;
+      padding: 10px 9px;
+      border-radius: 22px;
+      border: 1px solid rgba(255, 255, 255, 0.14);
+      background:
+        linear-gradient(180deg, rgba(255, 255, 255, 0.1), rgba(255, 255, 255, 0.02)),
+        rgba(16, 16, 16, 0.55);
+      backdrop-filter: blur(22px) saturate(190%);
+      -webkit-backdrop-filter: blur(22px) saturate(190%);
+      box-shadow:
+        0 12px 40px rgba(0, 0, 0, 0.55),
+        inset 0 1px 0 rgba(255, 255, 255, 0.22);
+      opacity: 0;
+      animation: riseIn 0.9s ease-out 1.2s forwards;
+    }
+    .shiyun-dock-list {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 6px;
+      list-style: none;
+      margin: 0;
+      padding: 0;
+    }
+    .shiyun-dock-item {
+      display: flex;
+    }
+    .shiyun-dock-sep {
+      width: 100%;
+      height: 1px;
+      margin: 4px 0;
+      background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.22), transparent);
+    }
+    .shiyun-dock-link {
+      position: relative;
+      display: block;
+      text-decoration: none;
+    }
+    .shiyun-dock-icon {
+      display: grid;
+      place-items: center;
+      width: 46px;
+      height: 46px;
+      border-radius: 13px;
+      font-size: 1.35rem;
+      line-height: 1;
+      font-family: "Noto Serif SC", "Songti SC", serif;
+      color: var(--cyan);
+      background:
+        linear-gradient(160deg, rgba(255, 255, 255, 0.16), rgba(255, 255, 255, 0.02) 60%),
+        linear-gradient(145deg, #242424, #101010);
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      box-shadow:
+        inset 0 1px 0 rgba(255, 255, 255, 0.25),
+        0 4px 10px rgba(0, 0, 0, 0.45);
+      transform-origin: center;
+      transition: transform 0.18s ease-out, box-shadow 0.25s, border-color 0.25s;
+      will-change: transform;
+    }
+    .shiyun-dock-link:hover .shiyun-dock-icon {
+      transform: scale(1.18);
+      border-color: rgba(111, 216, 200, 0.75);
+      box-shadow:
+        inset 0 1px 0 rgba(255, 255, 255, 0.35),
+        0 0 18px rgba(111, 216, 200, 0.45);
+    }
+    /* 悬停气泡标签（垂直 dock：标签弹出于图标右侧） */
+    .shiyun-dock-tip {
+      position: absolute;
+      top: 50%;
+      left: calc(100% + 12px);
+      transform: translateY(-50%) translateX(-4px);
+      padding: 5px 11px;
+      border-radius: 9px;
+      font-size: 0.72rem;
+      letter-spacing: 1px;
+      white-space: nowrap;
+      color: var(--text);
+      background: rgba(12, 12, 12, 0.85);
+      border: 1px solid rgba(255, 255, 255, 0.16);
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.2s, transform 0.2s;
+    }
+    .shiyun-dock-link:hover .shiyun-dock-tip {
+      opacity: 1;
+      transform: translateY(-50%) translateX(0);
+    }
+    /* 锚点滚动目标：留出偏移，避免被固定元素遮住标题 */
+    #poem-ancient,
+    #poem-modern {
+      scroll-margin-top: 22px;
+    }
+
+    /* 窄屏：dock 回落为底部水平导航（主页面同款布局） */
+    @media (max-width: 1024px) {
+      .shiyun-dock {
+        top: auto;
+        bottom: 18px;
+        left: 50%;
+        transform: translateX(-50%);
+        padding: 9px 14px;
+      }
+      .shiyun-dock-list {
+        flex-direction: row;
+        align-items: flex-end;
+        gap: 6px;
+      }
+      .shiyun-dock-sep {
+        width: 1px;
+        height: auto;
+        align-self: stretch;
+        margin: 4px 5px;
+        background: linear-gradient(180deg, transparent, rgba(255, 255, 255, 0.22), transparent);
+      }
+      .shiyun-dock-tip {
+        top: auto;
+        left: 50%;
+        bottom: calc(100% + 12px);
+        transform: translateX(-50%) translateY(6px);
+      }
+      .shiyun-dock-link:hover .shiyun-dock-tip {
+        transform: translateX(-50%) translateY(0);
+      }
+      .shiyun-dock-link:hover .shiyun-dock-icon {
+        transform-origin: center bottom;
+      }
+    }
+
+    /* ============ 悬浮粒子（面板外可交互光点 · 星尘风、无泡泡感） ============
+       小核心 + 弥散辉光：无圆形硬边、无球体内高光，呈现发光星尘的观感 */
+    .shiyun-orbs {
+      position: fixed;
+      inset: 0;
+      z-index: 100;
+      pointer-events: none;
+    }
+    .shiyun-orb {
+      position: absolute;
+      left: var(--ox);
+      top: var(--oy);
+      width: 34px;
+      height: 34px;
+      transform: translate(-50%, -50%);
+      padding: 0;
+      border-radius: 50%;
+      cursor: pointer;
+      pointer-events: auto;
+      border: none;
+      background: radial-gradient(
+        circle at 50% 50%,
+        #ffffff 0%,
+        rgba(190, 255, 248, 0.9) 28%,
+        rgba(111, 216, 200, 0.35) 55%,
+        rgba(111, 216, 200, 0) 75%
+      );
+      box-shadow:
+        0 0 10px rgba(170, 245, 235, 0.9),
+        0 0 26px rgba(111, 216, 200, 0.6),
+        0 0 60px rgba(111, 216, 200, 0.32);
+      animation: orbFloat 7s ease-in-out var(--ad) infinite;
+      transition: transform 0.25s cubic-bezier(0.22, 1, 0.36, 1), box-shadow 0.25s ease;
+      will-change: transform;
+    }
+    /* 弥散光晕层：无边界，随呼吸扩散消隐 */
+    .shiyun-orb::before {
+      content: "";
+      position: absolute;
+      inset: -10px;
+      border-radius: 50%;
+      background: radial-gradient(circle, rgba(111, 216, 200, 0.4) 0%, rgba(111, 216, 200, 0.12) 45%, rgba(111, 216, 200, 0) 70%);
+      animation: orbPulse 3.6s ease-in-out var(--ad) infinite;
+    }
+    /* 绕行卫星光点：沿轨道匀速旋转的细小亮星 */
+    .shiyun-orb::after {
+      content: "";
+      position: absolute;
+      left: 50%;
+      top: 50%;
+      width: 6px;
+      height: 6px;
+      margin: -3px;
+      border-radius: 50%;
+      background: radial-gradient(circle, #ffffff, rgba(160, 240, 230, 0.8) 50%, rgba(160, 240, 230, 0) 75%);
+      box-shadow: 0 0 8px rgba(170, 245, 235, 0.95);
+      animation: orbOrbit 5.2s linear var(--ad) infinite;
+    }
+    .shiyun-orb:hover {
+      transform: translate(-50%, -50%) scale(1.2);
+      box-shadow:
+        0 0 14px rgba(190, 255, 248, 1),
+        0 0 34px rgba(111, 216, 200, 0.85),
+        0 0 80px rgba(111, 216, 200, 0.5);
+    }
+
+    @keyframes orbFloat {
+      0%, 100% { margin-top: 0; }
+      50% { margin-top: -12px; }
+    }
+    @keyframes orbPulse {
+      0%, 100% { opacity: 0.5; transform: scale(0.85); }
+      50% { opacity: 1; transform: scale(1.15); }
+    }
+    @keyframes orbOrbit {
+      from { transform: rotate(0deg) translateX(26px) rotate(0deg); }
+      to { transform: rotate(360deg) translateX(26px) rotate(-360deg); }
+    }
+
+    /* ============ 照片相册弹窗（丝滑开合） ============ */
+    .shiyun-modal {
+      position: fixed;
+      inset: 0;
+      z-index: 400;
+      display: grid;
+      place-items: center;
+      padding: 24px;
+      visibility: hidden;
+      transition: visibility 0s linear 0.45s;
+    }
+    .shiyun-modal.is-open {
+      visibility: visible;
+      transition-delay: 0s;
+    }
+    .shiyun-modal-backdrop {
+      position: absolute;
+      inset: 0;
+      background: rgba(3, 4, 6, 0.72);
+      -webkit-backdrop-filter: blur(12px) saturate(120%);
+      backdrop-filter: blur(12px) saturate(120%);
+      opacity: 0;
+      transition: opacity 0.4s ease;
+    }
+    .shiyun-modal.is-open .shiyun-modal-backdrop { opacity: 1; }
+    .shiyun-modal-panel {
+      position: relative;
+      width: min(580px, 94vw);
+      max-height: min(82vh, 760px);
+      display: flex;
+      flex-direction: column;
+      background:
+        linear-gradient(165deg, rgba(22, 27, 37, 0.97), rgba(9, 11, 16, 0.98) 70%);
+      border: 1px solid rgba(111, 216, 200, 0.35);
+      border-top: 2px solid var(--cyan);
+      box-shadow:
+        0 34px 90px rgba(0, 0, 0, 0.72),
+        0 0 34px rgba(111, 216, 200, 0.14);
+      clip-path: polygon(0 0, calc(100% - 22px) 0, 100% 22px, 100% 100%, 22px 100%, 0 calc(100% - 22px));
+      opacity: 0;
+      transform: translateY(26px) scale(0.94);
+      transition:
+        transform 0.45s cubic-bezier(0.22, 1, 0.36, 1),
+        opacity 0.32s ease;
+    }
+    .shiyun-modal.is-open .shiyun-modal-panel {
+      opacity: 1;
+      transform: translateY(0) scale(1);
+    }
+    .shiyun-modal-head {
+      position: relative;
+      display: flex;
+      align-items: baseline;
+      gap: 14px;
+      padding: 20px 24px 14px;
+      border-bottom: 1px solid rgba(140, 155, 185, 0.18);
+    }
+    .shiyun-modal-kicker {
+      margin: 0;
+      font-family: "Courier New", ui-monospace, monospace;
+      font-size: 0.66rem;
+      letter-spacing: 3px;
+      color: var(--muted);
+      white-space: nowrap;
+      overflow: hidden;
+    }
+    .shiyun-modal-title {
+      margin: 0;
+      font-size: 1.1rem;
+      letter-spacing: 6px;
+      color: var(--cyan);
+    }
+    .shiyun-modal-close {
+      margin-left: auto;
+      width: 30px;
+      height: 30px;
+      align-self: center;
+      border-radius: 8px;
+      border: 1px solid rgba(140, 155, 185, 0.3);
+      background: transparent;
+      color: var(--text);
+      font-size: 1rem;
+      line-height: 1;
+      cursor: pointer;
+      transition: border-color 0.2s ease, color 0.2s ease, transform 0.2s ease, background 0.2s ease;
+    }
+    .shiyun-modal-close:hover {
+      color: var(--cyan);
+      border-color: var(--cyan);
+      background: rgba(111, 216, 200, 0.08);
+      transform: rotate(90deg);
+    }
+    .shiyun-modal-body {
+      flex: 1;
+      overflow-y: auto;
+      padding: 20px 24px;
+    }
+    /* 错落相册墙：dense 密集网格 + 随机跨行/跨列，照片大小不一、不整齐排列 */
+    .shiyun-album-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      grid-auto-rows: 86px;
+      grid-auto-flow: dense;
+      gap: 10px;
+    }
+    .shiyun-album-empty {
+      grid-column: 1 / -1;
+      margin: 0;
+      padding: 46px 0;
+      text-align: center;
+      font-family: "Courier New", ui-monospace, monospace;
+      font-size: 0.78rem;
+      letter-spacing: 2px;
+      color: var(--muted);
+    }
+    .shiyun-album-fig {
+      margin: 0;
+      position: relative;
+      border: 1px solid rgba(140, 155, 185, 0.25);
+      background: #0a0c11;
+      overflow: hidden;
+      clip-path: polygon(8px 0, 100% 0, 100% calc(100% - 8px), calc(100% - 8px) 100%, 0 100%, 0 8px);
+    }
+    .shiyun-album-fig img {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+    }
+    .shiyun-album-fig figcaption {
+      position: absolute;
+      left: 0;
+      bottom: 0;
+      width: 100%;
+      padding: 10px 8px 4px;
+      font-family: "Courier New", ui-monospace, monospace;
+      font-size: 0.6rem;
+      letter-spacing: 1px;
+      color: rgba(200, 207, 218, 0.85);
+      background: linear-gradient(transparent, rgba(3, 4, 6, 0.78));
+    }
+    @media (max-width: 560px) {
+      .shiyun-album-grid {
+        grid-template-columns: repeat(2, 1fr);
+      }
+    }
+    /* 上传入口：默认隐藏（照片只能由站主上传），弹窗进入 RW 模式后显示 */
+    .shiyun-upload {
+      display: none;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      margin-top: 16px;
+      padding: 11px 0;
+      border-radius: 12px;
+      border: 1px dashed rgba(111, 216, 200, 0.5);
+      color: var(--cyan);
+      font-size: 0.82rem;
+      letter-spacing: 2px;
+      cursor: pointer;
+      transition: background 0.25s ease, border-color 0.25s ease, box-shadow 0.25s ease;
+    }
+    .shiyun-modal.is-rw .shiyun-upload {
+      display: flex;
+    }
+    .shiyun-upload:hover {
+      background: rgba(111, 216, 200, 0.08);
+      border-color: var(--cyan);
+      box-shadow: 0 0 16px rgba(111, 216, 200, 0.2);
+    }
+    .shiyun-upload-plus {
+      font-size: 1.05rem;
+      line-height: 1;
+    }
+    .shiyun-modal-foot {
+      padding: 10px 24px 16px;
+      font-family: "Courier New", ui-monospace, monospace;
+      font-size: 0.62rem;
+      letter-spacing: 2px;
+      color: var(--muted);
+    }
+
+    /* 窄屏：隐藏悬浮粒子，避免挤压面板 */
+    @media (max-width: 1024px) {
+      .shiyun-orbs { display: none; }
     }
 
     /* 底部系统状态栏 */
@@ -363,9 +826,191 @@
       <h1 class="shiyun-title">诗 云</h1>
     </div>
     <p class="shiyun-sub">&gt; 暗语「<b>诗云</b>」已确认。当前坐标：轨道远点 07，静滞区。</p>
-    <section class="shiyun-body" id="shiyunBody"></section>
+    <section class="shiyun-body" id="shiyunBody">
+      <!-- 诗云简介 -->
+      <p class="shiyun-intro">"这是我无聊时写的几首小诗，均已上传微信朋友圈=0"</p>
+      <p class="shiyun-intro-sub">在无限的时间里，试遍文字的所有组合，猴子也能写出超越李白的诗笺。</p>
+
+      <!-- 板块一：古诗（词） -->
+      <p class="shiyun-cat" id="poem-ancient">&gt; 板块 // 古诗</p>
+      <p class="shiyun-poem-head">卜算子 · 夕阳故地复巡</p>
+      <p class="shiyun-poem">
+        晚阳照城郭，寂寞无人睹。<br>
+        正是人归日暮时，悲风独孤苦。<br>
+        <br>
+        无意且抬头，复至旧时处。<br>
+        朽木枝头黛叶出，回首故人颜。
+      </p>
+      <hr class="shiyun-poem-sep" aria-hidden="true">
+      <p class="shiyun-poem-head">采桑子 · 冬日自叹</p>
+      <p class="shiyun-poem">
+        青春不待年华尽，多少迷茫。多少迷茫，机遇皆失心中伤。<br>
+        <br>
+        一年秋去冬风来，前路何方？前路何方，银粟原中梅花香。
+      </p>
+      <hr class="shiyun-poem-sep" aria-hidden="true">
+      <p class="shiyun-poem-head">沁园春 · 烟火</p>
+      <p class="shiyun-poem">
+        花火齐鸣，云锦排空，除夕佳节。<br>
+        望窗前烟火，繁星摛锦，明烛清夜，回响绵绵。<br>
+        世路无穷，劳生有限，此景人间几回度？<br>
+        微品茗，举杯邀明月，往事无边。<br>
+        <br>
+        哀愁难释悠悠，但暂寄、且休烟火中。<br>
+        即烟花易冷，余生易逝，犹有绽放，罗琦芳尘。<br>
+        漫漫长途，不应有恨，纵享繁华且忘伤。<br>
+        舞焰火，破悲愁长夜，共度良宵。
+      </p>
+
+      <!-- 板块二：现代诗 -->
+      <hr class="shiyun-poem-sep" aria-hidden="true">
+      <p class="shiyun-cat" id="poem-modern">&gt; 板块 // 现代诗</p>
+      <p class="shiyun-poem-head">倚坐舷窗</p>
+      <p class="shiyun-poem">
+        夏风悠长<br>
+        船边的水向后缓缓地流淌<br>
+        船上的我向前无可救药地前行<br>
+        <br>
+        避这反射的水光，<br>
+        受那恼人的烈阳。<br>
+        今日的余晖是否还会重现，<br>
+        我的生命注定将在余晖中消亡。<br>
+        <br>
+        永别了，<br>
+        我的岛；<br>
+        再见了，<br>
+        我的海。<br>
+        我宁可死在这蝉鸣的盛夏，<br>
+        也不愿反复品味那秋日萧瑟的伤悲。
+      </p>
+      <hr class="shiyun-poem-sep" aria-hidden="true">
+      <p class="shiyun-poem-head">梦</p>
+      <p class="shiyun-poem">
+        已结束在结束之前，<br>
+        人<br>
+        将生活在生活之后。<br>
+        <br>
+        五日<br>
+        是闪着光辉却平淡似水，<br>
+        一年<br>
+        是不加粉饰而苦闷无涯。<br>
+        <br>
+        结束前<br>
+        不知一台机器也是否会迸发不甘的火花，<br>
+        结束前<br>
+        不知机械的人也是否会撕扯苦涩的喉咙<br>
+        嘶哑地呐喊。
+      </p>
+      <hr class="shiyun-poem-sep" aria-hidden="true">
+      <p class="shiyun-poem-head">一个夜</p>
+      <p class="shiyun-poem">
+        一个夜，<br>
+        一个平凡的夜。<br>
+        有几人清醒<br>
+        几人入眠。<br>
+        <br>
+        霓虹下的匆匆，<br>
+        匆匆地<br>
+        擦肩而过。<br>
+        暖光灯里的轻柔，<br>
+        轻柔地<br>
+        流入心间。<br>
+        <br>
+        我尝试抓住<br>
+        一瞬的刹那，<br>
+        是失败？<br>
+        是成功？<br>
+        我尝试聆听<br>
+        飘渺的回声，<br>
+        是徒劳？<br>
+        是新生？<br>
+        <br>
+        我曾孤身一人，<br>
+        我曾身处人群之中。<br>
+        在这片喧嚣的森林里，<br>
+        渴望着<br>
+        永不再临的呼唤。<br>
+        我也身处人群之中，<br>
+        我也不再孤单。<br>
+        在这片不眠的森林里，<br>
+        觅得了<br>
+        未曾料及的呐喊。<br>
+        <br>
+        或许几小时后，<br>
+        阳光会冲淡霓虹的色彩，<br>
+        鸟鸣会代替路人的喧闹，<br>
+        夜也会被遗忘吧。<br>
+        或许几年以后，<br>
+        风霜会浸染我的记忆，<br>
+        岁月会带走我的痕迹，<br>
+        我也会被忘却吧。<br>
+        <br>
+        在这个平凡的夜里，<br>
+        是喜悦？是悲伤？是孤独？是温暖？<br>
+        我不知道，<br>
+        夜也不知道。<br>
+        不过，<br>
+        这份答案<br>
+        有什么必要。<br>
+        <br>
+        在秋风中，<br>
+        我送别了夏日的夜；<br>
+        在喃喃中，<br>
+        夜接纳了疲惫的我。<br>
+        我，一个平凡的我，<br>
+        夜，一个平凡的夜。
+      </p>
+    </section>
     <a class="shiyun-back" href="index.html">&lt;- 返回主页</a>
   </main>
+
+  <!-- 板块导航 dock：古诗 / 现代诗 锚点切换（主页面同款毛玻璃风格，挂于正文面板右侧） -->
+  <nav class="shiyun-dock" id="shiyunDock" aria-label="诗云板块导航">
+    <ul class="shiyun-dock-list">
+      <li class="shiyun-dock-item">
+        <a class="shiyun-dock-link" href="#poem-ancient">
+          <span class="shiyun-dock-tip">古诗</span>
+          <span class="shiyun-dock-icon" aria-hidden="true">古</span>
+        </a>
+      </li>
+      <li class="shiyun-dock-sep" aria-hidden="true"></li>
+      <li class="shiyun-dock-item">
+        <a class="shiyun-dock-link" href="#poem-modern">
+          <span class="shiyun-dock-tip">现代诗</span>
+          <span class="shiyun-dock-icon" aria-hidden="true">现</span>
+        </a>
+      </li>
+    </ul>
+  </nav>
+
+  <!-- 悬浮粒子：面板外的可交互光球（点击开启对应相册弹窗，无文字纯光效） -->
+  <div class="shiyun-orbs">
+    <button class="shiyun-orb" data-orb="0" style="--ox: 8%; --oy: 26vh; --ad: 0s;" aria-label="拾光相册"></button>
+    <button class="shiyun-orb" data-orb="1" style="--ox: 12%; --oy: 62vh; --ad: 1.6s;" aria-label="流水相册"></button>
+    <button class="shiyun-orb" data-orb="2" style="--ox: 88%; --oy: 27vh; --ad: 0.8s;" aria-label="夜话相册"></button>
+    <button class="shiyun-orb" data-orb="3" style="--ox: 86%; --oy: 63vh; --ad: 2.4s;" aria-label="留影相册"></button>
+  </div>
+
+  <!-- 照片相册弹窗：点击粒子后弹出，后续可向其中上传照片 -->
+  <div class="shiyun-modal" id="shiyunModal" role="dialog" aria-modal="true" aria-labelledby="shiyunModalTitle">
+    <div class="shiyun-modal-backdrop" data-close-modal></div>
+    <div class="shiyun-modal-panel">
+      <header class="shiyun-modal-head">
+        <p class="shiyun-modal-kicker">SYS.ALBUM // 星尘相册</p>
+        <h2 class="shiyun-modal-title" id="shiyunModalTitle">拾光</h2>
+        <button class="shiyun-modal-close" data-close-modal aria-label="关闭">×</button>
+      </header>
+      <div class="shiyun-modal-body">
+        <div class="shiyun-album-grid" id="shiyunAlbumGrid"></div>
+        <label class="shiyun-upload" for="shiyunFileInput">
+          <span class="shiyun-upload-plus">＋</span>
+          <span>上传照片</span>
+          <input type="file" id="shiyunFileInput" accept="image/*" multiple hidden />
+        </label>
+      </div>
+      <footer class="shiyun-modal-foot">ALBUM.RO // 相册只读 · 照片由站主收录</footer>
+    </div>
+  </div>
 
   <!-- 底部系统状态栏 -->
   <div class="sys-bar" aria-hidden="true">
@@ -460,6 +1105,163 @@
       });
 
       requestAnimationFrame(tick);
+    })();
+
+    // ============ 悬浮粒子 + 照片相册弹窗 ============
+    (function () {
+      var ORB_NAMES = ["拾光", "流水", "夜话", "留影"];
+      var albums = {
+        // 拾光相册：站主预置照片（相对 shiyun.html 的静态资源路径）
+        "0": [
+          "assets/albums/shi-guang/photo-01.jpg",
+          "assets/albums/shi-guang/photo-02.jpg",
+          "assets/albums/shi-guang/photo-03.jpg",
+          "assets/albums/shi-guang/photo-04.jpg",
+          "assets/albums/shi-guang/photo-05.jpg",
+          "assets/albums/shi-guang/photo-06.jpg",
+          "assets/albums/shi-guang/photo-07.jpg",
+          "assets/albums/shi-guang/photo-08.jpg"
+        ],
+        // 流水相册：站主预置照片
+        "1": [
+          "assets/albums/liu-shui/photo-01.jpg",
+          "assets/albums/liu-shui/photo-02.jpg",
+          "assets/albums/liu-shui/photo-03.jpg",
+          "assets/albums/liu-shui/photo-04.jpg",
+          "assets/albums/liu-shui/photo-05.jpg",
+          "assets/albums/liu-shui/photo-06.jpg"
+        ],
+        // 夜话相册：站主预置照片
+        "2": [
+          "assets/albums/ye-hua/photo-01.jpg",
+          "assets/albums/ye-hua/photo-02.jpg",
+          "assets/albums/ye-hua/photo-03.jpg",
+          "assets/albums/ye-hua/photo-04.jpg",
+          "assets/albums/ye-hua/photo-05.jpg",
+          "assets/albums/ye-hua/photo-06.jpg",
+          "assets/albums/ye-hua/photo-07.jpg"
+        ],
+        // 留影相册：站主预置照片
+        "3": [
+          "assets/albums/liu-ying/photo-01.jpg",
+          "assets/albums/liu-ying/photo-02.jpg",
+          "assets/albums/liu-ying/photo-03.jpg",
+          "assets/albums/liu-ying/photo-04.jpg",
+          "assets/albums/liu-ying/photo-05.jpg",
+          "assets/albums/liu-ying/photo-06.jpg",
+          "assets/albums/liu-ying/photo-07.jpg",
+          "assets/albums/liu-ying/photo-08.jpg",
+          "assets/albums/liu-ying/photo-09.jpg"
+        ]
+      };
+      var currentKey = "0";
+
+      var modal = document.getElementById("shiyunModal");
+      var grid = document.getElementById("shiyunAlbumGrid");
+      var title = document.getElementById("shiyunModalTitle");
+      var fileInput = document.getElementById("shiyunFileInput");
+      var closeTargets = modal.querySelectorAll("[data-close-modal]");
+      var reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+      function render(key) {
+        var shots = albums[key] || [];
+        grid.innerHTML = "";
+        if (shots.length === 0) {
+          var empty = document.createElement("p");
+          empty.className = "shiyun-album-empty";
+          empty.textContent = "ALBUM.EMPTY // 尚未收录星尘照片";
+          grid.appendChild(empty);
+          return;
+        }
+        shots.forEach(function (src, i) {
+          var fig = document.createElement("figure");
+          fig.className = "shiyun-album-fig";
+          // 随机跨行/跨列（错落有致，不整齐排列）：约 30% 跨 2 列、35% 跨 2 行，
+          // 若既未跨列也未跨行，再以 45% 概率补一个高块，避免整排都是小方格
+          var cs = Math.random() < 0.3 ? 2 : 1;
+          var rs = Math.random() < 0.35 ? 2 : 1;
+          if (cs === 1 && rs === 1 && Math.random() < 0.45) rs = 2;
+          fig.style.gridColumn = "span " + cs;
+          fig.style.gridRow = "span " + rs;
+          var img = document.createElement("img");
+          img.src = src;
+          img.alt = "照片";
+          var cap = document.createElement("figcaption");
+          cap.textContent = "SHOT-" + String(i + 1).padStart(3, "0");
+          fig.appendChild(img);
+          fig.appendChild(cap);
+          grid.appendChild(fig);
+        });
+      }
+
+      function openModal(key) {
+        currentKey = key;
+        title.textContent = ORB_NAMES[Number(key)] || "相册";
+        render(key);
+        modal.classList.add("is-open");
+        document.body.style.overflow = "hidden";
+        if (reduceMotion) {
+          modal.style.transition = "none";
+        }
+      }
+
+      function closeModal() {
+        modal.classList.remove("is-open");
+        document.body.style.overflow = "";
+        fileInput.value = "";
+      }
+
+      document.querySelectorAll(".shiyun-orb").forEach(function (orb) {
+        orb.addEventListener("click", function () {
+          openModal(orb.getAttribute("data-orb"));
+        });
+      });
+
+      closeTargets.forEach(function (el) {
+        el.addEventListener("click", function (e) {
+          e.stopPropagation();
+          closeModal();
+        });
+      });
+
+      document.addEventListener("keydown", function (e) {
+        if (e.key === "Escape" && modal.classList.contains("is-open")) {
+          closeModal();
+        }
+      });
+
+      // 站主解锁：快速连点弹窗标题 7 次进入 RW 模式，上传入口随之出现（访客不可见）
+      var unlockClicks = 0;
+      var unlockTimer = null;
+      title.addEventListener("click", function () {
+        unlockClicks++;
+        clearTimeout(unlockTimer);
+        unlockTimer = setTimeout(function () { unlockClicks = 0; }, 1200);
+        if (unlockClicks >= 7) {
+          unlockClicks = 0;
+          modal.classList.add("is-rw");
+          var foot = modal.querySelector(".shiyun-modal-foot");
+          if (foot) foot.textContent = "ALBUM.RW // 站主上传模式已解锁";
+        }
+      });
+
+      fileInput.addEventListener("change", function () {
+        var files = Array.prototype.slice.call(fileInput.files || []);
+        if (!files.length) return;
+        var pending = files.filter(function (f) { return f.type.indexOf("image/") === 0; });
+        var done = 0;
+        pending.forEach(function (file) {
+          var reader = new FileReader();
+          reader.onload = function () {
+            albums[currentKey] = albums[currentKey] || [];
+            albums[currentKey].push(reader.result);
+            done++;
+            if (done === pending.length) render(currentKey);
+          };
+          reader.readAsDataURL(file);
+        });
+        fileInput.value = "";
+      });
     })();
   </script>
 </body>

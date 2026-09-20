@@ -125,6 +125,20 @@
     grid.appendChild(p);
   }
 
+  /* [AI-GEN] 内联数据兜底：直接双击打开（file:// 协议）时浏览器会拦截 fetch，
+   * 此时读取 <script type="application/json" id="arcadeData"> 中内嵌的数据副本，
+   * 保证本地直开也能正常渲染卡片；线上环境仍优先读取 arcade.json（数据分离不变）。 */
+  function loadInline() {
+    var el = document.getElementById("arcadeData");
+    if (!el) return null;
+    try {
+      var items = JSON.parse(el.textContent);
+      return Array.isArray(items) ? items : null;
+    } catch (e) {
+      return null;
+    }
+  }
+
   fetch("arcade.json", { cache: "no-store" })
     .then(function (res) {
       if (!res.ok) throw new Error("HTTP " + res.status);
@@ -134,5 +148,12 @@
       if (!Array.isArray(items)) throw new Error("arcade.json 顶层应为数组");
       render(items);
     })
-    .catch(showError);
+    .catch(function (err) {
+      var inline = loadInline();
+      if (inline) {
+        render(inline);
+        return;
+      }
+      showError(err);
+    });
 })();

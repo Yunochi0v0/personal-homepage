@@ -37,13 +37,19 @@
     "你再点我，我就把你写进死循环！",
     "404: 节操未找到。但没关系，代码能跑就行。"
   ];
+  // 稀有台词池（v1.41.1 · 站主定制）：出现概率较低（约 10%），与普通台词共用「不连续重复」规则
+  var RARE_LINES = [
+    "感觉lyc有点nb",
+    "梦想即力量！",
+    "诗云会是个好点子"
+  ];
   var CLICK_DIST = 5; // 点击判定阈值（px）：位移小于此值视为点击而非拖拽
   var BUBBLE_MS = 4000; // 气泡自动消失时长
   var SQUASH_MS = 650; // Q 弹挤压动画总时长（动画 0.6s + 余量）：结束后清理 class 以便重触发
   var bubble = null;    // .stick-bubble 元素（惰性获取）
   var bubbleTimer = null; // 气泡自动消失定时器
   var squashTimer = null; // Q 弹挤压 class 清理定时器
-  var lastLineIdx = -1; // 上次台词索引（避免连续重复）
+  var lastLineText = null; // 上次台词文本（避免连续重复，普通/稀有池通用）
 
   var dragging = false;
   var lastX = 0, lastY = 0; // 上一次指针位置（本次拖动的增量基准）
@@ -422,16 +428,22 @@
     if (!bubble) bubble = stickman.querySelector(".stick-bubble");
     return bubble;
   }
-  // 弹出气泡：随机台词（避免与上次连续重复），重置 4s 自动消失计时
+  // 弹出气泡：约 10% 概率从稀有台词池抽取，否则从普通台词池抽取；
+  // 避免与上次台词连续重复，重置 4s 自动消失计时
   function showBubble() {
     var b = getBubble();
     if (!b) return;
-    var idx;
-    do { idx = Math.floor(Math.random() * LINES.length); }
-    while (LINES.length > 1 && idx === lastLineIdx);
-    lastLineIdx = idx;
+    var rare = Math.random() < 0.1; // 稀有台词低概率触发
+    var pool = rare ? RARE_LINES : LINES;
+    var pick;
+    var guard = 0;
+    do {
+      pick = pool[(Math.random() * pool.length) | 0];
+      guard++;
+    } while (pool.length > 1 && pick === lastLineText && guard < 8);
+    lastLineText = pick;
     var text = b.querySelector(".stick-bubble-text");
-    if (text) text.textContent = LINES[idx];
+    if (text) text.textContent = pick;
     b.classList.add("show");
     if (bubbleTimer !== null) clearTimeout(bubbleTimer);
     bubbleTimer = setTimeout(hideBubble, BUBBLE_MS); // 4s 后自动淡出
@@ -462,4 +474,134 @@
   // 点击其他区域关闭气泡（捕获阶段：先于火柴人自身事件判断目标归属）
   document.addEventListener("mousedown", onDocDown, true);
   document.addEventListener("touchstart", onDocDown, true);
+})();
+
+/* ============================================================
+   第三个彩蛋（v1.41.2 · AI-GEN）：键盘直接输入 copy → 复制火柴人
+   - 在页面任意处（不在输入框内）依次按下 c-o-p-y，立即复制一个火柴人；
+   - 复制体随机出现在视口内，保留待机呼吸动画与对话气泡（点击可说
+     自己的台词）；复制体不可拖动（拖动物理只绑定本体）。
+   - 上限：含本体最多 10 个；已达上限再输入 copy → 清空全部复制体，
+     回到「只有本体一个」的状态，并由本体气泡播报一句。
+   - 键盘缓冲规则与 lycnb 彩蛋一致：忽略修饰键 / 输入法组字 / 输入框，
+     1.5s 空闲自动清空缓冲，避免误触。
+   ============================================================ */
+(function () {
+  "use strict";
+
+  var master = document.getElementById("stickman");
+  if (!master) return; // 结构缺失静默退出
+
+  var COPY_KEYS = "copy"; // 口令
+  var TTL = 1500;         // 口令缓冲空闲有效期（与 lycnb 一致）
+  var MAX_CLONES = 9;     // 复制体上限（本体 1 + 9 = 10）
+  var BUBBLE_MS = 4000;   // 复制体气泡自动消失时长（与本体一致）
+
+  // 复制体台词池
+  var CLONE_LINES = [
+    "我是你的复制体，请多指教。",
+    "copy 成功！我分身了。",
+    "我们看起来一模一样，对吧？",
+    "别按了别按了，队都快排到屏幕外面了。",
+    "复制体的梦想也是梦想——梦想即力量！"
+  ];
+  // 超限回收播报池（显示在本体气泡上）
+  var RESET_LINES = [
+    "已达上限！复制体已回收，回到最初的你。",
+    "人太多了，解散！回归单机模式。",
+    "上限 10 个达成，复制体合并完毕。"
+  ];
+
+  var clones = [];     // 复制体元素数组
+  var buffer = "";     // 口令缓冲
+  var bufferTimer = 0; // 缓冲空闲清空定时器
+
+  function isTypingTarget(node) {
+    if (!node) return false;
+    var tag = (node.tagName || "").toLowerCase();
+    return (
+      tag === "input" ||
+      tag === "textarea" ||
+      tag === "select" ||
+      node.isContentEditable === true
+    );
+  }
+
+  // 复制体自己的气泡（独立 DOM，不碰本体的气泡计时器）
+  function showCloneBubble(clone) {
+    var b = clone.querySelector(".stick-bubble");
+    if (!b) return;
+    var text = b.querySelector(".stick-bubble-text");
+    if (text) text.textContent = CLONE_LINES[(Math.random() * CLONE_LINES.length) | 0];
+    b.classList.add("show");
+    if (clone._bubbleTimer) clearTimeout(clone._bubbleTimer);
+    clone._bubbleTimer = setTimeout(function () {
+      b.classList.remove("show");
+    }, BUBBLE_MS);
+  }
+
+  // 本体气泡播报一句（直接 DOM 操作，与本体的 showBubble 并行且幂等）
+  function masterBubble(text) {
+    var b = master.querySelector(".stick-bubble");
+    if (!b) return;
+    var el = b.querySelector(".stick-bubble-text");
+    if (el) el.textContent = text;
+    b.classList.add("show");
+    if (master._copyResetTimer) clearTimeout(master._copyResetTimer);
+    master._copyResetTimer = setTimeout(function () {
+      b.classList.remove("show");
+    }, BUBBLE_MS);
+  }
+
+  // 复制/回收主逻辑
+  function spawnClone() {
+    // 已达上限：清空全部复制体，回到「只有本体一个」
+    if (clones.length >= MAX_CLONES) {
+      clones.forEach(function (c) { c.remove(); });
+      clones = [];
+      masterBubble(RESET_LINES[(Math.random() * RESET_LINES.length) | 0]);
+      return;
+    }
+    var clone = master.cloneNode(true); // 深克隆（含 SVG 与气泡），不复制事件监听
+    clone.removeAttribute("id");        // 避免重复 id
+    clone.classList.add("stickman-clone"); // 出现动画（CSS 追加）
+    clone.style.transform = "";         // 清掉本体可能的拖动位移
+    clone.style.right = "auto";         // 改用 left/top 随机定位
+    clone.style.bottom = "auto";
+    var w = window.innerWidth || document.documentElement.clientWidth;
+    var h = window.innerHeight || document.documentElement.clientHeight;
+    clone.style.left = Math.round(16 + Math.random() * Math.max(8, w - 100)) + "px";
+    clone.style.top = Math.round(16 + Math.random() * Math.max(8, h - 130)) + "px";
+    document.body.appendChild(clone);
+    // 复制体点击说话（cloneNode 不复制监听器，需单独绑定）
+    clone.addEventListener("mousedown", function (e) {
+      if (e.button !== 0) return;
+      showCloneBubble(clone);
+    });
+    clone.addEventListener("touchstart", function () {
+      showCloneBubble(clone);
+    }, { passive: true });
+    clones.push(clone);
+  }
+
+  document.addEventListener("keydown", function (e) {
+    // 带修饰键、输入法组字中的按键一律忽略
+    if (e.ctrlKey || e.metaKey || e.altKey || e.isComposing) return;
+    // 正在输入框里打字：不参与口令，并清空已累计的缓冲
+    if (isTypingTarget(e.target)) {
+      buffer = "";
+      return;
+    }
+    // 只统计单个可见字符（忽略 Shift、方向键、F1 等）
+    if (!e.key || e.key.length !== 1) return;
+    buffer = (buffer + e.key.toLowerCase()).slice(-COPY_KEYS.length);
+    clearTimeout(bufferTimer);
+    bufferTimer = setTimeout(function () {
+      buffer = "";
+    }, TTL);
+    if (buffer === COPY_KEYS) {
+      buffer = "";
+      spawnClone();
+    }
+  });
 })();

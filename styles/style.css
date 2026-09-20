@@ -5269,3 +5269,19 @@ textarea.feedback-message {
     animation: none;
   }
 }
+
+/* ============================================================
+   13. copy 彩蛋 · 复制火柴人（v1.41.2 · AI-GEN）
+   键盘输入 copy 生成的复制体：淡入弹出动画。
+   动画挂外层（复制体不再被 JS 写 translate3d，无冲突）；
+   内层呼吸/四肢动画不受影响。
+   ============================================================ */
+.stickman-clone {
+  animation: stickman-clone-pop 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+@keyframes stickman-clone-pop {
+  0%   { transform: scale(0.3); opacity: 0; }
+  60%  { transform: scale(1.12); opacity: 1; } /* 弹出轻微过冲 */
+  100% { transform: scale(1); opacity: 1; }
+}
