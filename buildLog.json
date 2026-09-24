@@ -5,6 +5,64 @@
   "note": "构建日志：记录每次 AI 生成 / 人工修改 / 验证过程，便于课程「过程可追溯」。AI 生成片段在步骤中以 [AI-GEN] 标注，人工修改以 [MANUAL] 标注。",
   "entries": [
     {
+      "version": "v1.50.1",
+      "date": "2026-09-25",
+      "steps": [
+        {
+          "order": 1,
+          "tag": "[AI-GEN]",
+          "action": "bindCursor() 形态优化：idleSvg 改完整樱花花朵（5 瓣 + 花蕊圆）；interactiveSvg 移除实心圆心（圆内部透明）、三片花瓣包 .m-cursor-orbit 组；移除 .m-cursor-dot 注入与定位。",
+          "files": [
+            "scripts/modern.js"
+          ],
+          "verify": "jsc 语法通过"
+        },
+        {
+          "order": 2,
+          "tag": "[AI-GEN]",
+          "action": "modern.css：删除 .m-cursor-dot 规则；新增 .m-cursor-orbit 持续缓慢旋转（mCursorOrbit 8s linear infinite，transform-origin 0 0）。",
+          "files": [
+            "styles/modern.css"
+          ],
+          "verify": "CDP orbitAnim/iterationCount"
+        },
+        {
+          "order": 3,
+          "tag": "[MANUAL]",
+          "action": "版本号 → 1.50.1 三处同步。",
+          "files": [
+            "modern.html"
+          ],
+          "verify": "一致"
+        },
+        {
+          "order": 4,
+          "tag": "[AI-GEN]",
+          "action": "开发日志同步：history.js 追加 v1.50.1；modern.js DEV_LOG_STAGES 同源重新提取（61 条）。",
+          "files": [
+            "scripts/history.js",
+            "scripts/modern.js"
+          ],
+          "verify": "语法 + 61 版本记录"
+        },
+        {
+          "order": 5,
+          "tag": "[AI-GEN]",
+          "action": "CHANGELOG.md 追加 v1.50.1 条目；buildLog 追加本记录。",
+          "files": [
+            "CHANGELOG.md",
+            "buildLog.json"
+          ],
+          "verify": "文档齐全"
+        }
+      ],
+      "verify": "CDP 全 PASS：常态 5 瓣花朵+花蕊、交互态透明圆环+3 瓣无限缓慢旋转（两次采样矩阵变化）、移出恢复、移动轨迹与其余功能无回归。",
+      "issues": [
+        "用户反馈常态应为樱花图案而非单片花瓣 → 5 瓣花朵重绘",
+        "用户反馈圆内部应透明且三瓣持续缓慢旋转 → 移除实心圆心 + mCursorOrbit 无限动画"
+      ]
+    },
+    {
       "version": "v1.50.0",
       "date": "2026-09-25",
       "steps": [

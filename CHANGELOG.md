@@ -10,6 +10,34 @@
 
 ---
 
+## [v1.50.1] 修改：樱花光标形态优化（完整花朵常态 / 透明圆环 + 三瓣持续旋转）
+
+- **日期**：2026-09-25
+- **作者**：katzegott
+- **类型**：`修改`（AI-generated）
+
+### 修改（AI-generated）
+- **常态 = 完整樱花花朵**：默认光标从单片花瓣改为**完整樱花图案**——5 片花瓣绕中心 `rotate(0/72/144/216/288)`（尖端朝外，同款 V 形缺口渐变）+ **中央花蕊**（淡粉小圆）；移除原 `.m-cursor-dot` 实心圆心元素及相关定位逻辑。
+- **交互态圆内部透明**：悬浮可交互元素旋转一圈后，圆环内**不再显示实心圆心**，仅保留透明圆环轮廓（呼应主页面霓虹光标圆环常规态）。
+- **三瓣持续缓慢旋转**：交互态三片花瓣包入 `.m-cursor-orbit` 组，新增 `mCursorOrbit` 动画（8s linear **infinite**，绕 SVG 原点 `transform-origin: 0px 0px`）持续缓慢旋转；进入交互态时的整体快速旋转一圈（`mCursorSpin` 0.55s 一次性）保留。
+- **版本号** → 1.50.1：`data-version`、`styles/modern.css?v=`、`scripts/modern.js?v=` 更新。
+
+### 涉及文件
+| 文件 | 类型 | 说明 |
+| --- | --- | --- |
+| `scripts/modern.js` | 修改 | 11.8 `bindCursor()`：idleSvg 改 5 瓣花朵+花蕊；interactiveSvg 去实心圆心、花瓣包 `.m-cursor-orbit` 组；移除 dot 注入与引用 |
+| `styles/modern.css` | 修改 | 删除 `.m-cursor-dot` 规则；新增 `#mCursor.interactive .m-cursor-orbit` + `mCursorOrbit` 无限旋转动画 |
+| `modern.html` | 修改 | 版本号 → 1.50.1（三处） |
+| `scripts/history.js` | 修改 | 开发日志 `STAGES` 追加 v1.50.1 记录 |
+| `scripts/modern.js` | 修改 | `DEV_LOG_STAGES` 同源重新提取（60 → 61 版本记录） |
+| `CHANGELOG.md` | 修改 | 追加本条目 |
+
+### 验证
+- jsc：语法通过。
+- CDP（modern.html?v=1.50.1）：常态 5 瓣 + 花蕊 1 圆、无 dot；交互态 3 瓣 + 1 圆环（无填充）、`orbitAnim=mCursorOrbit` 且 `iterationCount=infinite`、进入时 `svgAnim=mCursorSpin` 一次、两次采样 orbit 旋转矩阵不同（确认持续转动）；移出恢复 5 瓣；移动轨迹/原生光标隐藏/孪生/背景/加载层无回归。
+
+---
+
 ## [v1.50.0] 新增：现代版樱花光标（花瓣轨迹 / 交互圆环 + 三瓣环绕）
 
 - **日期**：2026-09-25

@@ -635,10 +635,11 @@
     });
   }
 
-  /* ---------- 11.8 樱花光标（v1.50.0） ----------
-   * 默认态 = 单片樱花花瓣（与背景图同款 V 形缺口）；悬浮可交互元素时
-   * 整体旋转一圈，变为「圆心 + 圆环 + 三片花瓣环绕」（圆心圆环形态呼应
-   * 主页面霓虹光标）；移动轨迹 = 花瓣散落粒子。
+  /* ---------- 11.8 樱花光标（v1.50.1） ----------
+   * 常态 = 完整樱花花朵（5 片花瓣 + 中央花蕊，与背景图同款 V 形缺口）；
+   * 悬浮可交互元素时整体旋转一圈（mCursorSpin 一次性），变为「透明圆环 +
+   * 三片花瓣环绕」，三片花瓣沿圆环持续缓慢旋转（mCursorOrbit 无限循环）；
+   * 移动轨迹 = 花瓣散落粒子。
    * 仅桌面精确指针且允许动效时启用；原生光标在首次移动后隐藏（html.has-mcursor）。 */
   var CURSOR_HOVER_SELECTOR = [
     "a", "button", "input", "textarea", "select", "summary", "label",
@@ -672,9 +673,18 @@
       return '<path d="' + CURSOR_PETAL_PATH + '" fill="url(#' + gradId + ')"/>';
     };
     var idleSvg = function () {
+      var bloom = "";
+      for (var i = 0; i < 5; i++) {
+        bloom +=
+          '<g transform="rotate(' + (i * 72) + ')">' +
+          '<g transform="translate(0,-13) scale(0.52)">' + petalPath() + "</g></g>";
+      }
       return (
         '<svg class="m-cursor-ring-svg" width="40" height="40" viewBox="-20 -20 40 40" aria-hidden="true">' +
-        petalDefs() + '<g transform="translate(0,-2)">' + petalPath() + "</g></svg>"
+        petalDefs() +
+        bloom +
+        '<circle r="2.8" fill="#ffb7d5" opacity="0.9"/>' +
+        "</svg>"
       );
     };
     var interactiveSvg = function () {
@@ -690,16 +700,12 @@
         '<svg class="m-cursor-ring-svg" width="56" height="56" viewBox="-28 -28 56 56" aria-hidden="true">' +
         petalDefs() +
         '<circle r="20" stroke="#c084fc" stroke-width="2"/>' +
-        '<circle r="3.5" fill="#fff" opacity="0.95"/>' +
-        petals +
+        '<g class="m-cursor-orbit">' + petals + "</g>" +
         "</svg>"
       );
     };
 
-    host.innerHTML =
-      '<div class="m-cursor-dot" aria-hidden="true"></div>' +
-      '<div class="m-cursor-ring" aria-hidden="true">' + idleSvg() + "</div>";
-    var dot = host.querySelector(".m-cursor-dot");
+    host.innerHTML = '<div class="m-cursor-ring" aria-hidden="true">' + idleSvg() + "</div>";
     var ring = host.querySelector(".m-cursor-ring");
 
     var mx = window.innerWidth / 2, my = window.innerHeight / 2;
@@ -768,8 +774,6 @@
         spawnPetal(tx, ty);
         lastX = tx; lastY = ty;
       }
-      dot.style.left = tx + "px";
-      dot.style.top = ty + "px";
     }
 
     function isHoverTarget(elm) {
@@ -1030,9 +1034,10 @@
           { v: "v1.48.0", date: "2026-09-25", text: "现代版新增沉浸模式：🖼️ 按钮点击后只保留背景与樱花粒子特效，导航 / 内容 / 状态条淡出隐藏，0.65s 双向过渡 + 背景推近 scale(1.1)" },
           { v: "v1.49.0", date: "2026-09-25", text: "现代版新增开发历程 LOG：MISSION_01 卡片 📜 LOG 按钮打开紫色毛玻璃弹窗，数据与本页面 history.js 同源（3 阶段 55 条版本记录），乱码口令与彩蛋解密共享同一 localStorage 记录" },
           { v: "v1.50.0", date: "2026-09-25", text: "现代版新增樱花光标：默认=单片樱花花瓣（V 形缺口同背景图），移动时花瓣散落轨迹；悬浮可交互元素时整体旋转一圈，变为圆心+圆环+三片花瓣环绕（呼应本页面霓虹光标），原生光标首次移动后隐藏" },
+          { v: "v1.50.1", date: "2026-09-25", text: "樱花光标形态优化：常态改为完整樱花花朵（5 片花瓣 + 中央花蕊），交互态圆内部透明（去掉实心圆心），三片环绕花瓣沿圆环持续缓慢旋转（8s 无限循环，进入时仍先旋转一圈）" },
         ]
       }
-    ];
+  ];
   var DEV_EGG_STORE_KEY = "personal-homepage-eggs"; // 与主页面 history.js 共享
   function devLogEggs() {
     try {
