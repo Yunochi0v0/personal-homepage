@@ -7,9 +7,22 @@
   <title>宝藏之地 · Treasure Land</title>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@400;500;700;900&family=Inter:wght@400;500;700;900&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="styles/modern.css?v=1.46.0" />
+  <link rel="stylesheet" href="styles/modern.css?v=1.47.0" />
 </head>
-<body data-version="1.46.0">
+<body data-version="1.47.0">
+
+  <!-- ===== 4 秒衔接加载动画（v1.47.0 · AI-GEN：赛博黄网格→紫色宝藏之地，衔接主页面与本页面风格） ===== -->
+  <div class="m-loader" id="mLoader" aria-hidden="true">
+    <div class="m-loader-grid"></div>
+    <div class="m-loader-scan"></div>
+    <div class="m-loader-glow"></div>
+    <div class="m-loader-mid">
+      <span class="m-loader-t1">// TREASURE LAND · LOADING</span>
+      <span class="m-loader-t2">宝藏之地 · 刘聿宸</span>
+    </div>
+    <div class="m-loader-bar"><i></i></div>
+    <div class="m-loader-petals" id="mLoaderPetals"></div>
+  </div>
 
   <!-- ===== 背景轮换层（v1.46.0 · AI-GEN：4 张樱花背景图，每 2 分钟自动轮换 / 右下角按钮手动切换） ===== -->
   <div class="m-bg-carousel" id="mBgCarousel" aria-hidden="true">

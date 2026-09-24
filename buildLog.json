@@ -5,6 +5,44 @@
   "note": "构建日志：记录每次 AI 生成 / 人工修改 / 验证过程，便于课程「过程可追溯」。AI 生成片段在步骤中以 [AI-GEN] 标注，人工修改以 [MANUAL] 标注。",
   "entries": [
     {
+      "version": "v1.47.0",
+      "date": "2026-09-25",
+      "author": "katzegott",
+      "type": "新增（AI-generated）",
+      "desc": "进入现代版页面时播放 4 秒衔接加载动画：阶段一赛博风（黄霓虹网格/青扫描线/// 文案，衔接主页面 index.html）→ 阶段二宝藏之地风（紫色毛玻璃标题/光晕/8 片樱花花瓣/三色进度条）→ 3.5s 淡出并带动内容上浮入场，4.2s 移除 DOM",
+      "steps": [
+        {
+          "order": 1,
+          "tag": "[AI-GEN]",
+          "action": "modern.html 添加 .m-loader 加载层（grid 网格 / scan 扫描线 / glow 光晕 / mid(t1 赛博文案 + t2 紫色标题) / bar 进度条 / petals 花瓣容器），aria-hidden，pointer-events:none；版本号 1.46.0 → 1.47.0（data-version + ?v= 引用）。",
+          "files": [
+            "modern.html"
+          ],
+          "verify": "DOM 结构存在"
+        },
+        {
+          "order": 2,
+          "tag": "[AI-GEN]",
+          "action": "modern.css 新增 loader 全样式：幕布 mLoaderOut 4s 淡出（0~82% 可见→100% hidden）；赛博网格 mGridFade（复用主页面 34px 黄线 + 径向遮罩）、青色扫描线 mScanRun、紫色光晕 mGlowIn、霓虹 // 文案 mT1In（黄辉光+青衬光）、紫渐变标题 mT2In、青→黄→紫进度条 mBarRun、8 片花瓣 mPetalFall（--d/--delay/--sx 变量）；main/.m-statusbar mContentIn 延迟入场；prefers-reduced-motion 全部禁用并立即隐藏 loader。",
+          "files": [
+            "styles/modern.css"
+          ],
+          "verify": "8 组 keyframes 齐全"
+        },
+        {
+          "order": 3,
+          "tag": "[AI-GEN]",
+          "action": "modern.js 新增 bindLoader()：生成 8 片入场花瓣（随机 left/时长/延迟/偏移/尺寸），setTimeout 4.2s 移除加载层 DOM，测试钩子 window.__modernLoader；init() 注册 bindLoader()。",
+          "files": [
+            "scripts/modern.js"
+          ],
+          "verify": "jsc 语法 OK"
+        }
+      ],
+      "verify": "CDP 时间轴取样 13 项全 PASS：0.7s 阶段一（霓虹文案/8 花瓣/黄网格）；2.5s 阶段二（紫标题/文案退场/光晕）；3.9s loader 淡出 0.045 而内容入场 0.65；5.2s loader 移除 + 钩子 done + 内容 opacity 1；孪生/背景轮换/花瓣动画无回归。",
+      "issues": []
+    },
+    {
       "version": "v1.46.0",
       "date": "2026-09-25",
       "author": "katzegott",

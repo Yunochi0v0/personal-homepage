@@ -772,6 +772,40 @@
     window.__modernPetals = { count: COUNT, running: function () { return running; } };
   }
 
+
+  /* ---------- 11.5 4 秒衔接加载动画（v1.47.0） ----------
+   * 阶段一赛博（黄网格/青扫描/霓虹 // 文案）→ 阶段二宝藏之地（紫色标题/花瓣/光晕）
+   * 纯 CSS 动画 4s 后自动淡出；此处负责生成飘入花瓣、4.2s 后移除 DOM */
+  function bindLoader() {
+    var loader = $("mLoader");
+    if (!loader) return;
+    window.__modernLoader = { done: false };
+
+    // 阶段二入场花瓣（8 片随机飘落，与主花瓣层视觉一致）
+    var box = loader.querySelector(".m-loader-petals");
+    if (box) {
+      var i, s;
+      for (i = 0; i < 8; i++) {
+        s = document.createElement("span");
+        s.className = "m-loader-petal";
+        s.style.left = (6 + Math.random() * 84) + "%";
+        s.style.setProperty("--d", (2.4 + Math.random() * 1.4).toFixed(2) + "s");
+        s.style.setProperty("--delay", (1 + Math.random() * 0.7).toFixed(2) + "s");
+        s.style.setProperty("--sx", ((Math.random() - 0.5) * 180).toFixed(0) + "px");
+        var sz = 11 + Math.random() * 9;
+        s.style.width = sz.toFixed(1) + "px";
+        s.style.height = sz.toFixed(1) + "px";
+        box.appendChild(s);
+      }
+    }
+
+    // 动画结束后移除加载层（CSS 淡出到 4.0s，留 0.2s 余量）
+    setTimeout(function () {
+      if (loader.parentNode) loader.parentNode.removeChild(loader);
+      window.__modernLoader = { done: true };
+    }, 4200);
+  }
+
   /* ---------- 12. 初始化 ---------- */
   function init() {
     bindTopbar();
@@ -788,6 +822,7 @@
     bindBackTop();
     bindBgCarousel();
     bindPetals();
+    bindLoader();
 
     // 个人资料卡统计数字（真实数据：项目 3 / 音游 8）
     var stProj = $("mStatProjects");

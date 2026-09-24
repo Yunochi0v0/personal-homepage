@@ -10,6 +10,34 @@
 
 ---
 
+## [v1.47.0] 新增：4 秒衔接加载动画（赛博主页面 → 紫色宝藏之地本页面）
+
+- **日期**：2026-09-25
+- **作者**：katzegott
+- **类型**：`新增`（AI-generated）
+
+### 新增（AI-generated）
+- **4 秒开场动画**：进入现代版页面时播放全屏 `.m-loader`（fixed，z-index 999，`pointer-events:none`），分两阶段衔接两页风格——
+  - **阶段一（0~2.2s，衔接主页面赛博风）**：深紫黑径向幕布 + 黄色霓虹网格（复用主页面 `grid-overlay` 的 34px 黄线样式与径向遮罩）+ 青色→黄色扫描线（复用 `hero-wave` 扫掠感）+ 霓虹等宽文案 `// TREASURE LAND · LOADING`（黄色辉光、青色衬光，主页面 `--neon` 配色）。
+  - **阶段二（1.2~4s，衔接本页面宝藏之地风）**：紫色光晕扩散、毛玻璃渐变主标题「宝藏之地 · 刘聿宸」（紫渐变文字 + drop-shadow）、8 片樱花花瓣 CSS 动画飘入（与主花瓣层同款粉）、进度条 0→100% 由青→黄→紫渐变。
+  - **收尾（3.5~4s）**：loader 整体淡出（`visibility:hidden` 兜底），主内容区 `main.m-main` 与状态条延迟上浮淡入入场；JS 在 4.2s 移除 loader DOM。
+- **代码结构**：`modern.html` 新增 `.m-loader` 层（grid/scan/glow/mid/t1/t2/bar/petals 子元素）；`modern.css` 新增 8 组 keyframes（`mLoaderOut/mGridFade/mScanRun/mGlowIn/mT1In/mT2In/mBarRun/mPetalFall`）与 `mContentIn` 入场；`modern.js` 新增 `bindLoader()`——生成 8 片入场花瓣（随机位置/时长/偏移/大小）、4.2s 移除加载层、测试钩子 `window.__modernLoader`；`init()` 注册。
+- **可访问性**：`prefers-reduced-motion` 时全部动画禁用、loader 立即隐藏、内容立即可用；动画层 `aria-hidden`。
+- **版本号** → 1.47.0：`data-version`、`styles/modern.css?v=`、`scripts/modern.js?v=` 更新。
+
+### 涉及文件
+| 文件 | 类型 | 说明 |
+| --- | --- | --- |
+| `modern.html` | 新增 | `.m-loader` 加载层（grid/scan/glow/t1/t2/bar/petals）、版本号 1.47.0 |
+| `styles/modern.css` | 新增 | loader 全样式 + 8 组关键帧 + 内容入场 + reduced-motion 兜底 |
+| `scripts/modern.js` | 新增 | `bindLoader()`（花瓣生成 + DOM 移除 + 测试钩子）、init 注册 |
+
+### 验证方式
+- `jsc` 语法校验 `modern.js` OK。
+- CDP 时间轴取样 13 项全 PASS：0.7s 加载层存在、霓虹 `//` 文案可见、8 片入场花瓣、赛博黄网格生效；2.5s 紫色标题可见、赛博文案退场、光晕扩散、loader 仍显示；3.9s loader 淡出（opacity 0.045）而 main 内容入场中（0.65）；5.2s loader DOM 已移除、`__modernLoader.done=true`、内容完全入场（opacity 1）；孪生问答/4 背景轮换/花瓣层动画均无回归，版本号 1.47.0。
+
+---
+
 ### 修改（v1.46.0 追加 · AI-generated）
 - **粒子形状改为单片樱花花瓣**（用户反馈）：`bindPetals()` 的 `drawPetal()` 由「五瓣完整花朵（5 椭圆 + 花心）」改为背景图中那样的**单片花瓣**——底部圆润、先端中央 V 形凹陷（3 段贝塞尔/二次曲线轮廓），随旋转、摇摆飘落，更贴近背景插画中的飘落花瓣。
 
