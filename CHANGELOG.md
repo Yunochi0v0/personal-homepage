@@ -10,6 +10,35 @@
 
 ---
 
+## [v1.48.0] 新增：沉浸模式（只显示背景与樱花特效，双向过渡）
+
+- **日期**：2026-09-25
+- **作者**：katzegott
+- **类型**：`新增`（AI-generated）
+
+### 新增（AI-generated）
+- **沉浸模式按钮**：悬浮栏新增 🖼️ 按钮 `#mFocusBtn`（置于背景切换按钮上方，双语 aria「沉浸模式 / Immersive Mode」，`aria-pressed` 记录状态）。
+- **沉浸模式行为**：点击后 `body` 添加 `.m-immersive`，仅保留**背景轮换层 + 樱花粒子层**；导航 `.m-nav`、主内容 `main.m-main`、状态条 `.m-statusbar`、像素猫与除沉浸按钮外的全部悬浮按钮均淡出隐藏；页面滚动锁定（`overflow:hidden`）。再次点击或 `__modernImmersive.toggle()` 恢复完整界面。
+- **双向过渡**：内容区 0.65s 过渡（opacity 淡出 + `blur(10px)` 模糊 + `translateY(-12px) scale(1.03)` 微缩放），悬浮按钮下沉缩小隐藏；背景轮换层 0.8s `scale(1.1)` **推近**制造景深——退出时全部反向过渡恢复。
+- **入场动画兼容**：主内容 `mContentIn` 的 fill 模式由 `both` 改为 `backwards`，动画结束后交还普通样式，保证沉浸过渡可正常接管（否则动画填充值会锁定 opacity）。
+- **可访问性**：`prefers-reduced-motion` 时沉浸切换无过渡、直接生效；沉浸按钮始终可见（唯一可交互元素），高亮描边提示。
+- **测试钩子**：`window.__modernImmersive = { isActive(), toggle(), active }`。
+- **版本号** → 1.48.0：`data-version`、`styles/modern.css?v=`、`scripts/modern.js?v=` 更新。
+
+### 涉及文件
+| 文件 | 类型 | 说明 |
+| --- | --- | --- |
+| `modern.html` | 新增 | `#mFocusBtn` 🖼️ 沉浸按钮（悬浮栏首位）、版本号 1.48.0 |
+| `styles/modern.css` | 新增 | `.m-immersive` 隐藏规则（nav/main/statusbar/悬浮按钮）、0.65s 过渡、背景推近 `scale(1.1)`、`mContentIn` 改 `backwards`、reduced-motion 兜底 |
+| `scripts/modern.js` | 新增 | `bindFocus()`（class 切换 + aria-pressed + 钩子）、DICT「沉浸模式」、init 注册 |
+
+### 验证方式
+- `jsc` 语法校验 `modern.js` OK。
+- CDP 时间轴 11 项全 PASS：初始非沉浸且导航/内容可见；进入过渡 0.35s 半透明（nav/main 0.20）、1.4s 全隐藏、背景/回顶按钮 hidden、沉浸按钮可见且 `aria-pressed=true`、背景 `scale(1.1)`、粒子运行、背景轮换仍在；退出过渡 0.35s 内容 0.80、1.4s 完全恢复（opacity 1、按钮 visible、pressed=false）；恢复后孪生交互无回归。
+- 过程修正：首轮验证发现 CSS 误用 `.m-topbar`（实际导航类为 `.m-nav`，导航未隐藏），已改为 `.m-nav` 后复测全 PASS。
+
+---
+
 ## [v1.47.0] 新增：4 秒衔接加载动画（赛博主页面 → 紫色宝藏之地本页面）
 
 - **日期**：2026-09-25

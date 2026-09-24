@@ -220,12 +220,13 @@ body {
   100% { opacity: 0.55; transform: translate(var(--sx, -60px), 106vh) rotate(340deg); }
 }
 
-/* 主内容入场（loader 淡出前 0.5s 开始上浮淡入） */
+/* 主内容入场（loader 淡出前 0.5s 开始上浮淡入；backwards 填充：动画结束后
+ * 交还普通样式，使 v1.48.0 沉浸模式的过渡可正常接管） */
 main.m-main {
-  animation: mContentIn 0.9s ease 3.5s both;
+  animation: mContentIn 0.9s ease 3.5s backwards;
 }
 .m-statusbar {
-  animation: mContentIn 0.9s ease 3.7s both;
+  animation: mContentIn 0.9s ease 3.7s backwards;
 }
 @keyframes mContentIn {
   from { opacity: 0; transform: translateY(18px); }
@@ -259,7 +260,7 @@ main.m-main {
   z-index: -1;
   overflow: hidden;
   filter: brightness(0.82) saturate(1.05);   /* 夜间压暗，保证毛玻璃卡可读 */
-  transition: filter 0.4s ease;
+  transition: filter 0.4s ease, transform 0.8s ease;   /* v1.48.0 沉浸推近过渡 */
 }
 body.is-light .m-bg-carousel {
   filter: none;   /* 日间模式原图亮度 */
@@ -998,6 +999,66 @@ body.is-light select.m-input option { background: #fff; color: #33275a; }
   cursor: pointer;
 }
 @keyframes m-bob { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-6px); } }
+
+/* ============================================================
+ * v1.48.0 沉浸模式：点击悬浮栏 🖼️ 后只保留背景轮换与樱花粒子
+ * 由 body.m-immersive 驱动；内容区 0.65s 淡出 + 模糊 + 微缩放，
+ * 背景层 0.8s 推近（景深过渡）；退出时反向过渡恢复
+ * ============================================================ */
+.m-nav,
+main.m-main,
+.m-statusbar,
+.m-float .m-float-btn,
+.m-pixel-cat {
+  transition: opacity 0.65s ease, transform 0.65s ease, filter 0.65s ease,
+    visibility 0.65s;
+}
+
+body.m-immersive {
+  overflow: hidden;
+  cursor: default;
+}
+
+/* 隐藏全部 UI：导航 / 主内容 / 状态条 / 像素猫 / 背景切换与回顶按钮 */
+body.m-immersive .m-nav,
+body.m-immersive main.m-main,
+body.m-immersive .m-statusbar,
+body.m-immersive .m-pixel-cat,
+body.m-immersive .m-float .m-float-btn:not(#mFocusBtn) {
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+  transform: translateY(-12px) scale(1.03);
+  filter: blur(10px);
+}
+/* 悬浮按钮隐藏形变：向下沉 + 缩小，贴合悬浮栏位置 */
+body.m-immersive .m-float .m-float-btn:not(#mFocusBtn) {
+  transform: translateY(8px) scale(0.55);
+}
+
+/* 沉浸切换按钮本身保持可见并高亮 */
+body.m-immersive #mFocusBtn {
+  border-color: rgba(232, 121, 249, 0.7);
+  box-shadow: 0 0 18px rgba(168, 85, 247, 0.6), var(--m-shadow);
+  transform: translateY(-2px);
+}
+
+/* 背景推近：轮换层整体放大，制造景深过渡 */
+body.m-immersive .m-bg-carousel {
+  transform: scale(1.1);
+}
+
+/* 减少动态效果偏好：沉浸切换直接生效、无过渡 */
+@media (prefers-reduced-motion: reduce) {
+  .m-nav,
+  main.m-main,
+  .m-statusbar,
+  .m-float .m-float-btn,
+  .m-pixel-cat,
+  .m-bg-carousel {
+    transition: none !important;
+  }
+}
 
 /* ============================================================
  * 搜索过滤（modern.js 切换类）

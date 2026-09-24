@@ -181,7 +181,8 @@
     "系统已稳定运行 ": "System stable for ",
     "梦想即力量": "Dreams Are Power",
     "回到顶部": "Back to top",
-    "切换背景": "Switch Background"
+    "切换背景": "Switch Background",
+    "沉浸模式": "Immersive Mode"
   };
 
   /* ---------- 3. data-lang 应用 ---------- */
@@ -773,6 +774,31 @@
   }
 
 
+  /* ---------- 11.6 沉浸模式（v1.48.0） ----------
+   * 点击悬浮栏 🖼️ 后只保留背景轮换与樱花粒子，其余 UI 淡出隐藏；
+   * 再次点击恢复。切换由 body.m-immersive 驱动 CSS 过渡（0.65s 淡出+模糊+缩放） */
+  function bindFocus() {
+    var btn = $("mFocusBtn");
+    if (!btn) return;
+
+    function setActive(on) {
+      document.body.classList.toggle("m-immersive", on);
+      btn.setAttribute("aria-pressed", on ? "true" : "false");
+      if (window.__modernImmersive) window.__modernImmersive.active = on;
+    }
+
+    btn.addEventListener("click", function () {
+      setActive(!document.body.classList.contains("m-immersive"));
+    });
+
+    // 测试钩子（CDP 验证用）
+    window.__modernImmersive = {
+      active: false,
+      isActive: function () { return document.body.classList.contains("m-immersive"); },
+      toggle: function () { setActive(!document.body.classList.contains("m-immersive")); }
+    };
+  }
+
   /* ---------- 11.5 4 秒衔接加载动画（v1.47.0） ----------
    * 阶段一赛博（黄网格/青扫描/霓虹 // 文案）→ 阶段二宝藏之地（紫色标题/花瓣/光晕）
    * 纯 CSS 动画 4s 后自动淡出；此处负责生成飘入花瓣、4.2s 后移除 DOM */
@@ -823,6 +849,7 @@
     bindBgCarousel();
     bindPetals();
     bindLoader();
+    bindFocus();
 
     // 个人资料卡统计数字（真实数据：项目 3 / 音游 8）
     var stProj = $("mStatProjects");

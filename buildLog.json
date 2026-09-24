@@ -5,6 +5,44 @@
   "note": "构建日志：记录每次 AI 生成 / 人工修改 / 验证过程，便于课程「过程可追溯」。AI 生成片段在步骤中以 [AI-GEN] 标注，人工修改以 [MANUAL] 标注。",
   "entries": [
     {
+      "version": "v1.48.0",
+      "date": "2026-09-25",
+      "author": "katzegott",
+      "type": "新增（AI-generated）",
+      "desc": "沉浸模式：悬浮栏新增 🖼️ 按钮，点击后仅保留背景轮换层与樱花粒子（隐藏导航/主内容/状态条/其余悬浮按钮、锁定滚动），0.65s 双向过渡 + 背景 scale(1.1) 推近",
+      "steps": [
+        {
+          "order": 1,
+          "tag": "[AI-GEN]",
+          "action": "modern.html：悬浮栏首位新增 #mFocusBtn（🖼️，data-lang-aria 沉浸模式，aria-pressed=false）；版本号 1.47.0 → 1.48.0。",
+          "files": [
+            "modern.html"
+          ],
+          "verify": "DOM 存在"
+        },
+        {
+          "order": 2,
+          "tag": "[AI-GEN]",
+          "action": "modern.css：.m-immersive 隐藏规则（.m-nav/main/.m-statusbar/.m-pixel-cat/.m-float-btn 0.65s opacity/transform/filter/visibility 过渡 + blur(10px) + 微缩放）；沉浸按钮高亮保留；.m-bg-carousel 加 transform 0.8s 过渡并在沉浸时 scale(1.1) 推近；mContentIn fill both→backwards（避免动画填充锁死 opacity 干扰过渡）；reduced-motion 直接切换无过渡。",
+          "files": [
+            "styles/modern.css"
+          ],
+          "verify": "首轮验证发现误用 .m-topbar（实际 .m-nav）致导航未隐藏，已修正后复测"
+        },
+        {
+          "order": 3,
+          "tag": "[AI-GEN]",
+          "action": "modern.js：新增 bindFocus()（body.m-immersive 切换 + aria-pressed + 测试钩子 __modernImmersive{isActive,toggle,active}）；DICT 加「沉浸模式/Immersive Mode」；init 注册 bindFocus()。",
+          "files": [
+            "scripts/modern.js"
+          ],
+          "verify": "jsc 语法 OK"
+        }
+      ],
+      "verify": "CDP 时间轴 11 项全 PASS：进入 0.35s 过渡中（nav/main 0.20）→ 1.4s 全隐藏 + 背景 scale(1.1) + 粒子运行 + 轮换继续 + 沉浸按钮可见 pressed=true；退出 0.35s（0.80）→ 1.4s 完全恢复；孪生交互无回归。",
+      "issues": []
+    },
+    {
       "version": "v1.47.0",
       "date": "2026-09-25",
       "author": "katzegott",
