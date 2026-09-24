@@ -10,6 +10,34 @@
 
 ---
 
+## [v1.46.0] 新增：樱花背景图轮换（手动/每 2 分钟自动）+ 樱花飘落粒子特效
+
+- **日期**：2026-09-25
+- **作者**：katzegott
+- **类型**：`新增`（AI-generated + [MANUAL] 素材上传）
+
+### 新增（AI-generated）
+- **背景轮换层**：`modern.html` 新增 `.m-bg-carousel`（fixed，z-index -1）内嵌 4 张 `.m-bg-slide`，`assets/bg/bg-1.jpg ~ bg-4.jpg`（[MANUAL] 用户提供的 4 张樱花主题插画，横版 1680~2000px，约 664K）；交叉淡入淡出（opacity 过渡 1.4s）。
+- **每 2 分钟自动轮换**：`scripts/modern.js` 新增 `bindBgCarousel()`，`setInterval` 120000ms 循环切换；切换前预加载全部背景图避免闪烁。
+- **手动替换按钮**：右下角悬浮栏（`.m-float`）新增 🌸 按钮 `#mBgBtn`，点击立即切换下一张并重置 2 分钟计时器；双语 aria「切换背景 / Switch Background」。
+- **樱花飘落粒子**：`modern.html` 新增 `<canvas id="mPetals">` 全屏层（fixed，z-index 0，`pointer-events:none` 不挡交互），`scripts/modern.js` 新增 `bindPetals()`——五瓣樱花（5 个椭圆花瓣 + 花心）随机大小/速度/摇摆/旋转，数量随屏宽自适应 14~32，`requestAnimationFrame` 循环；`prefers-reduced-motion` 时跳过；页面切后台自动暂停、回前台恢复；DPR 适配（≤2）。
+- **层级设计**：body 背景改为纯色兜底 → 背景图（-1）→ 花瓣（0）→ 主内容/状态条（1，毛玻璃卡透过花瓣若隐若现）；夜间模式背景 `filter: brightness(0.82) saturate(1.05)` 压暗保证可读，日间模式原图亮度。
+- **版本号** → 1.46.0：`data-version`、`styles/modern.css?v=`、`scripts/modern.js?v=` 更新。
+
+### 涉及文件
+| 文件 | 类型 | 说明 |
+| --- | --- | --- |
+| `modern.html` | 新增 | 背景轮换层（4 slide）、花瓣 canvas、🌸 切换按钮、版本号 1.46.0 |
+| `styles/modern.css` | 新增 | body 纯色兜底、`.m-bg-carousel/.m-bg-slide`、`.m-petals`、main/statusbar z-index 提升、日间亮度适配 |
+| `scripts/modern.js` | 新增 | `bindBgCarousel()`（120s 自动 + 手动切换 + 预加载）、`bindPetals()`（Canvas 五瓣樱花粒子）、DICT「切换背景」、init 注册 |
+| `assets/bg/bg-1~4.jpg` | 素材 | [MANUAL] 用户上传的 4 张樱花背景图（从会话 uploads 复制） |
+
+### 验证方式
+- `jsc` 语法校验 `modern.js` OK。
+- CDP 自动化 17 项全 PASS：版本号 1.46.0；4 张背景 slide、初始 active 第 1 张、点击按钮切到第 2 张、钩子 interval=120000ms；花瓣 canvas 存在且尺寸正常、数量 14~32、rAF 运行中、`pointer-events:none`、背景层 z-index -1 / 主内容 1；4 张背景图全部可加载；花瓣层下孪生提问等交互正常；日间模式 filter=none；英文 aria「Switch Background」。
+
+---
+
 ## [v1.45.1] 重构：现代版 UI 改为「宝藏之地」风格（紫色毛玻璃 + 导航 + 搜索 + 播放器卡 + 歌词横幅 + 日间模式）
 
 - **日期**：2026-09-25

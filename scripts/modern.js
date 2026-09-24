@@ -180,7 +180,8 @@
     /* Footer */
     "系统已稳定运行 ": "System stable for ",
     "梦想即力量": "Dreams Are Power",
-    "回到顶部": "Back to top"
+    "回到顶部": "Back to top",
+    "切换背景": "Switch Background"
   };
 
   /* ---------- 3. data-lang 应用 ---------- */
@@ -629,6 +630,152 @@
     });
   }
 
+  /* ---------- 13. v1.46.0 新增：背景轮换（手动/每 2 分钟自动）+ 樱花飘落粒子 ---------- */
+
+  /* 13.1 背景轮换：assets/bg/ 下 4 张樱花背景图，交叉淡入淡出 */
+  var BG_IMAGES = [
+    "assets/bg/bg-1.jpg",
+    "assets/bg/bg-2.jpg",
+    "assets/bg/bg-3.jpg",
+    "assets/bg/bg-4.jpg"
+  ];
+  var BG_INTERVAL = 120000;   // 2 分钟自动轮换
+
+  function bindBgCarousel() {
+    var slides = document.querySelectorAll(".m-bg-slide");
+    var btn = $("mBgBtn");
+    if (!slides.length) return;
+
+    // 预加载全部背景图，避免切换时闪烁
+    BG_IMAGES.forEach(function (src) {
+      var im = new Image();
+      im.src = src;
+    });
+
+    var idx = 0;
+    var next = function () {
+      slides[idx].classList.remove("is-active");
+      idx = (idx + 1) % slides.length;
+      slides[idx].classList.add("is-active");
+    };
+
+    // 每 2 分钟自动轮换
+    var timer = setInterval(next, BG_INTERVAL);
+
+    // 手动切换（右下角 🌸 按钮）：立即换下一张并重新计时
+    if (btn) {
+      btn.addEventListener("click", function () {
+        next();
+        clearInterval(timer);
+        timer = setInterval(next, BG_INTERVAL);
+      });
+    }
+
+    // 测试钩子（CDP 验证用）
+    window.__modernBg = {
+      count: slides.length,
+      interval: BG_INTERVAL,
+      index: function () { return idx; }
+    };
+  }
+
+  /* 13.2 樱花飘落粒子（Canvas 全屏层，pointer-events:none） */
+  function bindPetals() {
+    var cv = $("mPetals");
+    if (!cv || !cv.getContext) return;
+    if (window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+
+    var ctx = cv.getContext("2d");
+    var W = 0, H = 0;
+    var DPR = Math.min(window.devicePixelRatio || 1, 2);
+
+    function resize() {
+      W = cv.clientWidth;
+      H = cv.clientHeight;
+      cv.width = W * DPR;
+      cv.height = H * DPR;
+      ctx.setTransform(DPR, 0, 0, DPR, 0, 0);
+    }
+    resize();
+    window.addEventListener("resize", resize);
+
+    // 花瓣数量：随屏宽自适应，14 ~ 32 朵
+    var COUNT = Math.max(14, Math.min(32, Math.round(W / 55)));
+    var COLORS = ["255,182,193", "255,192,203", "255,160,190", "252,205,220", "250,170,200"];
+    var petals = [];
+
+    function makePetal() {
+      return {
+        x: Math.random() * W,
+        y: -40 - Math.random() * H * 0.5,
+        size: 7 + Math.random() * 13,          // 花瓣尺寸
+        vy: 0.35 + Math.random() * 0.9,        // 下落速度
+        sway: 0.4 + Math.random() * 1.1,       // 左右摇摆幅度
+        phase: Math.random() * Math.PI * 2,    // 摇摆相位
+        rot: Math.random() * Math.PI * 2,      // 旋转角
+        vr: (Math.random() - 0.5) * 0.035,     // 旋转速度
+        color: COLORS[(Math.random() * COLORS.length) | 0],
+        alpha: 0.5 + Math.random() * 0.4
+      };
+    }
+
+    var i, p;
+    for (i = 0; i < COUNT; i++) petals.push(makePetal());
+
+    // 五瓣樱花：5 个椭圆花瓣绕中心旋转排布
+    function drawPetal(p) {
+      ctx.save();
+      ctx.translate(p.x, p.y);
+      ctx.rotate(p.rot);
+      ctx.globalAlpha = p.alpha;
+      ctx.fillStyle = "rgba(" + p.color + ",0.85)";
+      var r = p.size / 2;
+      var k;
+      for (k = 0; k < 5; k++) {
+        ctx.save();
+        ctx.rotate((k * Math.PI * 2) / 5);
+        ctx.beginPath();
+        ctx.ellipse(0, -r * 0.85, r * 0.42, r * 0.62, 0, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.restore();
+      }
+      ctx.beginPath();
+      ctx.arc(0, 0, r * 0.12, 0, Math.PI * 2);   // 花心
+      ctx.fill();
+      ctx.restore();
+    }
+
+    var running = true;
+    document.addEventListener("visibilitychange", function () {
+      var was = running;
+      running = !document.hidden;
+      if (!was && running) requestAnimationFrame(frame);   // 回到前台时恢复动画
+    });
+
+    function frame() {
+      ctx.clearRect(0, 0, W, H);
+      for (i = 0; i < petals.length; i++) {
+        p = petals[i];
+        p.phase += 0.012;
+        p.rot += p.vr;
+        p.x += Math.sin(p.phase) * p.sway * 0.6;
+        p.y += p.vy;
+        if (p.y > H + 40) {
+          petals[i] = makePetal();
+          petals[i].y = -40;
+        }
+        if (p.x > W + 40) p.x = -40;
+        if (p.x < -40) p.x = W + 40;
+        drawPetal(p);
+      }
+      if (running) requestAnimationFrame(frame);
+    }
+    requestAnimationFrame(frame);
+
+    // 测试钩子（CDP 验证用）
+    window.__modernPetals = { count: COUNT, running: function () { return running; } };
+  }
+
   /* ---------- 12. 初始化 ---------- */
   function init() {
     bindTopbar();
@@ -643,6 +790,8 @@
     bindUptime();
     bindTheme();
     bindBackTop();
+    bindBgCarousel();
+    bindPetals();
 
     // 个人资料卡统计数字（真实数据：项目 3 / 音游 8）
     var stProj = $("mStatProjects");

@@ -5,6 +5,53 @@
   "note": "构建日志：记录每次 AI 生成 / 人工修改 / 验证过程，便于课程「过程可追溯」。AI 生成片段在步骤中以 [AI-GEN] 标注，人工修改以 [MANUAL] 标注。",
   "entries": [
     {
+      "version": "v1.46.0",
+      "date": "2026-09-25",
+      "author": "katzegott",
+      "type": "新增（AI-generated + [MANUAL] 素材）",
+      "desc": "现代版新增樱花背景图轮换（右下角 🌸 手动切换 / 每 2 分钟自动轮换，4 张资产复制自会话 uploads）+ 樱花飘落 Canvas 粒子特效",
+      "steps": [
+        {
+          "order": 1,
+          "tag": "[MANUAL]",
+          "action": "用户提供 4 张樱花主题插画（会话附件），复制到 assets/bg/bg-1.jpg ~ bg-4.jpg（横版 1680~2000px，共约 664K）。",
+          "files": [
+            "assets/bg/bg-1~4.jpg"
+          ],
+          "verify": "HTTP 200 可访问"
+        },
+        {
+          "order": 2,
+          "tag": "[AI-GEN]",
+          "action": "modern.html 添加背景轮换层（.m-bg-carousel 内 4 个 .m-bg-slide，CSS background 引用 4 张图）、花瓣 canvas（#mPetals）、右下角悬浮按钮 #mBgBtn（🌸）；版本号 1.45.1 → 1.46.0（data-version + ?v= 引用）。",
+          "files": [
+            "modern.html"
+          ],
+          "verify": "HTML 结构检查"
+        },
+        {
+          "order": 3,
+          "tag": "[AI-GEN]",
+          "action": "modern.css：body 背景改纯色兜底；新增 .m-bg-carousel（z-index -1，夜间 filter brightness(0.82) 压暗、日间 none，opacity 1.4s 交叉淡入淡出）、.m-petals（fixed z-index 0 pointer-events:none）、main/.m-statusbar z-index:1 提升。",
+          "files": [
+            "styles/modern.css"
+          ],
+          "verify": "层叠 z-index 验证（-1 / 0 / 1）"
+        },
+        {
+          "order": 4,
+          "tag": "[AI-GEN]",
+          "action": "modern.js：新增 bindBgCarousel()——4 张图预加载 + setInterval 120000ms 自动轮换 + #mBgBtn 点击立即切换并重置计时；新增 bindPetals()——Canvas 五瓣樱花粒子（14~32 朵随屏宽，随机大小/速度/摇摆/旋转，rAF 循环，prefers-reduced-motion 跳过，visibilitychange 暂停/恢复，DPR≤2）；DICT 加「切换背景/Switch Background」；init() 注册两个新模块。",
+          "files": [
+            "scripts/modern.js"
+          ],
+          "verify": "jsc 语法 OK"
+        }
+      ],
+      "verify": "CDP 自动化 17 项全 PASS：版本号 1.46.0；4 张背景 slide、点击切换 active 0→1、钩子 interval=120000ms；花瓣 canvas 尺寸正常、数量 14~32、rAF 运行、pointer-events:none；z-index -1/1；4 张背景图可加载；孪生交互正常；日间 filter=none；英文 aria 正确。",
+      "issues": []
+    },
+    {
       "version": "v1.45.1",
       "date": "2026-09-25",
       "type": "重构",

@@ -48,24 +48,53 @@ body {
   font-family: "Noto Sans SC", "Inter", -apple-system, "PingFang SC", sans-serif;
   color: var(--m-text);
   min-height: 100vh;
-  background: linear-gradient(160deg, var(--m-bg-1), var(--m-bg-2) 45%, var(--m-bg-3));
-  background-attachment: fixed;
+  background: var(--m-bg-1);   /* v1.46.0：纯色兜底，背景图由 .m-bg-carousel 层负责 */
   line-height: 1.7;
   transition: background 0.4s ease, color 0.4s ease;
 }
 
-/* [MANUAL] 背景图占位：上传 assets/modern-bg.jpg 后取消注释，
- * 并把 body 背景改为纯色 + background-image 覆盖（参考图紫蓝动漫风）。 */
-/* body::before {
-  content: "";
+/* ============================================================
+ * v1.46.0 背景轮换层：4 张樱花背景图，交叉淡入淡出
+ * 层级：z-index -1（body 纯色背景之上、花瓣/内容之下）
+ * ============================================================ */
+.m-bg-carousel {
   position: fixed;
   inset: 0;
   z-index: -1;
-  background-image: url("../assets/modern-bg.jpg");
+  overflow: hidden;
+  filter: brightness(0.82) saturate(1.05);   /* 夜间压暗，保证毛玻璃卡可读 */
+  transition: filter 0.4s ease;
+}
+body.is-light .m-bg-carousel {
+  filter: none;   /* 日间模式原图亮度 */
+}
+.m-bg-slide {
+  position: absolute;
+  inset: 0;
   background-size: cover;
   background-position: center;
-  filter: blur(4px) brightness(0.8);
-} */
+  opacity: 0;
+  transition: opacity 1.4s ease;
+}
+.m-bg-slide.is-active { opacity: 1; }
+
+/* ============================================================
+ * v1.46.0 樱花粒子画布：固定全屏，位于背景之上、内容之下
+ * pointer-events:none —— 绝不遮挡点击与滚动
+ * ============================================================ */
+.m-petals {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+}
+
+/* 主内容与状态条提升到花瓣层之上 */
+main.m-main,
+.m-statusbar {
+  position: relative;
+  z-index: 1;
+}
 
 a { color: inherit; text-decoration: none; }
 button { font-family: inherit; cursor: pointer; }
