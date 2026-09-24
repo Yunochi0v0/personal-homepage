@@ -70,12 +70,13 @@
     "本个人主页": "This Personal Homepage",
     "进行中": "In Progress",
     "查看本个人主页的开发历程": "View dev history of this homepage",
-    "用于记录学习与成长的个人主页 MVP。纯 HTML / CSS / JavaScript 手写，无框架、无构建步骤；包含自我介绍、技能进度、项目档案与数字孪生问答。":
-      "MVP personal homepage for documenting learning & growth. Handwritten in plain HTML / CSS / JavaScript — no framework, no build step; includes self-intro, skill progress, project archive and a digital twin Q&A.",
+    "用于记录学习与成长的个人主页 MVP。纯 HTML / CSS / JavaScript 手写，无框架、无构建步骤；包含自我介绍、技能进度、项目档案、数字孪生问答，并持续加入访客反馈墙、音游展示区、开发历程 LOG 与移动端适配等新能力。":
+      "MVP personal homepage for documenting learning & growth. Handwritten in plain HTML / CSS / JavaScript — no framework, no build step. Features: self-intro, skill progress, project archive, digital twin Q&A, plus a feedback wall, a rhythm-game showcase, a dev-history LOG and mobile adaptation.",
     "技术栈": "Stack",
     "方式": "Method",
     "成长史": "History",
-    "点击 LOG 查看开发历程": "Click LOG for dev history",
+    "V3.22 上线 GitHub Pages → 反馈墙 / 音游展示区 / 开发历程 LOG → v1.44.0 移动端菜单 → v1.44.1 LOG 修复；点击 LOG 查看全部版本":
+      "V3.22 live on GitHub Pages → feedback wall / game showcase / dev LOG → v1.44.0 mobile menu → v1.44.1 LOG fix · Click LOG for all versions",
     "课程项目": "Course Projects",
     "待填充": "TBD",
     "课程里的真实项目，会在这里记录目标、过程与收获。目前尚未开工，欢迎回来查看更新。":
