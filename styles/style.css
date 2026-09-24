@@ -4531,17 +4531,23 @@ textarea.feedback-message {
 }
 
 /* 2. 遮罩：全屏暗化 + 模糊，点击关闭 */
-.history-overlay {
-  position: fixed;
-  inset: 0;
-  z-index: 9996;
-  display: none;
-  place-items: center;
-  padding: 24px;
-  background: rgba(3, 3, 3, 0.82);
-  backdrop-filter: blur(6px);
-  -webkit-backdrop-filter: blur(6px);
-}
+ .history-overlay {
+   position: fixed;
+   inset: 0;
+   z-index: 9996;
+   display: none;
+   place-items: center;
+   padding: 24px;
+   background: rgba(3, 3, 3, 0.82);
+   backdrop-filter: blur(6px);
+   -webkit-backdrop-filter: blur(6px);
+ }
+
+ /* 弹窗打开期间（含开启动画）锁定页面滚动；面板 .history-modal 内部滚动不受影响 */
+ html.is-history-open {
+   overflow: hidden;
+   scrollbar-gutter: stable; /* 保留滚动条槽位，避免内容横向跳动 */
+ }
 
 .history-overlay.is-open {
   display: grid;

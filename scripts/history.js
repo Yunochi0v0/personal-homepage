@@ -92,6 +92,7 @@
         { v: "V3.42.2", date: "2026-09-20", text: "页脚新增「了解更多」按钮：点击跳转 B 站视频（BV1UT42167xb），新标签页打开" },
         { v: "V3.42.3", date: "2026-09-20", text: "成就简介保密：未解锁的成就一律以「???」代替简介，不再展示达成条件" },
         { v: "V3.42.4", date: "2026-09-20", text: "新增成就「你被骗了」：点击页脚「了解更多」按钮解锁" },
+        { v: "V3.42.9", date: "2026-09-24", text: "LOG 弹窗锁页：开发历程弹窗打开期间（含开启动画）锁定页面滚动，背景不可下滑，面板内滚动不受影响，关闭即恢复" },
         { v: "V3.42.8", date: "2026-09-20", text: "彩蛋行解密：触发全站对应彩蛋（页脚暗号 / lycnb / 待机 / 火柴人 / copy）后，开发历程弹窗中对应乱码口令自动解密为真实版本日志" },
         { v: "V3.42.7", date: "2026-09-20", text: "修复：开发历程弹窗打不开（history.js 上一版本多出一对闭合括号导致语法错误）" },
         { v: "V3.42.6", date: "2026-09-20", text: "英文态像素字体：切换英文后全站文本使用 Press Start 2P 8-bit 像素字体" },
@@ -422,6 +423,8 @@
   function open() {
     overlay.classList.add("is-open");
     overlay.setAttribute("aria-hidden", "false");
+    // 锁定页面滚动（含开启动画期间），关闭时恢复；面板内部滚动不受影响
+    document.documentElement.classList.add("is-history-open");
     // 每次打开按最新彩蛋登记重渲染：彩蛋在弹窗关闭期间被触发（site-egg 只
     // 登记未刷新）时，重开弹窗仍能正确解密对应行。
     renderStages();
@@ -444,6 +447,8 @@
     if (bootRunning && finishBoot) finishBoot();
     overlay.classList.remove("is-open");
     overlay.setAttribute("aria-hidden", "true");
+    // 恢复页面滚动
+    document.documentElement.classList.remove("is-history-open");
     stopGarble();
     if (onKeydown) {
       window.removeEventListener("keydown", onKeydown);

@@ -10,7 +10,35 @@
 
 ---
 
-## [v1.42.8] 彩蛋行解密：触发全站彩蛋后乱码自动还原为真实版本日志（当前）
+## [v1.42.9] 修复：LOG 弹窗开启动画期间页面可下滑（当前）
+
+- **日期**：2026-09-24
+- **作者**：katzegott
+- **类型**：`修复`
+
+### 修复
+- 问题反馈：点击项目板块「开发历程 / LOG」后，弹窗开启动画期间背景页面仍可滚动下滑。
+- 原因：`.history-overlay` 为 fixed 全屏遮罩、`.history-modal` 面板内部可滚动，但打开弹窗时未锁定页面滚动，滚轮 / 触屏拖动会穿透到背景页面。
+- 实现（[AI-GEN]）：
+  - `history.js` `open()` 时给 `<html>` 加 `is-history-open`，`close()` 时移除——锁页范围覆盖开启动画全程与浏览全程，动画中途 Esc / 点遮罩关闭也会解锁。
+  - `style.css` 新增 `html.is-history-open { overflow: hidden; scrollbar-gutter: stable; }`：锁定页面滚动且保留滚动条槽位避免内容横向跳动；面板 `.history-modal` 内部滚动不受影响。
+- **版本**：主页版本号 → 1.42.9；`style.css` / `main.js` / `stickman.js` / `history.js` 引用 `?v=1.42.9`；`main.js` BIOS → v1.42.9；`history.js` 新增 V3.42.9 条目。
+
+### 涉及文件
+| 文件 | 类型 | 说明 |
+| --- | --- | --- |
+| `scripts/history.js` | 修改 | `open()` 加锁 / `close()` 解锁 `is-history-open`；V3.42.9 条目 |
+| `styles/style.css` | 修改 | 新增 `html.is-history-open` 锁滚动样式（含 `scrollbar-gutter: stable`） |
+| `index.html` | 修改 | 版本号 → 1.42.9；相关引用 `?v=1.42.9` |
+| `scripts/main.js` | 修改 | BIOS → v1.42.9 |
+
+### 验证方式
+- `history.js` / `main.js` V8 `--check` 语法通过；页面与脚本 HTTP 200。
+- CDP 浏览器实测：打开 LOG 弹窗（含 3 秒动画期间）`<html>` 带 `is-history-open`，`window.scrollTo` / 滚轮无法滚动背景页面；关闭弹窗后滚动恢复；弹窗面板内部内容滚动不受影响。
+
+---
+
+## [v1.42.8] 彩蛋行解密：触发全站彩蛋后乱码自动还原为真实版本日志(历史)
 
 - **日期**：2026-09-20
 - **作者**：katzegott
