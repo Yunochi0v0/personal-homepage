@@ -182,7 +182,11 @@
     "梦想即力量": "Dreams Are Power",
     "回到顶部": "Back to top",
     "切换背景": "Switch Background",
-    "沉浸模式": "Immersive Mode"
+    "沉浸模式": "Immersive Mode",
+    "查看开发日志": "View Dev Log",
+    "开发历程 · 宝藏之地": "Dev History · Treasure Land",
+    "本个人主页的开发版本记录 · 与主页面同步": "Version records of this site, synced with the main page",
+    "关闭": "Close"
   };
 
   /* ---------- 3. data-lang 应用 ---------- */
@@ -774,6 +778,218 @@
   }
 
 
+  /* ---------- 11.7 开发历程弹窗（v1.49.0） ----------
+   * 与主页面 index.html 的 history.js 同源数据（DEV_LOG_STAGES 由脚本从
+   * history.js 提取，保持双页版本记录一致；新增版本两处同步维护）。
+   * 紫色毛玻璃风格；{GARBLE:n} 占位渲染静态乱码口令；彩蛋行读同一
+   * localStorage（personal-homepage-eggs）——已在主页面触发的彩蛋，对应行
+   * 在此同样解密为真实版本日志。关闭：✕ / 遮罩点击 / Esc，打开时锁滚动。 */
+  var DEV_LOG_STAGES = [
+      {
+        stage: "V1.0",
+        range: "v1.0 ~ v1.7",
+        period: "2026-09-03 ~ 2026-09-10",
+        theme: "更改光标之前 · 从零到一的建站期",
+        desc: "建立个人主页 MVP，奠定黑黄赛博朋克视觉基调；补齐数字孪生、动漫头像、官方校徽、液态玻璃交互与页脚彩蛋，最后以 macOS 风格悬浮 Dock 替换顶部导航。",
+        versions: [
+          { v: "v1.0", date: "2026-09-03", text: "个人主页 MVP 初始建立：Hero / 关于 / 技能 / 项目 / 联系 / 页脚" },
+          { v: "v1.1", date: "2026-09-07", text: "新增数字孪生区块：纯前端对话式「虚拟的我」" },
+          { v: "v1.2", date: "2026-09-07", text: "默认文字头像替换为动漫头像" },
+          { v: "v1.3", date: "2026-09-07", text: "官方校徽图片替换文字占位校徽（TJU / PolyU）" },
+          { v: "v1.4", date: "2026-09-07", text: "全站可交互按钮加入液态玻璃质感" },
+          { v: "v1.5", date: "2026-09-07", text: "{GARBLE:29}", egg: "dream-power", secret: "页面底部彩蛋：输入暗号「梦想即力量」点亮页面并跳转 BanG Dream" },
+          { v: "v1.6", date: "2026-09-07", text: "全站 slogan 更正为「梦想即力量」" },
+          { v: "v1.7", date: "2026-09-10", text: "顶部导航替换为 macOS 风格悬浮 Dock" }
+        ]
+      },
+      {
+        stage: "V2.0",
+        range: "V2.8 ~ V2.21",
+        period: "2026-09-10 ~ 2026-09-17",
+        theme: "光标 → 发布 GitHub · 视觉与彩蛋打磨期",
+        desc: "从自定义霓虹光标起步，逐步叠加像素风、CRT 扫描线、彩蛋浮层与开机动画；项目区改造为 MISSION 全息列表，待机彩蛋加入警报与乱码；最后上线 GitHub 卡片、当前状态仪表盘与「故障解除」退出动画。",
+        versions: [
+          { v: "V2.8", date: "2026-09-10", text: "自定义霓虹光标 + 轨迹拖尾 + 四芒星交互形态" },
+          { v: "V2.9", date: "2026-09-10", text: "像素风格（8-bit）：像素字体 / 台阶切角 / 硬阴影 / 动态正弦波背景" },
+          { v: "V2.10", date: "2026-09-10", text: "{GARBLE:17}", egg: "lycnb", secret: "彩蛋升级为 lycnb 解锁的隐藏关卡浮层" },
+          { v: "V2.11", date: "2026-09-10", text: "复古 CRT 开启动画：约 4.6 秒终端解密自检" },
+          { v: "V2.12", date: "2026-09-10", text: "{GARBLE:13}", egg: "lycnb", secret: "修复彩蛋浮层与开启动画遮挡自定义光标" },
+          { v: "V2.13", date: "2026-09-10", text: "开启动画播放期间隐藏鼠标光标" },
+          { v: "V2.14", date: "2026-09-10", text: "Dock 栏整体深色半透明毛玻璃底板" },
+          { v: "V2.15", date: "2026-09-10", text: "四芒星光标由黄色改为青色，与按钮点亮色区分" },
+          { v: "V2.16", date: "2026-09-10", text: "叠加 CRT 水平扫描线与全页微弱噪点" },
+          { v: "V2.17", date: "2026-09-10", text: "项目区改为 MISSION 任务列表 + 悬停全息简报面板" },
+          { v: "V2.18", date: "2026-09-10", text: "{GARBLE:25}", egg: "idle", secret: "新增待机彩蛋：3 分钟无操作触发红色警报与乱码提醒" },
+          { v: "V2.19", date: "2026-09-14", text: "待机乱码铺满全屏（按视口实测字符动态计算行列）" },
+          { v: "V2.20", date: "2026-09-17", text: "Hero 当前状态座舱仪表盘 + 联系区 GitHub 卡片上线" },
+          { v: "V2.21", date: "2026-09-17", text: "{GARBLE:21}", egg: "idle", secret: "待机彩蛋新增「故障解除」退出动画（3 秒）" }
+        ]
+      },
+      {
+        stage: "V3.0",
+        range: "V3.22 ~ 至今",
+        period: "2026-09-17 ~ 至今",
+        theme: "发布 GitHub 之后 · 功能与物理引擎迭代期",
+        desc: "发布到 GitHub Pages 公开上线后转入功能与玩法迭代：访客反馈 + Supabase 后台、网易云音乐播放器、赛博火柴人彩蛋与音游展示区；随后对火柴人连续做橡皮管拉伸、弹性绳子物理、Q 弹挤压与软绳弧等 10+ 个小版本打磨；再到开发历程弹窗、数字孪生定制与第三个键盘彩蛋。",
+        versions: [
+          { v: "V3.22", date: "2026-09-17", text: "访客反馈功能 + Supabase 后台（V3 课件 · 发布 GitHub Pages）" },
+          { v: "V3.23", date: "2026-09-17", text: "网易云音乐播放器：右下角 🎵 入口 + 赛博随身听浮窗" },
+          { v: "V3.24", date: "2026-09-17", text: "{GARBLE:27}", egg: "stickman", secret: "新增赛博火柴人彩蛋：两段式奔跑 / 方向跟随 / 点击说话" },
+          { v: "V3.25", date: "2026-09-18", text: "音游展示区：世界计划 MASTER 全连记录（数据驱动渲染）" },
+          { v: "V3.26", date: "2026-09-18", text: "火柴人橡皮管拉伸改造：三层 DOM 解耦，防 transform 冲突" },
+          { v: "V3.30", date: "2026-09-18", text: "火柴人中层仅结构占位，不再直接写 transform" },
+          { v: "V3.33", date: "2026-09-18", text: "躯干绳子节点重写：贝塞尔 path + Verlet 质点弹簧" },
+          { v: "V3.34", date: "2026-09-18", text: "弹性绳子 + 抓取点感知 + 镜像补偿（甩出波浪、波动回弹）" },
+          { v: "V3.35", date: "2026-09-18", text: "拖动速度注入：快速甩动目标超前，Q 弹手感" },
+          { v: "V3.36", date: "2026-09-18", text: "双臂软连接：切线旋转跟随 + 速度保留弹性滞后" },
+          { v: "V3.37", date: "2026-09-18", text: "中层 Q 弹挤压动画：落地 / 松手压扁拉长衰减恢复" },
+          { v: "V3.38", date: "2026-09-18", text: "手臂连接平滑去锯齿：宽差分切线 + 角度单帧限幅" },
+          { v: "V3.39", date: "2026-09-18", text: "待机软绳弧：静止躯干呈自然弧线而非僵直直线" },
+          { v: "V3.40", date: "2026-09-18", text: "走路挺直：拖动中弧线收平不驼背，松手弹回软绳弧" },
+          { v: "V3.41", date: "2026-09-20", text: "项目板块新增开发历程弹窗：LOG 按钮 + 三大阶段数据驱动展示（V1.0 建站 / V2.0 光标→GitHub / V3.0 发布后迭代）" },
+          { v: "V3.41.1", date: "2026-09-20", text: "{GARBLE:95}", egg: "rare-line", secret: "数字孪生与火柴人定制优化：知识库 12→25 条全站取材、火柴人稀有台词约 10% 概率、随机回复池兜底" },
+          { v: "V3.41.2", date: "2026-09-20", text: "{GARBLE:51}", egg: "copy", secret: "第三个键盘彩蛋：输入 copy 复制火柴人，上限 10 个，超限一键回收" },
+          { v: "V3.42", date: "2026-09-20", text: "成就系统上线：主页新增成就栏，浏览 / 互动解锁成就并点亮，达成时右下角弹出 Steam 风格提示" },
+          { v: "V3.42.1", date: "2026-09-20", text: "成就系统 10 项成就落地：待机彩蛋 / 彩蛋关卡 / 诗云传送 / 停留 10 分钟 / 全成就收藏家" },
+          { v: "V3.42.2", date: "2026-09-20", text: "页脚新增「了解更多」按钮：点击跳转 B 站视频（BV1UT42167xb），新标签页打开" },
+          { v: "V3.42.3", date: "2026-09-20", text: "成就简介保密：未解锁的成就一律以「???」代替简介，不再展示达成条件" },
+          { v: "V3.42.4", date: "2026-09-20", text: "新增成就「你被骗了」：点击页脚「了解更多」按钮解锁" },
+          { v: "V3.42.5", date: "2026-09-20", text: "多语言切换：左上角 EN / 中 按钮一键切换整站中英文，成就 / 数字孪生 / 打字机 slogan 随语言切换" },
+          { v: "V3.42.6", date: "2026-09-20", text: "英文态像素字体：切换英文后全站文本使用 Press Start 2P 8-bit 像素字体" },
+          { v: "V3.42.7", date: "2026-09-20", text: "修复：开发历程弹窗打不开（history.js 上一版本多出一对闭合括号导致语法错误）" },
+          { v: "V3.42.8", date: "2026-09-20", text: "彩蛋行解密：触发全站对应彩蛋（页脚暗号 / lycnb / 待机 / 火柴人 / copy）后，开发历程弹窗中对应乱码口令自动解密为真实版本日志" },
+          { v: "V3.42.9", date: "2026-09-24", text: "LOG 弹窗锁页：开发历程弹窗打开期间（含开启动画）锁定页面滚动，背景不可下滑，面板内滚动不受影响，关闭即恢复" },
+          { v: "V3.42.10", date: "2026-09-24", text: "LOG 弹窗锁页加固：开启动画期间弹窗面板与背景一并锁定不可滚动（含触屏），动画结束显示内容后恢复面板内部滚动" },
+          { v: "V3.43.0", date: "2026-09-24", text: "反馈墙上线：反馈提交时可选公开展示，展示的反馈可被点赞 / 评论；主人经 Supabase 邮箱登录后可下架（软下架，数据保留）" },
+          { v: "V3.44.0", date: "2026-09-24", text: "移动端功能菜单：音乐 / 反馈 / 反馈墙 三枚板块按钮收进一枚主按钮，点击展开（再点收起，返回顶部保持独立）" },
+          { v: "V3.44.1", date: "2026-09-24", text: "修复：手机端项目板块 LOG 按钮被全息投影面板遮挡——触屏触摸任务行触发 :hover 时，残留的 translateY(-50%) 使内联常显面板上移盖住按钮；媒体查询分支强制 hover 状态下面板不位移" },
+          { v: "V3.44.2", date: "2026-09-24", text: "项目板块写入迭代历史：MISSION_01 全息简报由初始占位更新为当前功能集合（反馈墙 / 音游展示区 / 开发历程 LOG / 移动端适配）与成长里程碑" },
+          { v: "V3.44.3", date: "2026-09-24", text: "迭代记录按时间先后重排：开发历程弹窗 V3.0 阶段版本列表恢复时间顺序（09-20 条目不再被 09-24 新条目插乱），项目板块成长史并列项同步按时间排序" },
+        ]
+      }
+    ];
+
+  var DEV_EGG_STORE_KEY = "personal-homepage-eggs"; // 与主页面 history.js 共享
+  function devLogEggs() {
+    try {
+      var list = JSON.parse(localStorage.getItem(DEV_EGG_STORE_KEY) || "[]");
+      return Array.isArray(list) ? list : [];
+    } catch (e) { return []; }
+  }
+  var DEV_GARBLE_CHARS = "abcdefghijklmnopqrstuvwxyz0123456789!@#$%^*-_=+[];:,.?\/";
+  function devLogGarble(n) {
+    var s = "";
+    for (var i = 0; i < n; i++) {
+      s += DEV_GARBLE_CHARS.charAt(Math.floor(Math.random() * DEV_GARBLE_CHARS.length));
+    }
+    return s;
+  }
+  function devLogReplaceGarble(text) {
+    var out = "";
+    var rest = text;
+    while (true) {
+      var mm = /^([\s\S]*?)\{GARBLE:(\d+)\}([\s\S]*)$/.exec(rest);
+      if (!mm) { out += rest; break; }
+      var n = parseInt(mm[2], 10);
+      if (!(n > 0)) { out += mm[1] + mm[3]; break; }
+      out += mm[1] +
+        '<span class="m-devlog-garble" aria-label="乱码口令">' + devLogGarble(n) + "</span>";
+      rest = mm[3];
+    }
+    return out;
+  }
+  function devLogVersionText(ver) {
+    var eggs = devLogEggs();
+    if (ver.egg && ver.secret && eggs.indexOf(ver.egg) !== -1) {
+      return '<span class="m-devlog-declassified">' + ver.secret + "</span>";
+    }
+    return devLogReplaceGarble(ver.text);
+  }
+
+  function bindDevLog() {
+    var overlay = $("mDevLogOverlay");
+    var stageList = $("mDevLogStages");
+    var trigger = $("mDevLogTrigger");
+    var closeBtn = $("mDevLogClose");
+    if (!overlay || !stageList) return;
+
+    var onKeydown = null;
+
+    function renderStages() {
+      var html = "";
+      for (var i = 0; i < DEV_LOG_STAGES.length; i++) {
+        var s = DEV_LOG_STAGES[i];
+        var items = "";
+        for (var j = 0; j < s.versions.length; j++) {
+          var ver = s.versions[j];
+          items +=
+            '<li class="m-devlog-item">' +
+              '<span class="m-devlog-ver">' + ver.v + "</span>" +
+              '<span class="m-devlog-date">' + ver.date + "</span>" +
+              '<span class="m-devlog-text">' + devLogVersionText(ver) + "</span>" +
+            "</li>";
+        }
+        html +=
+          '<section class="m-devlog-stage">' +
+            '<header class="m-devlog-stage-head">' +
+              '<span class="m-devlog-stage-badge">' + s.stage + "</span>" +
+              '<h4 class="m-devlog-stage-theme">' + devLogReplaceGarble(s.theme) + "</h4>" +
+              '<span class="m-devlog-stage-meta">' + s.range + " · " + s.period + "</span>" +
+            "</header>" +
+            '<p class="m-devlog-stage-desc">' + devLogReplaceGarble(s.desc) + "</p>" +
+            '<ul class="m-devlog-list">' + items + "</ul>" +
+          "</section>";
+      }
+      stageList.innerHTML = html;
+    }
+
+    function open() {
+      renderStages();   // 每次打开按最新彩蛋登记重渲染
+      overlay.classList.add("is-open");
+      overlay.setAttribute("aria-hidden", "false");
+      document.documentElement.classList.add("is-devlog-open");
+      document.body.classList.add("is-devlog-open");
+      if (onKeydown) window.removeEventListener("keydown", onKeydown);
+      onKeydown = function (e) {
+        if (e.key === "Escape" || e.keyCode === 27) close();
+      };
+      window.addEventListener("keydown", onKeydown);
+      if (window.__modernDevLog) window.__modernDevLog.active = true;
+    }
+
+    function close() {
+      overlay.classList.remove("is-open");
+      overlay.setAttribute("aria-hidden", "true");
+      document.documentElement.classList.remove("is-devlog-open");
+      document.body.classList.remove("is-devlog-open");
+      if (onKeydown) {
+        window.removeEventListener("keydown", onKeydown);
+        onKeydown = null;
+      }
+      if (window.__modernDevLog) window.__modernDevLog.active = false;
+    }
+
+    if (trigger) trigger.addEventListener("click", open);
+    if (closeBtn) closeBtn.addEventListener("click", close);
+    overlay.addEventListener("click", function (e) {
+      if (e.target === overlay) close();   // 只响应遮罩本身
+    });
+
+    // 测试钩子（CDP 验证用）
+    window.__modernDevLog = {
+      active: false,
+      isOpen: function () { return overlay.classList.contains("is-open"); },
+      open: open,
+      close: close,
+      stages: function () { return DEV_LOG_STAGES.length; },
+      versions: function () {
+        var n = 0;
+        for (var i = 0; i < DEV_LOG_STAGES.length; i++) n += DEV_LOG_STAGES[i].versions.length;
+        return n;
+      }
+    };
+  }
+
   /* ---------- 11.6 沉浸模式（v1.48.0） ----------
    * 点击悬浮栏 🖼️ 后只保留背景轮换与樱花粒子，其余 UI 淡出隐藏；
    * 再次点击恢复。切换由 body.m-immersive 驱动 CSS 过渡（0.65s 淡出+模糊+缩放） */
@@ -850,6 +1066,7 @@
     bindPetals();
     bindLoader();
     bindFocus();
+    bindDevLog();
 
     // 个人资料卡统计数字（真实数据：项目 3 / 音游 8）
     var stProj = $("mStatProjects");

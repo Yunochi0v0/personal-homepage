@@ -7,9 +7,9 @@
   <title>宝藏之地 · Treasure Land</title>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@400;500;700;900&family=Inter:wght@400;500;700;900&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="styles/modern.css?v=1.48.0" />
+  <link rel="stylesheet" href="styles/modern.css?v=1.49.0" />
 </head>
-<body data-version="1.48.0">
+<body data-version="1.49.0">
 
   <!-- ===== 4 秒衔接加载动画（v1.47.0 · AI-GEN：赛博黄网格→紫色宝藏之地，衔接主页面与本页面风格） ===== -->
   <div class="m-loader" id="mLoader" aria-hidden="true">
@@ -217,6 +217,7 @@
           <h3 data-lang="本个人主页">本个人主页</h3>
           <p data-lang="记录学习与成长的个人主页 MVP。纯 HTML / CSS / JavaScript 手写，持续加入反馈墙、音游展示区、开发历程 LOG 与移动端适配。">记录学习与成长的个人主页 MVP。纯 HTML / CSS / JavaScript 手写，持续加入反馈墙、音游展示区、开发历程 LOG 与移动端适配。</p>
           <span class="m-chip m-chip-active" data-lang="进行中">进行中</span>
+          <button class="m-project-log" id="mDevLogTrigger" type="button" data-lang-aria="查看开发日志" aria-label="查看开发日志" aria-haspopup="dialog">📜 LOG</button>
         </article>
         <article class="m-project" data-search="课程项目">
           <span class="m-project-id">[MISSION_02]</span>
@@ -334,7 +335,22 @@
   <!-- ===== 樱花飘落粒子特效（v1.46.0 · AI-GEN，Canvas 全屏层，不遮挡交互） ===== -->
   <canvas id="mPetals" class="m-petals" aria-hidden="true"></canvas>
 
-  <script src="scripts/modern.js?v=1.48.0"></script>
+  <!-- ===== 开发历程弹窗（v1.49.0 · AI-GEN：与主页面 index.html 的 history.js 同源数据，
+        紫色毛玻璃风格；彩蛋乱码行读取同一 localStorage 解密记录） ===== -->
+  <div class="m-devlog-overlay" id="mDevLogOverlay" role="dialog" aria-modal="true" aria-labelledby="mDevLogTitle" aria-hidden="true">
+    <div class="m-devlog" id="mDevLog">
+      <header class="m-devlog-head">
+        <div class="m-devlog-head-text">
+          <h3 class="m-devlog-title" id="mDevLogTitle" data-lang="开发历程 · 宝藏之地">开发历程 · 宝藏之地</h3>
+          <p class="m-devlog-sub" data-lang="本个人主页的开发版本记录 · 与主页面同步">本个人主页的开发版本记录 · 与主页面同步</p>
+        </div>
+        <button class="m-devlog-close" id="mDevLogClose" type="button" data-lang-aria="关闭" aria-label="关闭">✕</button>
+      </header>
+      <div class="m-devlog-body" id="mDevLogStages"></div>
+    </div>
+  </div>
+
+  <script src="scripts/modern.js?v=1.49.0"></script>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.49.4/dist/umd/supabase.min.js"></script>
 </body>
 </html>

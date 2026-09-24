@@ -5,6 +5,43 @@
   "note": "构建日志：记录每次 AI 生成 / 人工修改 / 验证过程，便于课程「过程可追溯」。AI 生成片段在步骤中以 [AI-GEN] 标注，人工修改以 [MANUAL] 标注。",
   "entries": [
     {
+      "version": "v1.49.0",
+      "date": "2026-09-25",
+      "author": "katzegott",
+      "type": "新增（AI-generated）",
+      "desc": "现代版项目板块新增开发历程弹窗：MISSION_01 卡片 📜 LOG 按钮；紫色毛玻璃弹窗；DEV_LOG_STAGES 与主页面 history.js 同源（3 阶段 55 版本）；{GARBLE:n} 乱码口令；彩蛋行共享 localStorage personal-homepage-eggs 解密；✕/遮罩/Esc 关闭；锁滚动；双语 aria",
+      "steps": [
+        {
+          "order": 1,
+          "tag": "[AI-GEN]",
+          "action": "modern.html：MISSION_01 卡片新增 #mDevLogTrigger（📜 LOG，data-lang-aria 查看开发日志 + aria-haspopup=dialog）；body 末尾新增 .m-devlog-overlay#mDevLogOverlay 弹窗容器（头部标题/副标题/✕ 关闭 + 正文 #mDevLogStages）；版本号 1.48.0 → 1.49.0。",
+          "files": [
+            "modern.html"
+          ],
+          "verify": "DOM 存在"
+        },
+        {
+          "order": 2,
+          "tag": "[AI-GEN]",
+          "action": "modern.css：.m-project-log 胶囊按钮（紫描边 hover 辉光）；弹窗系列样式——overlay 遮罩 backdrop-filter 模糊 + is-open 过渡、.m-devlog 毛玻璃卡片上浮淡入、头部紫渐变标题、阶段徽章/主题/区间/描述、可滚动版本列表（ver/date/text 三列）、乱码行青色辉光、解密行金色、响应式窄屏单列。",
+          "files": [
+            "styles/modern.css"
+          ],
+          "verify": "CDP 样式生效"
+        },
+        {
+          "order": 3,
+          "tag": "[AI-GEN]",
+          "action": "modern.js：新增 bindDevLog()——DEV_LOG_STAGES 由脚本从 history.js 的 STAGES 提取同源数据；devLogReplaceGarble 静态乱码口令；devLogVersionText 读共享 localStorage（personal-homepage-eggs）彩蛋解密；renderStages 渲染三阶段 + 版本列表；open/close（锁滚动 + Esc 监听 + aria 切换）；✕/遮罩（仅遮罩本身）/Esc 关闭；测试钩子 __modernDevLog{isOpen,open,close,stages,versions,active}；DICT 加「查看开发日志/开发历程·宝藏之地/关闭」等；init 注册 bindDevLog()。",
+          "files": [
+            "scripts/modern.js"
+          ],
+          "verify": "jsc 语法 OK（曾因 var 重复语法错误，修正为纯数组字面量后通过）"
+        }
+      ],
+      "verify": "CDP 14 项全 PASS：版本 1.49.0；LOG 按钮存在；3 阶段 / 55 版本（与主页面一致）；打开 aria=false + 锁滚动 + 6 处乱码 + 首行 v1.0 末行 V3.44.3；模拟主页面彩蛋记录 → 弹窗批量解密（金色）；Esc/遮罩/✕ 三种关闭生效、关闭后解锁 + 弹窗隐藏；点击弹窗内部不关闭；英文 aria View Dev Log；彩蛋记录测试后还原；孪生/背景/花瓣/沉浸无回归"
+    },
+    {
       "version": "v1.48.0",
       "date": "2026-09-25",
       "author": "katzegott",

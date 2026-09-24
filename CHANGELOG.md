@@ -10,6 +10,36 @@
 
 ---
 
+## [v1.49.0] 新增：现代版开发历程弹窗（与主页面 history.js 同源数据）
+
+- **日期**：2026-09-25
+- **作者**：katzegott
+- **类型**：`新增`（AI-generated）
+
+### 新增（AI-generated）
+- **LOG 查看入口**：项目板块 `[MISSION_01] 本个人主页` 卡片新增 📜 LOG 按钮 `#mDevLogTrigger`（双语 aria「查看开发日志 / View Dev Log」、`aria-haspopup="dialog"`），点击打开开发历程弹窗——满足「现代版项目板块的个人主页开发日志同主页面一样可查看」。
+- **紫色毛玻璃弹窗**：`.m-devlog-overlay`（fixed 全屏遮罩 + `backdrop-filter` 模糊）内 `.m-devlog`（毛玻璃卡片，紫渐变标题「开发历程 · 宝藏之地」），含头部（标题/副标题/✕ 关闭）与可滚动正文；打开时上浮淡入过渡，`z-index:400` 高于悬浮栏。
+- **同源数据**：`DEV_LOG_STAGES` 由脚本从主页面 `scripts/history.js` 的 `STAGES` 原样提取（三阶段 V1.0/V2.0/V3.0，共 55 个版本记录，新增版本需两处同步维护），保持双页版本记录一致；弹窗渲染每阶段徽章/主题/版本区间/阶段描述 + 可滚动版本列表（版本号/日期/说明）。
+- **乱码口令与彩蛋解密**：`{GARBLE:n}` 占位渲染静态乱码口令（青色辉光等宽字体）；彩蛋行读取**与主页面同一** `localStorage`（`personal-homepage-eggs`）——已在主页面触发的彩蛋，现代版弹窗对应行同样解密为真实版本日志（金色高亮）；彩蛋记录在测试后已还原。
+- **关闭交互**：✕ / 点击遮罩（仅遮罩本身，点击弹窗内部不关闭）/ Esc 三种方式；关闭后解锁页面滚动、`aria-hidden` 恢复。
+- **可访问性**：`role="dialog" aria-modal`、打开时锁滚动（`html/body.is-devlog-open`）、响应式窄屏版式；关闭按钮 `aria-label` 双语。
+- **测试钩子**：`window.__modernDevLog = { isOpen(), open(), close(), stages(), versions(), active }`。
+- **版本号** → 1.49.0：`data-version`、`styles/modern.css?v=`、`scripts/modern.js?v=` 更新。
+
+### 涉及文件
+| 文件 | 类型 | 说明 |
+| --- | --- | --- |
+| `modern.html` | 新增 | `#mDevLogTrigger` 📜 LOG 按钮（MISSION_01 卡片）、`.m-devlog-overlay` 弹窗容器、版本号 1.49.0 |
+| `styles/modern.css` | 新增 | `.m-project-log` 按钮样式；弹窗系列样式（overlay/devlog/head/close/stage/list/garble/declassified）+ 响应式 |
+| `scripts/modern.js` | 新增 | `bindDevLog()`（数据渲染/乱码/彩蛋解密/开合/锁滚动/钩子）、`DEV_LOG_STAGES`（与 history.js 同源）、DICT「查看开发日志」等、init 注册 |
+
+### 验证方式
+- `jsc` 语法校验 `modern.js` OK。
+- CDP 14 项全 PASS：版本 1.49.0；LOG 按钮存在（文本 `📜 LOG` + aria）；同源数据 3 阶段 / 55 版本；点击打开（`aria-hidden=false` + 锁滚动 + 3 阶段 + 55 版本行 + 6 处乱码口令 + 首行 `v1.0` / 末行 `V3.44.3` + 阶段描述正确）；模拟主页面彩蛋记录（`dream-power` 等）→ 弹窗对应行批量解密为真实日志（金色）；Esc / 遮罩 / ✕ 三种关闭均生效，关闭后 `aria-hidden=true` + 解锁滚动 + 弹窗隐藏；点击弹窗内部不关闭；英文 aria `View Dev Log`；彩蛋记录测试后已还原；孪生/背景轮换/花瓣粒子/沉浸开关无回归。
+- 过程说明：注入数据块时曾出现 `var` 重复导致的语法错误，已修正为纯数组字面量后 `jsc` 通过；按钮最初用 `data-lang` 覆盖文本导致 emoji 丢失，改为固定文本 + `data-lang-aria` 双语。
+
+---
+
 ## [v1.48.0] 新增：沉浸模式（只显示背景与樱花特效，双向过渡）
 
 - **日期**：2026-09-25
