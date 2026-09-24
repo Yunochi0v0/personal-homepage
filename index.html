@@ -7,7 +7,7 @@
   <title>刘聿宸 · 个人主页</title>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@700;900&family=Press+Start+2P&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="styles/style.css?v=1.44.3" />
+  <link rel="stylesheet" href="styles/style.css?v=1.45.0" />
   <!-- 开启动画：提前锁定页面滚动，避免动画播放期间背景被滚动。
        若脚本异常或未执行，则由 CSS 兜底动画与 <noscript> 保证页面仍可正常显示。 -->
   <script>
@@ -29,10 +29,13 @@
   </script>
   <noscript><style>.boot { display: none !important; }</style></noscript>
 </head>
-<body data-version="1.44.3">
+<body data-version="1.45.0">
 
   <!-- 多语言切换按钮（v1.42.5 · AI-GEN）：左上角悬浮，点击中英切换 -->
   <button id="langSwitch" class="lang-switch" type="button" aria-label="切换语言 / Switch language">EN</button>
+  <!-- 现代版入口按钮（v1.45.0 · AI-GEN）：左上角悬浮，点击跳转 modern.html -->
+  <button id="modernSwitch" class="lang-switch modern-switch" type="button"
+          data-i18n="🎨 切换现代模式" data-i18n-aria="🎨 切换现代模式" aria-label="🎨 切换现代模式">🎨 切换现代模式</button>
   <!-- 开启动画（复古 CRT 开机自检） -->
   <div class="boot" id="bootScreen" aria-hidden="true">
     <span class="boot-dot"></span>
@@ -740,16 +743,16 @@
   <!-- 成就提示容器（右下角 Steam 风格，achievements.js 注入） -->
   <div class="achievement-toasts" id="achievementToasts" aria-live="polite"></div>
 
-  <script src="scripts/i18n.js?v=1.44.3"></script>
-  <script src="scripts/main.js?v=1.44.3"></script>
-  <script src="scripts/shiyun.js?v=1.44.3"></script>
+  <script src="scripts/i18n.js?v=1.45.0"></script>
+  <script src="scripts/main.js?v=1.45.0"></script>
+  <script src="scripts/shiyun.js?v=1.45.0"></script>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.49.4/dist/umd/supabase.min.js"></script>
-  <script src="scripts/feedback.js?v=1.44.3"></script>
-  <script src="scripts/feedback-wall.js?v=1.44.3"></script>
+  <script src="scripts/feedback.js?v=1.45.0"></script>
+  <script src="scripts/feedback-wall.js?v=1.45.0"></script>
   <script src="scripts/music.js?v=1.42.6"></script>
-  <script src="scripts/stickman.js?v=1.44.3"></script>
+  <script src="scripts/stickman.js?v=1.45.0"></script>
   <script src="scripts/arcade.js?v=1.42.6"></script>
-  <script src="scripts/history.js?v=1.44.3"></script>
+  <script src="scripts/history.js?v=1.45.0"></script>
   <script src="scripts/achievements.js?v=1.42.6"></script>
 </body>
 </html>

@@ -74,6 +74,14 @@ backTop.addEventListener("click", () => {
   window.scrollTo({ top: 0, behavior: "smooth" });
 });
 
+/* ---------- 3a.5 现代版入口（v1.45.0 · AI-GEN）：跳转 modern.html ---------- */
+const modernSwitch = document.getElementById("modernSwitch");
+if (modernSwitch) {
+  modernSwitch.addEventListener("click", () => {
+    window.location.href = "modern.html";
+  });
+}
+
 /* ---------- 3b. 移动端功能菜单（v1.44.0）：主按钮展开 音乐 / 反馈 / 反馈墙 ---------- */
 const sideBtns = document.getElementById("sideBtns");
 const menuBadge = document.getElementById("menuBadge");
@@ -1075,7 +1083,7 @@ document.querySelectorAll(".is-placeholder").forEach((link) => {
   }
 
   const LINES = [
-    "DEEPWORKS BIOS v1.44.3",
+    "DEEPWORKS BIOS v1.45.0",
     "MEMTEST 640K ............... <OK>",
     "NEON SHADER LOAD ........... <OK>",
     "SINE WAVE ENGINE ........... <OK>",

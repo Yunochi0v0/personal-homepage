@@ -3,8 +3,9 @@
  * ------------------------------------------------------------
  * 功能：
  *   1. 左上角「EN / 中」按钮切换整站语言（中文 ⇄ 英文）；
- *   2. 语言选择持久化到 localStorage（key: personal-homepage-lang），
- *      刷新与重开保持；
+ *   2. 语言选择持久化到 localStorage（key: preferredLang，v1.45.0 起；
+ *      兼容旧键 personal-homepage-lang，读取时前者优先、写入时双写，与
+ *      modern.html 共享同一语言偏好），刷新与重开保持；
  *   3. 翻译方式：元素级标注 + 字典映射。
  *      - data-i18n="原文"        → 替换 textContent（原文即 key，切回中文天然恢复）
  *      - data-i18n-html="原文"   → 替换 innerHTML（仅英文态生效，用于含 <strong> 的富文本段）
@@ -22,7 +23,8 @@
 (function () {
   "use strict";
 
-  var STORAGE_KEY = "personal-homepage-lang";
+  var STORAGE_KEY = "personal-homepage-lang"; // 旧键（v1.45.0 前）
+  var PREFERRED_KEY = "preferredLang";         // 新键：与 modern.html 共享（v1.45.0）
 
   /* ---------- 1. 翻译字典（中文原文 → 英文） ---------- */
   var DICT = {
@@ -117,6 +119,9 @@
     "打开音乐播放器": "Open music player",
     "打开功能菜单": "Open menu",
 
+    /* 现代版入口（v1.45.0 · AI-GEN） */
+    "🎨 切换现代模式": "🎨 Switch to Modern UI",
+
     /* Footer */
     "刘聿宸 · 梦想即力量": "Liu Yuchen · Dreams Are Power",
     "了解更多": "Learn More",
@@ -168,7 +173,7 @@
   /* ---------- 2. 状态 ---------- */
   var lang = "zh";
   try {
-    var saved = localStorage.getItem(STORAGE_KEY);
+    var saved = localStorage.getItem(PREFERRED_KEY) || localStorage.getItem(STORAGE_KEY);
     if (saved === "en" || saved === "zh") lang = saved;
   } catch (e) { /* 忽略 */ }
 
@@ -238,7 +243,10 @@
     setLang: function (l) {
       if (l !== "zh" && l !== "en") return;
       lang = l;
-      try { localStorage.setItem(STORAGE_KEY, l); } catch (e) { /* 忽略 */ }
+      try {
+        localStorage.setItem(PREFERRED_KEY, l); // 与 modern.html 共享
+        localStorage.setItem(STORAGE_KEY, l);   // 旧键兼容
+      } catch (e) { /* 忽略 */ }
       apply();
     },
     toggle: function () { this.setLang(lang === "zh" ? "en" : "zh"); }

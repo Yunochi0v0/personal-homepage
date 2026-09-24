@@ -10,11 +10,40 @@
 
 ---
 
-## [v1.44.3] 修复：迭代记录按时间先后重排（当前）
+## [v1.45.0] 新增：现代版主页（Bento Grid，双页面中英同步）
 
-- **日期**：2026-09-24
+- **日期**：2026-09-25
 - **作者**：katzegott
-- **类型**：`修复`
+- **类型**：`新增`
+
+### 新增（AI-generated）
+- **现代版入口按钮**：赛博版 `index.html` 左上角新增「🎨 切换现代模式 / 🎨 Switch to Modern UI」悬浮按钮（与语言切换按钮同款 HUD 风格，`.modern-switch` 样式），点击跳转 `modern.html`。
+- **现代版主页** `modern.html`（全新页面）：Bento Grid + 毛玻璃（深色半透明遮罩、白微透明边框、大圆角、背景模糊）。包含与赛博版对应的 11 个板块——Hero / 个人简介 / 技能 / 项目 / 音游 / 联系 / 数字孪生 / 音乐播放器 / 反馈 / 反馈墙 / 成就；音游列表、数字孪生问答、网易云播放（懒加载）、反馈提交（Supabase 同表）、反馈墙（只读展示公开反馈）、成就（读取赛博版同一 localStorage 解锁状态）。
+- **返回按钮**：`modern.html` 右上角「返回赛博版 / Back to Cyberpunk UI」按钮，跳转回 `index.html`。
+- **现代版样式** `styles/modern.css`：Bento Grid 布局、毛玻璃卡片、深蓝紫渐变背景（背景图位置预留，待用户上传后替换，见文件内 `[MANUAL]` 注释）。
+- **现代版脚本** `scripts/modern.js`：data-lang 双语切换（现代版独立实现，`MODERN_DICT` 词条与赛博版 i18n.js 对齐）+ 各互动板块逻辑。
+
+### 修改（AI-generated）
+- **语言持久化双键兼容**（Phase 4）：`scripts/i18n.js` 与 `scripts/modern.js` 均读写新键 `preferredLang`（两页共享），同时双写旧键 `personal-homepage-lang`（兼容）；读取时新键优先、回退旧键 → 两页互跳时语言自动同步。
+- 版本号 → 1.45.0：`index.html` 的 `?v=` 引用（8 处）与 `data-version`、`scripts/main.js` BIOS。
+
+### 验证方式
+- CDP（Chrome DevTools Protocol）自动化验证 19 项全 PASS：modernSwitch 按钮存在且双语文案正确；modern.html 11 板块齐全、data-lang 标注 73 处；默认中文渲染正确；切英文后 `preferredLang`/旧键双写为 `en`、slogan/返回按钮/标题/html lang 全翻译；返回赛博版后语言继承 `en`（langSwitch 显示「中」、slogan 英文、modernSwitch 英文文案）；互动板块抽查——音游 8 项、成就 11 项、数字孪生欢迎语、音乐按钮、反馈墙容器、联系 2 卡、项目 3 卡、技能 4 条。
+
+### 涉及文件
+| 文件 | 类型 | 说明 |
+| --- | --- | --- |
+| `index.html` | 修改 | 新增 modernSwitch 按钮 + `?v=1.45.0` + `data-version="1.45.0"` |
+| `modern.html` | 新增 | 现代版主页（11 板块 data-lang 双语） |
+| `styles/modern.css` | 新增 | Bento Grid + 毛玻璃样式 |
+| `scripts/modern.js` | 新增 | 现代版 i18n（data-lang）+ 互动逻辑 |
+| `scripts/i18n.js` | 修改 | preferredLang 双键兼容 + 「切换现代模式」词条 |
+| `scripts/main.js` | 修改 | modernSwitch 跳转绑定 + BIOS → v1.45.0 |
+| `styles/style.css` | 修改 | `.modern-switch` 按钮样式 |
+
+---
+
+## [v1.44.3] 修复：迭代记录按时间先后重排（历史）
 
 ### 修复
 - 用户反馈：迭代记录的顺序反了，要求按时间先后排列。

@@ -1,0 +1,244 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description" content="刘聿宸的个人主页 - 现代版（Bento Grid）" />
+  <title>刘聿宸 · 现代版主页</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@400;500;700;900&family=Inter:wght@400;500;700;900&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="styles/modern.css?v=1.45.0" />
+</head>
+<body data-version="1.45.0">
+
+  <!-- 顶部工具栏（v1.45.0 · AI-GEN）：右侧两个悬浮按钮 ——
+       语言切换（Bento 风格，data-lang 双语）+ 返回赛博版 -->
+  <header class="m-topbar">
+    <button id="mLangSwitch" class="m-btn m-lang" type="button" aria-label="切换语言 / Switch language">EN</button>
+    <button id="mBackToCyber" class="m-btn m-back" type="button" data-lang-aria="返回赛博版" aria-label="返回赛博版">
+      <span data-lang="返回赛博版">返回赛博版</span>
+    </button>
+  </header>
+
+  <main class="m-main">
+
+    <!-- 1. Hero -->
+    <section id="m-hero" class="m-bento m-hero">
+      <div class="m-hero-avatar"><img src="assets/avatar.jpg" alt="刘聿宸头像" /></div>
+      <div>
+        <p class="m-hero-kicker" data-lang="// MODERN EDITION · 现代版主页">// MODERN EDITION · 现代版主页</p>
+        <h1 class="m-hero-name"><span data-lang="你好，我是 ">你好，我是 </span><strong>刘聿宸</strong><span data-lang=" · 18 岁"> · 18 岁</span></h1>
+        <p class="m-hero-slogan" data-lang="梦想即力量">梦想即力量</p>
+        <p class="m-hero-sub" data-lang="大一新生 · 编程与人工智能初学者 · 正在用 AI 辅助开发记录我的成长">大一新生 · 编程与人工智能初学者 · 正在用 AI 辅助开发记录我的成长</p>
+        <p class="m-hero-status">
+          <span class="m-dot" aria-hidden="true"></span>
+          <span data-lang="当前位于 深圳 · 持续迭代中">当前位于 深圳 · 持续迭代中</span>
+        </p>
+        <div class="m-hero-actions">
+          <a class="m-btn m-btn-primary" href="#m-contact" data-lang="联系我">联系我</a>
+          <a class="m-btn m-btn-ghost" href="#m-about" data-lang="了解我">了解我</a>
+        </div>
+      </div>
+    </section>
+
+    <!-- 2. 个人简介 About -->
+    <section id="m-about" class="m-bento">
+      <h2 class="m-title" data-lang="个人简介">个人简介</h2>
+      <p class="m-sub" data-lang="一点关于我的介绍">一点关于我的介绍</p>
+      <div class="m-stack">
+        <p data-lang="我是刘聿宸，18 岁，目前就读于天津大学香港理工大学深圳未来技术学院，学习计算机科学与技术专业。">我是刘聿宸，18 岁，目前就读于<strong>天津大学香港理工大学深圳未来技术学院</strong>，学习<strong>计算机科学与技术</strong>专业。</p>
+        <p data-lang="关于本站：这是利用 vibe coding 制作的第一个计算机项目，包含基本信息、项目与小巧思，今后也会持续迭代。">关于本站：这是利用 vibe coding 制作的第一个计算机项目，包含基本信息、项目与小巧思，今后也会持续迭代。</p>
+        <p data-lang="关于我：本质是远离所有不必要社交的绝对 i 人，平时打打音游（phigros、pjsk），听听歌（J-ROCK 和 J-POP），看看番。欢迎通过邮箱联系我。">关于我：本质是远离所有不必要社交的绝对 i 人，平时打打音游（phigros、pjsk），听听歌（J-ROCK 和 J-POP），看看番。欢迎通过邮箱联系我。</p>
+      </div>
+    </section>
+
+    <!-- 3. 技能栏 Skills -->
+    <section id="m-skills" class="m-bento">
+      <h2 class="m-title" data-lang="技能">技能</h2>
+      <p class="m-sub" data-lang="我掌握与正在学习的内容">我掌握与正在学习的内容</p>
+      <div class="m-skill-list">
+        <div class="m-skill">
+          <div class="m-skill-head"><span data-lang="前端基础 HTML / CSS / JS">前端基础 HTML / CSS / JS</span><span>75%</span></div>
+          <div class="m-skill-bar"><i style="width:75%"></i></div>
+        </div>
+        <div class="m-skill">
+          <div class="m-skill-head"><span data-lang="Python 编程">Python 编程</span><span>65%</span></div>
+          <div class="m-skill-bar"><i style="width:65%"></i></div>
+        </div>
+        <div class="m-skill">
+          <div class="m-skill-head"><span data-lang="AI 辅助开发（Vibe Coding）">AI 辅助开发（Vibe Coding）</span><span>50%</span></div>
+          <div class="m-skill-bar"><i style="width:50%"></i></div>
+        </div>
+        <div class="m-skill">
+          <div class="m-skill-head"><span data-lang="Git 版本控制">Git 版本控制</span><span data-lang="学习中">学习中</span></div>
+          <div class="m-skill-bar"><i style="width:40%"></i></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 4. 项目栏 Projects -->
+    <section id="m-projects" class="m-bento">
+      <h2 class="m-title" data-lang="项目">项目</h2>
+      <p class="m-sub" data-lang="正在完成与计划中的作品">正在完成与计划中的作品</p>
+      <div class="m-project-grid">
+        <article class="m-project">
+          <span class="m-project-id">[MISSION_01]</span>
+          <h3 data-lang="本个人主页">本个人主页</h3>
+          <p data-lang="记录学习与成长的个人主页 MVP。纯 HTML / CSS / JavaScript 手写，持续加入反馈墙、音游展示区、开发历程 LOG 与移动端适配。">记录学习与成长的个人主页 MVP。纯 HTML / CSS / JavaScript 手写，持续加入反馈墙、音游展示区、开发历程 LOG 与移动端适配。</p>
+          <span class="m-chip m-chip-active" data-lang="进行中">进行中</span>
+        </article>
+        <article class="m-project">
+          <span class="m-project-id">[MISSION_02]</span>
+          <h3 data-lang="课程项目">课程项目</h3>
+          <p data-lang="课程里的真实项目，会在这里记录目标、过程与收获。目前尚未开工。">课程里的真实项目，会在这里记录目标、过程与收获。目前尚未开工。</p>
+          <span class="m-chip" data-lang="待填充">待填充</span>
+        </article>
+        <article class="m-project">
+          <span class="m-project-id">[MISSION_03]</span>
+          <h3 data-lang="我的下一个想法">我的下一个想法</h3>
+          <p data-lang="正在酝酿中的小点子，等它成型后我会写下完整的设计与实现。">正在酝酿中的小点子，等它成型后我会写下完整的设计与实现。</p>
+          <span class="m-chip" data-lang="待填充">待填充</span>
+        </article>
+      </div>
+    </section>
+
+    <!-- 5. 音游栏 Arcade -->
+    <section id="m-arcade" class="m-bento">
+      <h2 class="m-title" data-lang="音游">音游</h2>
+      <p class="m-sub" data-lang="世界计划 缤纷舞台 · MASTER 全连记录">世界计划 缤纷舞台 · MASTER 全连记录</p>
+      <ul class="m-arcade-list" id="mArcadeList">
+        <!-- modern.js 读取 arcade.json 渲染 -->
+      </ul>
+    </section>
+
+    <!-- 6. 联系方式 Contact -->
+    <section id="m-contact" class="m-bento">
+      <h2 class="m-title" data-lang="联系我">联系我</h2>
+      <p class="m-sub" data-lang="欢迎交流，期待认识你">欢迎交流，期待认识你</p>
+      <div class="m-contact-grid">
+        <a class="m-contact-card" href="mailto:319008328@qq.com">
+          <span class="m-contact-label" data-lang="邮箱">邮箱</span>
+          <span class="m-contact-value">319008328@qq.com</span>
+        </a>
+        <a class="m-contact-card" href="https://github.com/Yunochi0v0" target="_blank" rel="noopener noreferrer">
+          <span class="m-contact-label">GitHub</span>
+          <span class="m-contact-value">Yunochi0v0</span>
+        </a>
+      </div>
+    </section>
+
+    <!-- 7. 数字孪生 Twin -->
+    <section id="m-twin" class="m-bento">
+      <h2 class="m-title" data-lang="数字孪生">数字孪生</h2>
+      <p class="m-sub" data-lang="虚拟的我 · 基于个人简介与你对话">虚拟的我 · 基于个人简介与你对话</p>
+      <div class="m-twin-card">
+        <div class="m-twin-head">
+          <div class="m-twin-avatar"><img src="assets/avatar.jpg" alt="数字孪生头像" /></div>
+          <div>
+            <span class="m-twin-name">AI · 刘聿宸</span>
+            <span class="m-twin-status"><span class="m-dot" aria-hidden="true"></span><span data-lang="在线 · 数字孪生">在线 · 数字孪生</span></span>
+          </div>
+          <span class="m-chip">BETA</span>
+        </div>
+        <div class="m-twin-body" id="mTwinBody" role="log" aria-live="polite"></div>
+        <div class="m-twin-suggests" id="mTwinSuggests">
+          <button type="button" data-q="你是谁？" data-lang="你是谁？">你是谁？</button>
+          <button type="button" data-q="你的 slogan 是什么？" data-lang="你的 slogan 是什么？">你的 slogan 是什么？</button>
+          <button type="button" data-q="你在哪个学校？" data-lang="你在哪个学校？">你在哪个学校？</button>
+          <button type="button" data-q="你有什么爱好？" data-lang="你有什么爱好？">你有什么爱好？</button>
+        </div>
+        <form class="m-twin-input" id="mTwinForm" autocomplete="off">
+          <input id="mTwinInput" type="text" maxlength="80" data-lang-ph="向我提问，比如：你会什么技能？" placeholder="向我提问，比如：你会什么技能？" />
+          <button type="submit" data-lang-aria="发送" aria-label="发送">➤</button>
+        </form>
+      </div>
+    </section>
+
+    <!-- 8. 音乐播放器 Music -->
+    <section id="m-music" class="m-bento">
+      <h2 class="m-title" data-lang="音乐播放器">音乐播放器</h2>
+      <p class="m-sub" data-lang="点击播放一首歌（网易云外链）">点击播放一首歌（网易云外链）</p>
+      <div class="m-music-card">
+        <p class="m-music-title" data-lang="🎧 现代随身听">🎧 现代随身听</p>
+        <!-- [MANUAL] 网易云外链 iframe（单曲 1935705479，v1.45.0）：懒加载，点击按钮才注入。
+             换歌只需替换歌曲 ID；与赛博版 music.js 同一首曲目。 -->
+        <div class="m-music-player" id="mMusicPlayer"></div>
+        <button class="m-btn m-btn-primary" id="mMusicBtn" type="button" data-lang="播放 / 切换">播放 / 切换</button>
+      </div>
+    </section>
+
+    <!-- 9. 反馈栏 Feedback -->
+    <section id="m-feedback" class="m-bento">
+      <h2 class="m-title" data-lang="留个反馈">留个反馈</h2>
+      <p class="m-sub" data-lang="反馈不会公开，只有我能看到。">反馈不会公开，只有我能看到。</p>
+      <form class="m-feedback-form" id="mFeedbackForm" novalidate>
+        <label class="m-field">
+          <span class="m-field-label" data-lang="昵称（可选）">昵称（可选）</span>
+          <input class="m-input" id="mFbName" type="text" maxlength="40" data-lang-ph="怎么称呼你？" placeholder="怎么称呼你？" autocomplete="nickname" />
+        </label>
+        <div class="m-field-row">
+          <label class="m-field">
+            <span class="m-field-label" data-lang="关系">关系</span>
+            <select class="m-input" id="mFbRelation">
+              <option value="" disabled selected data-lang="请选择">请选择</option>
+              <option data-lang="同学">同学</option>
+              <option data-lang="老师">老师</option>
+              <option data-lang="家人">家人</option>
+              <option data-lang="朋友">朋友</option>
+              <option data-lang="其他">其他</option>
+            </select>
+          </label>
+          <label class="m-field">
+            <span class="m-field-label" data-lang="设备">设备</span>
+            <select class="m-input" id="mFbDevice">
+              <option value="" disabled selected data-lang="请选择">请选择</option>
+              <option data-lang="电脑">电脑</option>
+              <option data-lang="手机">手机</option>
+              <option data-lang="平板">平板</option>
+              <option data-lang="其他">其他</option>
+            </select>
+          </label>
+        </div>
+        <label class="m-field">
+          <span class="m-field-label" data-lang="反馈内容 *">反馈内容 *</span>
+          <textarea class="m-input" id="mFbMessage" maxlength="1000" rows="4" data-lang-ph="想对我说点什么？" placeholder="想对我说点什么？"></textarea>
+        </label>
+        <label class="m-field m-check">
+          <input type="checkbox" id="mFbList" />
+          <span data-lang="公开展示到反馈墙（可被点赞和评论）">公开展示到反馈墙（可被点赞和评论）</span>
+        </label>
+        <p class="m-form-error" id="mFbError" role="alert" hidden></p>
+        <button class="m-btn m-btn-primary" id="mFbSubmit" type="submit" data-lang="提交反馈">提交反馈</button>
+      </form>
+      <p class="m-form-success" id="mFbSuccess" hidden data-lang="已收到，谢谢你的反馈！">已收到，谢谢你的反馈！</p>
+    </section>
+
+    <!-- 10. 反馈展示栏 Feedback Wall -->
+    <section id="m-wall" class="m-bento">
+      <h2 class="m-title" data-lang="反馈墙 · 大家的声音">反馈墙 · 大家的声音</h2>
+      <p class="m-sub" data-lang="公开发布的访客反馈（只读版）">公开发布的访客反馈（只读版）</p>
+      <div class="m-wall-list" id="mWallList">
+        <p class="m-wall-empty" data-lang="还没有公开的反馈，来留一条吧？">还没有公开的反馈，来留一条吧？</p>
+      </div>
+    </section>
+
+    <!-- 11. 成就栏 Achievements -->
+    <section id="m-achievements" class="m-bento">
+      <h2 class="m-title" data-lang="成就">成就</h2>
+      <p class="m-sub"><span data-lang="探索本站，解锁成就 · 已解锁">探索本站，解锁成就 · 已解锁</span> <span id="mAchievementCounter">0 / 0</span></p>
+      <div class="m-ach-grid" id="mAchievementGrid">
+        <!-- modern.js 渲染成就卡片 -->
+      </div>
+    </section>
+
+  </main>
+
+  <footer class="m-footer">
+    <p>© <span id="mYear"></span> <span data-lang="刘聿宸 · 梦想即力量">刘聿宸 · 梦想即力量</span></p>
+    <p class="m-footer-note">Powered by Vibe Coding · Modern Edition</p>
+  </footer>
+
+  <script src="scripts/modern.js?v=1.45.0"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.49.4/dist/umd/supabase.min.js"></script>
+</body>
+</html>

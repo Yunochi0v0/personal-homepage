@@ -6077,6 +6077,20 @@ textarea.feedback-message {
   transform: translateY(0) scale(0.96);
 }
 
+/* 现代版入口（v1.45.0 · AI-GEN）：与 langSwitch 同款 HUD 悬浮钮，右移避让 */
+.modern-switch {
+  left: 84px;
+}
+
+@media (max-width: 768px) {
+  .modern-switch {
+    left: 66px;
+    top: 12px;
+    min-width: 0;
+    font-size: 13px;
+  }
+}
+
 /* 小屏：避免遮挡 Dock */
 @media (max-width: 768px) {
   .lang-switch {

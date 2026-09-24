@@ -1,0 +1,482 @@
+/* ============================================================
+ * 现代版主页样式（v1.45.0 · AI-GEN）
+ * ------------------------------------------------------------
+ * 风格：Bento Grid + 毛玻璃（glassmorphism）
+ *   - 卡片：深色半透明遮罩 + 白微透明边框 + 大圆角 + 背景模糊
+ *   - 布局：12 列 Bento Grid，各卡片跨列/跨行错落拼接
+ *   - 配色：深蓝紫底色渐变 + 青/紫点缀（区别于赛博版黄黑）
+ * 背景图：稍后由用户上传，替换 body 背景即可（见 .m-main 注释）
+ * ============================================================ */
+:root {
+  --m-bg: #0b1020;
+  --m-glass: rgba(255, 255, 255, 0.07);
+  --m-glass-strong: rgba(255, 255, 255, 0.12);
+  --m-border: rgba(255, 255, 255, 0.22);
+  --m-text: #eef2ff;
+  --m-text-dim: rgba(238, 242, 255, 0.66);
+  --m-accent: #7c9cff;
+  --m-accent-2: #b78cff;
+  --m-radius: 22px;
+}
+
+* { box-sizing: border-box; }
+
+html { scroll-behavior: smooth; }
+
+body {
+  margin: 0;
+  font-family: "Inter", "Noto Sans SC", -apple-system, "PingFang SC", sans-serif;
+  color: var(--m-text);
+  background:
+    radial-gradient(1200px 700px at 12% -8%, rgba(124, 156, 255, 0.22), transparent 55%),
+    radial-gradient(1000px 650px at 90% 18%, rgba(183, 140, 255, 0.18), transparent 55%),
+    linear-gradient(160deg, #0b1020 0%, #101a3a 55%, #0b1020 100%);
+  background-attachment: fixed;
+  min-height: 100vh;
+}
+
+/* 背景图（[MANUAL]）：上传后替换为
+   background-image: url("../assets/modern-bg.jpg"); 置于最上层渐变之前 */
+body::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  /* background-image: url("../assets/modern-bg.jpg"); */
+  background-size: cover;
+  background-position: center;
+  opacity: 0.35;
+  pointer-events: none;
+}
+
+/* ---------- 顶部工具栏 ---------- */
+.m-topbar {
+  position: fixed;
+  top: 18px;
+  right: 18px;
+  z-index: 9000;
+  display: flex;
+  gap: 10px;
+}
+
+.m-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  padding: 10px 18px;
+  font-family: inherit;
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--m-text);
+  background: var(--m-glass);
+  border: 1px solid var(--m-border);
+  border-radius: 999px;
+  cursor: pointer;
+  -webkit-backdrop-filter: blur(12px);
+  backdrop-filter: blur(12px);
+  transition: all 0.25s ease;
+  user-select: none;
+  -webkit-user-select: none;
+  text-decoration: none;
+}
+
+.m-btn:hover {
+  background: var(--m-glass-strong);
+  border-color: rgba(255, 255, 255, 0.45);
+  transform: translateY(-1px);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.35);
+}
+
+.m-btn:active { transform: translateY(0) scale(0.97); }
+
+.m-lang { min-width: 52px; }
+
+.m-back { background: var(--m-glass-strong); }
+
+.m-btn-primary {
+  background: linear-gradient(135deg, var(--m-accent), var(--m-accent-2));
+  border: none;
+  color: #fff;
+}
+
+.m-btn-primary:hover { box-shadow: 0 8px 28px rgba(124, 156, 255, 0.45); }
+
+.m-btn-ghost { background: transparent; }
+
+/* ---------- 主体：Bento Grid ---------- */
+.m-main {
+  max-width: 1120px;
+  margin: 0 auto;
+  padding: 92px 22px 60px;
+  display: grid;
+  grid-template-columns: repeat(12, 1fr);
+  gap: 18px;
+}
+
+.m-bento {
+  position: relative;
+  grid-column: span 4;
+  padding: 26px;
+  background: var(--m-glass);
+  border: 1px solid var(--m-border);
+  border-radius: var(--m-radius);
+  -webkit-backdrop-filter: blur(16px);
+  backdrop-filter: blur(16px);
+  box-shadow: 0 10px 34px rgba(0, 0, 0, 0.28);
+  transition: transform 0.25s ease, border-color 0.25s ease;
+}
+
+.m-bento:hover {
+  transform: translateY(-3px);
+  border-color: rgba(255, 255, 255, 0.4);
+}
+
+/* Hero 横跨整行 */
+.m-hero {
+  grid-column: span 12;
+  display: grid;
+  grid-template-columns: 128px 1fr;
+  gap: 26px;
+  align-items: center;
+}
+
+/* 简介、项目 跨 8 列；技能、联系 跨 4 列 */
+#m-about, #m-projects { grid-column: span 8; }
+#m-skills, #m-contact { grid-column: span 4; }
+
+/* 音游、孪生 各 6 列；音乐、反馈 各 6 列；反馈墙、成就 各 6 列 */
+#m-arcade, #m-twin { grid-column: span 6; }
+#m-music, #m-feedback { grid-column: span 6; }
+#m-wall, #m-achievements { grid-column: span 6; }
+
+.m-title {
+  margin: 0 0 6px;
+  font-size: 24px;
+  font-weight: 900;
+  letter-spacing: 0.5px;
+}
+
+.m-sub {
+  margin: 0 0 18px;
+  font-size: 14px;
+  color: var(--m-text-dim);
+}
+
+/* ---------- Hero ---------- */
+.m-hero-avatar {
+  width: 128px;
+  height: 128px;
+  border-radius: 50%;
+  padding: 4px;
+  background: linear-gradient(135deg, var(--m-accent), var(--m-accent-2));
+}
+
+.m-hero-avatar img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: 50%;
+  display: block;
+}
+
+.m-hero-kicker {
+  margin: 0 0 8px;
+  font-size: 13px;
+  letter-spacing: 2px;
+  color: var(--m-accent);
+}
+
+.m-hero-name { margin: 0 0 6px; font-size: 34px; font-weight: 900; }
+.m-hero-name strong { background: linear-gradient(135deg, var(--m-accent), var(--m-accent-2)); -webkit-background-clip: text; background-clip: text; color: transparent; }
+.m-hero-slogan { margin: 0 0 10px; font-size: 20px; font-weight: 700; color: var(--m-accent-2); }
+.m-hero-sub { margin: 0 0 14px; font-size: 15px; color: var(--m-text-dim); line-height: 1.7; }
+
+.m-hero-status { display: inline-flex; align-items: center; gap: 8px; margin: 0 0 16px; font-size: 13px; color: var(--m-text-dim); }
+
+.m-dot {
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
+  background: #5fe8a0;
+  box-shadow: 0 0 8px rgba(95, 232, 160, 0.8);
+  display: inline-block;
+  animation: m-blink 1.6s ease-in-out infinite;
+}
+
+@keyframes m-blink { 0%, 100% { opacity: 1; } 50% { opacity: 0.35; } }
+
+.m-hero-actions { display: flex; gap: 10px; }
+
+/* ---------- 简介 ---------- */
+.m-stack p { margin: 0 0 12px; font-size: 15px; line-height: 1.85; color: var(--m-text); }
+.m-stack p:last-child { margin-bottom: 0; }
+.m-stack strong { color: var(--m-accent); }
+
+/* ---------- 技能 ---------- */
+.m-skill { margin-bottom: 16px; }
+.m-skill:last-child { margin-bottom: 0; }
+.m-skill-head {
+  display: flex;
+  justify-content: space-between;
+  font-size: 14px;
+  font-weight: 500;
+  margin-bottom: 7px;
+}
+.m-skill-head span:last-child { color: var(--m-accent); font-weight: 700; }
+.m-skill-bar {
+  height: 8px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.1);
+  overflow: hidden;
+}
+.m-skill-bar i {
+  display: block;
+  height: 100%;
+  border-radius: 999px;
+  background: linear-gradient(90deg, var(--m-accent), var(--m-accent-2));
+}
+
+/* ---------- 项目 ---------- */
+.m-project-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; }
+.m-project {
+  padding: 18px;
+  border-radius: 16px;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  transition: all 0.25s ease;
+}
+.m-project:hover { background: rgba(255, 255, 255, 0.09); border-color: var(--m-border); }
+.m-project-id { font-size: 12px; color: var(--m-accent); letter-spacing: 1px; }
+.m-project h3 { margin: 6px 0 8px; font-size: 17px; font-weight: 700; }
+.m-project p { margin: 0 0 12px; font-size: 13px; line-height: 1.7; color: var(--m-text-dim); }
+
+.m-chip {
+  display: inline-block;
+  padding: 4px 12px;
+  font-size: 12px;
+  font-weight: 700;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.1);
+  border: 1px solid var(--m-border);
+}
+.m-chip-active { background: rgba(95, 232, 160, 0.16); border-color: rgba(95, 232, 160, 0.5); color: #7ff0b4; }
+
+/* ---------- 音游 ---------- */
+.m-arcade-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 10px;
+}
+.m-arcade-item {
+  padding: 12px 14px;
+  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  font-size: 13px;
+  line-height: 1.5;
+}
+.m-arcade-item em { font-style: normal; color: var(--m-accent); font-size: 11px; display: block; margin-bottom: 2px; }
+
+/* ---------- 联系 ---------- */
+.m-contact-grid { display: grid; gap: 12px; }
+.m-contact-card {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: 16px;
+  border-radius: 16px;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  text-decoration: none;
+  color: var(--m-text);
+  transition: all 0.25s ease;
+}
+.m-contact-card:hover { background: rgba(255, 255, 255, 0.1); border-color: var(--m-border); transform: translateY(-2px); }
+.m-contact-label { font-size: 12px; color: var(--m-text-dim); letter-spacing: 1px; }
+.m-contact-value { font-size: 15px; font-weight: 700; color: var(--m-accent); }
+
+/* ---------- 数字孪生 ---------- */
+.m-twin-card {
+  border-radius: 16px;
+  overflow: hidden;
+  background: rgba(0, 0, 0, 0.18);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+.m-twin-head {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 14px 16px;
+  background: rgba(255, 255, 255, 0.05);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+.m-twin-avatar { width: 40px; height: 40px; border-radius: 50%; padding: 2px; background: linear-gradient(135deg, var(--m-accent), var(--m-accent-2)); }
+.m-twin-avatar img { width: 100%; height: 100%; object-fit: cover; border-radius: 50%; display: block; }
+.m-twin-name { font-weight: 700; font-size: 14px; display: block; }
+.m-twin-status { font-size: 12px; color: var(--m-text-dim); display: flex; align-items: center; gap: 6px; }
+.m-twin-head .m-chip { margin-left: auto; }
+.m-twin-body {
+  height: 168px;
+  overflow-y: auto;
+  padding: 14px 16px;
+  font-size: 14px;
+  line-height: 1.7;
+}
+.m-msg { margin-bottom: 10px; }
+.m-msg.me { text-align: right; }
+.m-msg span {
+  display: inline-block;
+  padding: 8px 12px;
+  border-radius: 14px;
+  background: rgba(255, 255, 255, 0.09);
+  max-width: 85%;
+}
+.m-msg.me span { background: linear-gradient(135deg, rgba(124, 156, 255, 0.4), rgba(183, 140, 255, 0.4)); }
+.m-twin-suggests { display: flex; flex-wrap: wrap; gap: 8px; padding: 10px 14px; }
+.m-twin-suggests button {
+  padding: 6px 12px;
+  font-size: 12px;
+  font-family: inherit;
+  color: var(--m-text);
+  background: rgba(255, 255, 255, 0.07);
+  border: 1px solid var(--m-border);
+  border-radius: 999px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+.m-twin-suggests button:hover { background: var(--m-glass-strong); }
+.m-twin-input { display: flex; gap: 8px; padding: 10px 14px 14px; }
+.m-twin-input input {
+  flex: 1;
+  padding: 10px 14px;
+  font-family: inherit;
+  font-size: 14px;
+  color: var(--m-text);
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid var(--m-border);
+  border-radius: 999px;
+  outline: none;
+  transition: border-color 0.2s ease;
+}
+.m-twin-input input:focus { border-color: var(--m-accent); }
+.m-twin-input button {
+  width: 42px;
+  border-radius: 999px;
+  border: none;
+  background: linear-gradient(135deg, var(--m-accent), var(--m-accent-2));
+  color: #fff;
+  font-size: 14px;
+  cursor: pointer;
+}
+
+/* ---------- 音乐 ---------- */
+.m-music-card { text-align: center; }
+.m-music-title { font-size: 16px; font-weight: 700; margin: 0 0 14px; }
+.m-music-player {
+  min-height: 80px;
+  margin-bottom: 14px;
+  border-radius: 12px;
+  overflow: hidden;
+  background: rgba(0, 0, 0, 0.22);
+}
+.m-music-player iframe { width: 100%; border: 0; display: block; }
+
+/* ---------- 反馈 ---------- */
+.m-feedback-form { display: grid; gap: 12px; }
+.m-field { display: grid; gap: 6px; }
+.m-field-row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+.m-field-label { font-size: 13px; font-weight: 500; color: var(--m-text-dim); }
+.m-input {
+  padding: 10px 14px;
+  font-family: inherit;
+  font-size: 14px;
+  color: var(--m-text);
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid var(--m-border);
+  border-radius: 12px;
+  outline: none;
+  transition: border-color 0.2s ease;
+}
+.m-input:focus { border-color: var(--m-accent); }
+select.m-input option { background: #101a3a; color: var(--m-text); }
+textarea.m-input { resize: vertical; }
+.m-check { display: flex; align-items: center; gap: 8px; font-size: 13px; color: var(--m-text-dim); cursor: pointer; }
+.m-check input { accent-color: var(--m-accent); width: 16px; height: 16px; }
+.m-form-error { margin: 0; font-size: 13px; color: #ff8a8a; }
+.m-form-success {
+  margin: 0;
+  padding: 22px;
+  text-align: center;
+  font-size: 15px;
+  font-weight: 700;
+  color: #7ff0b4;
+  background: rgba(95, 232, 160, 0.1);
+  border: 1px solid rgba(95, 232, 160, 0.4);
+  border-radius: 14px;
+}
+
+/* ---------- 反馈墙 ---------- */
+.m-wall-list { display: grid; gap: 10px; max-height: 320px; overflow-y: auto; }
+.m-wall-empty { color: var(--m-text-dim); font-size: 14px; text-align: center; padding: 18px 0; margin: 0; }
+.m-wall-card {
+  padding: 12px 14px;
+  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  font-size: 13px;
+  line-height: 1.6;
+}
+.m-wall-card-meta { font-size: 11px; color: var(--m-text-dim); margin-bottom: 4px; display: flex; gap: 8px; }
+
+/* ---------- 成就 ---------- */
+.m-ach-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; }
+.m-ach {
+  padding: 12px;
+  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  text-align: center;
+  font-size: 12px;
+  line-height: 1.5;
+  transition: all 0.25s ease;
+}
+.m-ach.is-unlocked { background: rgba(124, 156, 255, 0.14); border-color: rgba(124, 156, 255, 0.45); }
+.m-ach.is-locked { opacity: 0.45; filter: grayscale(0.7); }
+.m-ach-icon { font-size: 22px; display: block; margin-bottom: 4px; }
+.m-ach-title { font-weight: 700; }
+
+/* ---------- Footer ---------- */
+.m-footer {
+  max-width: 1120px;
+  margin: 0 auto;
+  padding: 26px 22px 44px;
+  text-align: center;
+  font-size: 13px;
+  color: var(--m-text-dim);
+}
+.m-footer-note { margin: 6px 0 0; font-size: 12px; letter-spacing: 1px; }
+
+/* ---------- 响应式 ---------- */
+@media (max-width: 900px) {
+  .m-bento, #m-about, #m-projects, #m-skills, #m-contact,
+  #m-arcade, #m-twin, #m-music, #m-feedback, #m-wall, #m-achievements {
+    grid-column: span 12;
+  }
+  .m-hero { grid-template-columns: 1fr; text-align: center; }
+  .m-hero-avatar { margin: 0 auto; }
+  .m-hero-actions { justify-content: center; }
+  .m-project-grid { grid-template-columns: 1fr; }
+  .m-arcade-list, .m-ach-grid { grid-template-columns: 1fr 1fr; }
+  .m-field-row { grid-template-columns: 1fr; }
+  .m-topbar { top: 12px; right: 12px; }
+  .m-main { padding-top: 84px; }
+}
+
+@media (max-width: 480px) {
+  .m-arcade-list, .m-ach-grid { grid-template-columns: 1fr; }
+  .m-btn { padding: 9px 14px; font-size: 13px; }
+}

@@ -1,0 +1,63 @@
+{
+  "project": "个人主页 · personal-homepage",
+  "repo": "https://github.com/Yunochi0v0/personal-homepage",
+  "generator": "DeepWorks (DeepSeek-V4-Flash)",
+  "note": "构建日志：记录每次 AI 生成 / 人工修改 / 验证过程，便于课程「过程可追溯」。AI 生成片段在步骤中以 [AI-GEN] 标注，人工修改以 [MANUAL] 标注。",
+  "entries": [
+    {
+      "version": "v1.45.0",
+      "date": "2026-09-25",
+      "type": "新增",
+      "title": "现代版主页（Bento Grid）· 双页面中英同步",
+      "steps": [
+        {
+          "order": 1,
+          "tag": "[AI-GEN]",
+          "action": "scripts/i18n.js：新增词条「🎨 切换现代模式」→「🎨 Switch to Modern UI」；STORAGE_KEY 旁新增 PREFERRED_KEY='preferredLang'，读取优先新键回退旧键，setLang 双写两键。",
+          "files": ["scripts/i18n.js"],
+          "verify": "window.I18n.t('🎨 切换现代模式') 返回英文词条"
+        },
+        {
+          "order": 2,
+          "tag": "[AI-GEN]",
+          "action": "index.html：左上角新增 #modernSwitch 按钮（class='lang-switch modern-switch'，data-i18n 双语）；styles/style.css 追加 .modern-switch（left:84px 避让 langSwitch，小屏适配）；scripts/main.js 追加 click → location.href='modern.html'；版本 ?v= / data-version / BIOS → 1.45.0。",
+          "files": ["index.html", "styles/style.css", "scripts/main.js"],
+          "verify": "CDP：modernSwitch 存在且双语文案正确"
+        },
+        {
+          "order": 3,
+          "tag": "[AI-GEN]",
+          "action": "新建 modern.html：11 板块（Hero/About/Skills/Projects/Arcade/Contact/Twin/Music/Feedback/Wall/Achievements）全部 data-lang 双语标注（共 73 处），右上角 mLangSwitch + mBackToCyber 按钮。",
+          "files": ["modern.html"],
+          "verify": "CDP：11 板块齐全，langEls=73"
+        },
+        {
+          "order": 4,
+          "tag": "[AI-GEN]",
+          "action": "新建 styles/modern.css：Bento Grid（12 列，跨列错落）+ 毛玻璃（深色半透明遮罩/白微透明边框/22px 圆角/backdrop blur）+ 深蓝紫渐变背景；body::before 预留背景图占位。",
+          "files": ["styles/modern.css"],
+          "verify": "页面样式渲染正常"
+        },
+        {
+          "order": 5,
+          "tag": "[AI-GEN]",
+          "action": "新建 scripts/modern.js：data-lang 双语切换（独立 DICT，词条对齐 i18n.js）+ preferredLang 双键读写 + 互动板块（音游列表 8 项 / 数字孪生关键词问答 / 网易云 iframe 懒加载 / 反馈提交到 Supabase feedback 表 / 反馈墙只读读取 listed=true / 成就读取赛博版同 localStorage）。",
+          "files": ["scripts/modern.js"],
+          "verify": "CDP：音游 8 项、成就 11 项、孪生欢迎语、反馈墙容器"
+        },
+        {
+          "order": 6,
+          "tag": "[AI-GEN]",
+          "action": "CHANGELOG.md 追加 v1.45.0 条目。",
+          "files": ["CHANGELOG.md"],
+          "verify": "文档齐全"
+        }
+      ],
+      "verify": "CDP 自动化 19 项全 PASS：双页互跳、preferredLang 跨页同步（en 态切到现代版→返回赛博版仍 en）、11 板块双语渲染、互动板块数据正确。",
+      "issues": [
+        "首测发现英文态 modernSwitch 文案丢失 🎨 前缀 → 词条并入 emoji 修复",
+        "验证脚本受上一轮测试遗留 preferredLang 污染 → 脚本开头重置语言状态"
+      ]
+    }
+  ]
+}
