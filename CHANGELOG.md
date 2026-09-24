@@ -20,11 +20,14 @@
 - **去除「YuchenSama」署名**（用户反馈）：导航 Logo →「宝藏之地 / Treasure Land」；hero 名字 →「刘聿宸 / Liu Yuchen」；孪生卡名 →「AI · 刘聿宸」；footer →「梦想即力量 / Dreams Are Power」；`<title>` →「宝藏之地 · 刘聿宸 / Treasure Land · Liu Yuchen」。
 - **hero 栏删除「成就」统计**（用户反馈）：个人资料卡统计仅保留「项目 3」「音游全连 8」两项，`mStatAch` 元素与对应 init 代码移除。
 
+### 移除（v1.45.1 追加）
+- **删除现代版「成就」板块**（用户反馈）：移除导航「成就」锚点、`#m-achievements` section、`scripts/modern.js` 中 ACH 数组 / `loadUnlocked` / `renderAchievements` 及其 init 与 i18n 刷新调用、MODERN_DICT 成就词条、`styles/modern.css` 中 `.m-ach*` 样式。导航锚点由 8 个变为 7 个（首页/关于/项目/音游/音乐/反馈墙/联系），板块数 11 → 10。经 CDP 回归：页面与代码中均无「成就/Achievement」残留，其余 10 板块与互动功能（音游 8 / 孪生问答 / 反馈墙 / 时钟 / 双语）全部正常。
+
 ### 重构（AI-generated）
 - **整体风格**：现代版 `modern.html` 参考「宝藏之地」类参考图重构为紫色毛玻璃风格——深色夜间主题 + `body.is-light` 日间主题（`styles/modern.css` 全量重写为 CSS 变量）。
-- **顶部导航栏**：粘性导航（`.m-nav`）含 Logo「YuchenSama の 宝藏之地 / YuchenSama's Treasure Land」+ 8 个板块锚点（首页/关于/项目/音游/音乐/反馈墙/成就/联系）+ 主题切换 🌙/🌸、语言切换、返回赛博版按钮；滚动时高亮当前板块（兼容音乐卡位于页顶导致的 offsetTop 非单调布局，取最大 offsetTop 项 + 130px 提前量）。
+- **顶部导航栏**：粘性导航（`.m-nav`）含 Logo「宝藏之地 / Treasure Land」+ 7 个板块锚点（首页/关于/项目/音游/音乐/反馈墙/联系）+ 主题切换 🌙/🌸、语言切换、返回赛博版按钮；滚动时高亮当前板块（兼容音乐卡位于页顶导致的 offsetTop 非单调布局，取最大 offsetTop 项 + 130px 提前量）。
 - **搜索条**：居中胶囊搜索「搜寻标题、描述或标签…」，输入即过滤项目/音游/反馈墙/孪生/记录/主题卡（`.is-search-hidden`）。
-- **双卡片行**：个人资料卡（头像 `assets/avatar.jpg`、简介、真实统计——项目 3 / 音游 8 / 成就解锁数动态计算、邮箱/GitHub/网易云图标）+ 播放器卡（CLOUD MUSIC 徽章、网易云 iframe 懒加载，外链 id=1935705479）。
+- **双卡片行**：个人资料卡（头像 `assets/avatar.jpg`、简介、真实统计——项目 3 / 音游 8、邮箱/GitHub/网易云图标）+ 播放器卡（CLOUD MUSIC 徽章、网易云 iframe 懒加载，外链 id=1935705479）。
 - **歌词横幅**：波形 + 「♪ 梦想即力量 · Dreams Are Power」data-lang 双语。
 - **内容网格**：LATEST INSIGHT 大卡（v1.45.1 宝藏之地风格上线）、数字孪生卡、开发历程 RECORDS、日间模式主题卡（点击切换 + 持久化 `localStorage modern-theme`）。
 - **底部状态条**：实时时钟（每秒刷新）、运行时长（`modern-site-since` 首次访问计时，X 天 X 小时 X 分钟 / Xd Xh Xm）、技术徽章（HTML5 · CSS3 · JavaScript · Vibe Coding）、© 年份自动更新。
@@ -32,7 +35,7 @@
 - **版本号** → 1.45.1：`modern.html` 的 `data-version` 与 `?v=` 引用更新。
 
 ### 验证方式
-- CDP（Chrome DevTools Protocol）自动化验证 50+ 项全 PASS：布局骨架（导航 8 项/搜索/个人卡/播放器卡/歌词横幅/内容网格/状态条/悬浮按钮）、11 板块 id 保留、导航滚动高亮 9 个位置正确（顶部→首页、双卡行→音乐、About→关于、Projects→项目、Arcade→音游、Contact→联系、Wall→反馈墙、成就、底部→联系）、搜索过滤与清空恢复、日间模式切换 + localStorage 持久化、互动板块（音游 8 / 成就 11 / 孪生问答回复 / 反馈墙 / 音乐 iframe id=1935705479）、英文态全词条翻译 + `html lang="en"`。
+- CDP（Chrome DevTools Protocol）自动化验证全 PASS：布局骨架（导航 7 项/搜索/个人卡/播放器卡/歌词横幅/内容网格/状态条/悬浮按钮）、10 板块 id 保留、导航滚动高亮位置正确（顶部→首页、双卡行→音乐、About→关于、Projects→项目、Arcade→音游、Contact→联系、Wall→反馈墙、底部→联系）、搜索过滤与清空恢复、日间模式切换 + localStorage 持久化、互动板块（音游 8 / 孪生问答回复 / 反馈墙 / 音乐 iframe id=1935705479）、英文态全词条翻译 + `html lang="en"`。
 
 ### 涉及文件
 | 文件 | 类型 | 说明 |

@@ -57,15 +57,28 @@
             "scripts/modern.js"
           ],
           "verify": "CDP：页面无 YuchenSama、hero 统计仅 2 项、双语（宝藏之地/Treasure Land、刘聿宸/Liu Yuchen、梦想即力量/Dreams Are Power、title 双语）全 PASS"
+        },
+        {
+          "order": 6,
+          "tag": "[MANUAL]",
+          "action": "用户反馈：移除现代版「成就」板块。删除导航成就锚点、#m-achievements section、modern.js 的 ACH 数组/loadUnlocked/renderAchievements 及 init 与 i18n 调用、MODERN_DICT 成就词条、modern.css 的 .m-ach* 样式；同步更新 CHANGELOG 描述。",
+          "files": [
+            "modern.html",
+            "scripts/modern.js",
+            "styles/modern.css",
+            "CHANGELOG.md"
+          ],
+          "verify": "grep 全仓库无成就/Achievement/m-ach/ACH 残留；jsc 语法 OK；CDP 回归：无成就 section 与导航项、导航 7 项（首页/关于/项目/音游/音乐/反馈墙/联系）、其余 10 板块齐全、音游 8/孪生/反馈墙/时钟/hero 统计 2 项、英文导航 7 项全 PASS"
         }
       ],
-      "verify": "CDP 自动化 50+ 项全 PASS（含用户反馈修正后回归）：布局骨架、11 板块、导航滚动高亮、搜索过滤、日间模式持久化、双语完整、音乐 iframe、孪生问答、无 YuchenSama、hero 统计 2 项。",
+      "verify": "CDP 自动化全 PASS（含成就板块移除后回归）：导航 7 项、10 板块、互动功能（音游/孪生/反馈墙/时钟/双语）正常，页面与代码无成就残留。",
       "issues": [
         "首测导航高亮在音乐卡位于页顶导致 offsetTop 非单调、滚动到 About 区域仍高亮音乐 → 改为取满足条件中 offsetTop 最大项 + 固定 130px 提前量后通过",
         "验证脚本曾受上一轮英文态遗留污染（搜索匹配中文失败）→ 脚本开头重置语言状态",
         "scripts/modern.js 编辑期间多次 DEEPWORKS_FILE_WRITE_LOCK_TIMEOUT → 改用 Python 脚本直接写入文件成功",
         "CDP Page.captureScreenshot 在该环境持续超时（非功能项）→ 跳过视觉截图，功能验证已全通过",
-        "scripts/modern.js 编辑两次 DEEPWORKS_FILE_WRITE_LOCK_TIMEOUT → Python 直写完成"
+        "scripts/modern.js 编辑两次 DEEPWORKS_FILE_WRITE_LOCK_TIMEOUT → Python 直写完成",
+        "scripts/modern.js 经 edit 工具多次 DEEPWORKS_FILE_WRITE_LOCK_TIMEOUT → Python 直写完成；英文导航断言首次误写为 Feedback Wall，实际 DICT 为 Wall（断言修正，非缺陷）"
       ]
     },
     {

@@ -12,7 +12,7 @@
  *      同时双写旧键 personal-homepage-lang 与赛博版 index.html 共享；
  *      读取时前者优先，回退旧键 → 两页互跳时语言自动同步。
  *   3. 互动板块：音游列表 / 数字孪生问答 / 网易云播放 / 反馈提交 /
- *      反馈墙读取 / 成就展示（读取赛博版同一 localStorage 解锁状态）。
+ *      反馈墙读取。
  *   4. v1.45.1 新增（宝藏之地风格）：
  *      - 导航栏滚动高亮（IntersectionObserver）
  *      - 搜索条过滤（标题/描述/标签，支持中英文）
@@ -47,7 +47,6 @@
     "音游": "Arcade",
     "音乐": "Music",
     "反馈墙": "Wall",
-    "成就": "Achievements",
     "联系": "Contact",
 
     /* 搜索 */
@@ -178,10 +177,6 @@
     "公开发布的访客反馈（只读版）": "Public visitor feedback (read-only)",
     "还没有公开的反馈，来留一条吧？": "No public feedback yet — leave one?",
 
-    /* Achievements */
-    "成就": "Achievements",
-    "探索本站，解锁成就 · 已解锁": "Explore to unlock achievements · Unlocked",
-
     /* Footer */
     "系统已稳定运行 ": "System stable for ",
     "梦想即力量": "Dreams Are Power",
@@ -233,7 +228,7 @@
         : "刘聿宸的个人主页 - 现代版（宝藏之地风格）");
     }
 
-    // 通知动态渲染模块（成就等按语言刷新）
+    // 通知动态渲染模块（按语言刷新）
     document.dispatchEvent(new CustomEvent("modern:i18n", { detail: { lang: lang } }));
   }
 
@@ -500,50 +495,6 @@
       });
   }
 
-  /* ---------- 10. 成就（读取赛博版同一 localStorage 解锁状态） ---------- */
-  var ACH_STORAGE_KEY = "personal-homepage-achievements-v1";
-  var ACH = [
-    { id: "first_visit", icon: "👋", title: "初来乍到", titleEn: "First Visit" },
-    { id: "open_log", icon: "📜", title: "档案解密", titleEn: "Archive Decrypted" },
-    { id: "many_clones", icon: "🤖", title: "好多小人", titleEn: "So Many Clones" },
-    { id: "idle_alert", icon: "🚨", title: "还有人类吗", titleEn: "Any Humans Left?" },
-    { id: "lyc_nb", icon: "⭐", title: "lyc确实nb", titleEn: "lyc is indeed nb" },
-    { id: "dream_power", icon: "✨", title: "梦想无限大！！！！！", titleEn: "Dream Power Unlocked!!!!!" },
-    { id: "shiyun_poet", icon: "🌌", title: "这诗人吗？", titleEn: "A Poet?" },
-    { id: "feedback_sent", icon: "📡", title: "我爱反馈", titleEn: "I Love Feedback" },
-    { id: "kksk", icon: "⏱️", title: "kksk", titleEn: "kksk" },
-    { id: "more_clicked", icon: "🪤", title: "你被骗了", titleEn: "You've Been Tricked" },
-    { id: "all_achiever", icon: "🏆", title: "成就收藏家", titleEn: "Achievement Collector" }
-  ];
-
-  function loadUnlocked() {
-    try {
-      var raw = localStorage.getItem(ACH_STORAGE_KEY);
-      return raw ? (JSON.parse(raw) || {}) : {};
-    } catch (e) { return {}; }
-  }
-
-  function renderAchievements() {
-    var grid = $("mAchievementGrid");
-    var counter = $("mAchievementCounter");
-    if (!grid) return;
-    var unlocked = loadUnlocked();
-    var count = 0;
-    var html = "";
-    for (var i = 0; i < ACH.length; i++) {
-      var a = ACH[i];
-      var isUnlocked = !!unlocked[a.id];
-      if (isUnlocked) count++;
-      html +=
-        '<div class="m-ach ' + (isUnlocked ? "is-unlocked" : "is-locked") + '">' +
-          '<span class="m-ach-icon">' + (isUnlocked ? a.icon : "🔒") + "</span>" +
-          '<span class="m-ach-title">' + esc(isEn() && a.titleEn ? a.titleEn : a.title) + "</span>" +
-        "</div>";
-    }
-    grid.innerHTML = html;
-    if (counter) counter.textContent = count + " / " + ACH.length;
-  }
-
   /* ---------- 11. v1.45.1 新增：导航高亮 / 搜索 / 时钟 / 运行时长 / 主题 / 返回顶部 ---------- */
 
   /* 11.1 导航滚动高亮 */
@@ -686,7 +637,6 @@
     bindMusic();
     bindFeedback();
     loadWall();
-    renderAchievements();
     bindNavHighlight();
     bindSearch();
     bindClock();
@@ -705,7 +655,6 @@
 
     document.addEventListener("modern:i18n", function () {
       renderArcade();
-      renderAchievements();
     });
 
     apply();

@@ -703,29 +703,6 @@ body.is-light select.m-input option { background: #fff; color: #33275a; }
 .m-wall-card-meta { display: flex; justify-content: space-between; font-size: 11px; color: var(--m-text-dim); }
 .m-wall-card-meta span:first-child { color: var(--m-accent); font-weight: 700; }
 
-/* 成就 */
-.m-ach-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(130px, 1fr)); gap: 12px; }
-.m-ach {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  gap: 6px;
-  background: var(--m-card-strong);
-  border: 1px solid var(--m-border);
-  border-radius: var(--m-radius-sm);
-  padding: 16px 8px;
-  text-align: center;
-  transition: all 0.25s ease;
-}
-.m-ach-icon { font-size: 26px; }
-.m-ach-title { font-size: 12px; font-weight: 700; line-height: 1.4; }
-.m-ach.is-locked { opacity: 0.45; filter: grayscale(0.8); }
-.m-ach.is-unlocked {
-  border-color: var(--m-accent);
-  box-shadow: 0 4px 18px rgba(168, 85, 247, 0.3);
-}
-
 /* ============================================================
  * 底部状态条
  * ============================================================ */
