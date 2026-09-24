@@ -14,37 +14,58 @@
           "order": 1,
           "tag": "[AI-GEN]",
           "action": "modern.html 全量重写：顶部粘性导航栏（Logo「YuchenSama の 宝藏之地」+ 8 个板块锚点 + 主题/语言/返回赛博版按钮）；居中胶囊搜索条（占位「搜寻标题、描述或标签…」）；双卡片行（个人资料卡：头像/简介/真实统计 3/8/解锁数 + 社交图标；播放器卡：CLOUD MUSIC 徽章 + 网易云 iframe 懒加载）；歌词横幅；内容网格（LATEST INSIGHT 大卡 / 数字孪生卡 / 开发历程 RECORDS / 日间模式主题卡）；底部状态条（实时时钟/运行时长/技术徽章/© 年份）；悬浮返回顶部 + 像素猫；11 板块 id 全部保留。",
-          "files": ["modern.html"],
+          "files": [
+            "modern.html"
+          ],
           "verify": "CDP：11 板块 id 齐全、导航 8 项、头像引用正确"
         },
         {
           "order": 2,
           "tag": "[AI-GEN]",
           "action": "styles/modern.css 全量重写：CSS 变量暗色主题 + body.is-light 日间主题；紫色毛玻璃（.m-nav/.m-profile/.m-player/.m-grid-top 等）；.is-search-hidden 隐藏规则；980/620px 响应式；背景图 .m-bg 占位（文件内 [MANUAL] 注释待用户放 assets/modern-bg.jpg）。",
-          "files": ["styles/modern.css"],
+          "files": [
+            "styles/modern.css"
+          ],
           "verify": "页面渲染正常（导航/网格/状态条样式）"
         },
         {
           "order": 3,
           "tag": "[AI-GEN]",
           "action": "scripts/modern.js：MODERN_DICT 扩充（导航/搜索/个人卡/播放器/歌词/网格/状态条词条）；新增模块——bindNavHighlight（滚动高亮导航，offsetTop 非单调兼容）、bindSearch（关键词过滤卡片）、bindClock（每秒刷新）、bindUptime（localStorage modern-site-since 首次访问计时）、bindTheme（日间/夜间切换，localStorage modern-theme 持久化）、bindBackTop（返回顶部）；init() 接入新模块 + 个人卡统计真实数据（项目 3 / 音游 ARCADES.length / 成就 loadUnlocked 计数）。",
-          "files": ["scripts/modern.js"],
+          "files": [
+            "scripts/modern.js"
+          ],
           "verify": "CDP：时钟格式、运行时长、统计数字、导航高亮随滚动切换、日间模式持久化、搜索过滤/清空恢复"
         },
         {
           "order": 4,
           "tag": "[AI-GEN]",
           "action": "CDP 全量回归验证（50+ 项）：布局骨架、11 板块、导航高亮（顶部/音乐/关于/项目/音游/联系/反馈墙/成就/底部 9 位置）、搜索过滤、日间模式切换与持久化、互动板块（音游 8/成就 11/孪生问答/反馈墙/音乐 iframe id=1935705479）、英文态全词条翻译 + html lang=en。",
-          "files": ["modern.html", "styles/modern.css", "scripts/modern.js"],
+          "files": [
+            "modern.html",
+            "styles/modern.css",
+            "scripts/modern.js"
+          ],
           "verify": "50+ 项全 PASS"
+        },
+        {
+          "order": 5,
+          "tag": "[MANUAL]",
+          "action": "用户反馈修正：1) 去除全部 YuchenSama 署名（导航 Logo→宝藏之地、hero 名字→刘聿宸、孪生卡名→AI · 刘聿宸、footer→梦想即力量、title→宝藏之地 · 刘聿宸，含 MODERN_DICT 英文词条同步）；2) hero 栏删除「成就」统计，仅保留项目 3 / 音游全连 8（移除 mStatAch 元素与 init 代码）。",
+          "files": [
+            "modern.html",
+            "scripts/modern.js"
+          ],
+          "verify": "CDP：页面无 YuchenSama、hero 统计仅 2 项、双语（宝藏之地/Treasure Land、刘聿宸/Liu Yuchen、梦想即力量/Dreams Are Power、title 双语）全 PASS"
         }
       ],
-      "verify": "CDP 自动化 50+ 项全 PASS：新布局骨架齐全、11 板块保留、导航滚动高亮 9 位置正确、搜索过滤恢复、日间模式持久化（localStorage modern-theme）、英文态翻译完整、音乐 iframe 注入正确、孪生问答回复渲染。",
+      "verify": "CDP 自动化 50+ 项全 PASS（含用户反馈修正后回归）：布局骨架、11 板块、导航滚动高亮、搜索过滤、日间模式持久化、双语完整、音乐 iframe、孪生问答、无 YuchenSama、hero 统计 2 项。",
       "issues": [
         "首测导航高亮在音乐卡位于页顶导致 offsetTop 非单调、滚动到 About 区域仍高亮音乐 → 改为取满足条件中 offsetTop 最大项 + 固定 130px 提前量后通过",
         "验证脚本曾受上一轮英文态遗留污染（搜索匹配中文失败）→ 脚本开头重置语言状态",
         "scripts/modern.js 编辑期间多次 DEEPWORKS_FILE_WRITE_LOCK_TIMEOUT → 改用 Python 脚本直接写入文件成功",
-        "CDP Page.captureScreenshot 在该环境持续超时（非功能项）→ 跳过视觉截图，功能验证已全通过"
+        "CDP Page.captureScreenshot 在该环境持续超时（非功能项）→ 跳过视觉截图，功能验证已全通过",
+        "scripts/modern.js 编辑两次 DEEPWORKS_FILE_WRITE_LOCK_TIMEOUT → Python 直写完成"
       ]
     },
     {
@@ -57,42 +78,56 @@
           "order": 1,
           "tag": "[AI-GEN]",
           "action": "scripts/i18n.js：新增词条「🎨 切换现代模式」→「🎨 Switch to Modern UI」；STORAGE_KEY 旁新增 PREFERRED_KEY='preferredLang'，读取优先新键回退旧键，setLang 双写两键。",
-          "files": ["scripts/i18n.js"],
+          "files": [
+            "scripts/i18n.js"
+          ],
           "verify": "window.I18n.t('🎨 切换现代模式') 返回英文词条"
         },
         {
           "order": 2,
           "tag": "[AI-GEN]",
           "action": "index.html：左上角新增 #modernSwitch 按钮（class='lang-switch modern-switch'，data-i18n 双语）；styles/style.css 追加 .modern-switch（left:84px 避让 langSwitch，小屏适配）；scripts/main.js 追加 click → location.href='modern.html'；版本 ?v= / data-version / BIOS → 1.45.0。",
-          "files": ["index.html", "styles/style.css", "scripts/main.js"],
+          "files": [
+            "index.html",
+            "styles/style.css",
+            "scripts/main.js"
+          ],
           "verify": "CDP：modernSwitch 存在且双语文案正确"
         },
         {
           "order": 3,
           "tag": "[AI-GEN]",
           "action": "新建 modern.html：11 板块（Hero/About/Skills/Projects/Arcade/Contact/Twin/Music/Feedback/Wall/Achievements）全部 data-lang 双语标注（共 73 处），右上角 mLangSwitch + mBackToCyber 按钮。",
-          "files": ["modern.html"],
+          "files": [
+            "modern.html"
+          ],
           "verify": "CDP：11 板块齐全，langEls=73"
         },
         {
           "order": 4,
           "tag": "[AI-GEN]",
           "action": "新建 styles/modern.css：Bento Grid（12 列，跨列错落）+ 毛玻璃（深色半透明遮罩/白微透明边框/22px 圆角/backdrop blur）+ 深蓝紫渐变背景；body::before 预留背景图占位。",
-          "files": ["styles/modern.css"],
+          "files": [
+            "styles/modern.css"
+          ],
           "verify": "页面样式渲染正常"
         },
         {
           "order": 5,
           "tag": "[AI-GEN]",
           "action": "新建 scripts/modern.js：data-lang 双语切换（独立 DICT，词条对齐 i18n.js）+ preferredLang 双键读写 + 互动板块（音游列表 8 项 / 数字孪生关键词问答 / 网易云 iframe 懒加载 / 反馈提交到 Supabase feedback 表 / 反馈墙只读读取 listed=true / 成就读取赛博版同 localStorage）。",
-          "files": ["scripts/modern.js"],
+          "files": [
+            "scripts/modern.js"
+          ],
           "verify": "CDP：音游 8 项、成就 11 项、孪生欢迎语、反馈墙容器"
         },
         {
           "order": 6,
           "tag": "[AI-GEN]",
           "action": "CHANGELOG.md 追加 v1.45.0 条目。",
-          "files": ["CHANGELOG.md"],
+          "files": [
+            "CHANGELOG.md"
+          ],
           "verify": "文档齐全"
         }
       ],

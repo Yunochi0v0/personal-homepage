@@ -39,7 +39,8 @@
     /* 导航 */
     "返回赛博版": "Back to Cyberpunk UI",
     "切换现代模式": "Switch to Modern UI",
-    "YuchenSama の 宝藏之地": "YuchenSama's Treasure Land",
+    "刘聿宸": "Liu Yuchen",
+    "宝藏之地": "Treasure Land",
     "首页": "Home",
     "关于": "About",
     "项目": "Projects",
@@ -183,9 +184,8 @@
 
     /* Footer */
     "系统已稳定运行 ": "System stable for ",
-    "YuchenSama · 梦想即力量": "YuchenSama · Dreams Are Power",
-    "回到顶部": "Back to top",
-    "刘聿宸 · 梦想即力量": "Liu Yuchen · Dreams Are Power"
+    "梦想即力量": "Dreams Are Power",
+    "回到顶部": "Back to top"
   };
 
   /* ---------- 3. data-lang 应用 ---------- */
@@ -225,12 +225,12 @@
     var sw = document.getElementById("mLangSwitch");
     if (sw) sw.textContent = isEn() ? "中" : "EN";
 
-    document.title = isEn() ? "Liu Yuchen · Modern Homepage" : "刘聿宸 · 现代版主页";
+    document.title = isEn() ? "Treasure Land · Liu Yuchen" : "宝藏之地 · 刘聿宸";
     var metaDesc = document.querySelector('meta[name="description"]');
     if (metaDesc) {
       metaDesc.setAttribute("content", isEn()
-        ? "Liu Yuchen's personal homepage - Modern Edition (Bento Grid)"
-        : "刘聿宸的个人主页 - 现代版（Bento Grid）");
+        ? "Liu Yuchen's personal homepage - Modern Edition (Treasure-Land style)"
+        : "刘聿宸的个人主页 - 现代版（宝藏之地风格）");
     }
 
     // 通知动态渲染模块（成就等按语言刷新）
@@ -694,18 +694,11 @@
     bindTheme();
     bindBackTop();
 
-    // 个人资料卡统计数字（真实数据：项目 3 / 音游 8 / 成就解锁数）
+    // 个人资料卡统计数字（真实数据：项目 3 / 音游 8）
     var stProj = $("mStatProjects");
     if (stProj) stProj.textContent = "3";
     var stArc = $("mStatArcade");
     if (stArc) stArc.textContent = String(ARCADES.length);
-    var stAch = $("mStatAch");
-    if (stAch) {
-      var unlockedCount = 0;
-      var unlockedMap = loadUnlocked();
-      for (var i = 0; i < ACH.length; i++) if (unlockedMap[ACH[i].id]) unlockedCount++;
-      stAch.textContent = String(unlockedCount);
-    }
 
     var year = $("mYear");
     if (year) year.textContent = String(new Date().getFullYear());

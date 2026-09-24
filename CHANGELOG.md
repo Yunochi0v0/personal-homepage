@@ -16,6 +16,10 @@
 - **作者**：katzegott
 - **类型**：`重构`
 
+### 修复（v1.45.1 追加）
+- **去除「YuchenSama」署名**（用户反馈）：导航 Logo →「宝藏之地 / Treasure Land」；hero 名字 →「刘聿宸 / Liu Yuchen」；孪生卡名 →「AI · 刘聿宸」；footer →「梦想即力量 / Dreams Are Power」；`<title>` →「宝藏之地 · 刘聿宸 / Treasure Land · Liu Yuchen」。
+- **hero 栏删除「成就」统计**（用户反馈）：个人资料卡统计仅保留「项目 3」「音游全连 8」两项，`mStatAch` 元素与对应 init 代码移除。
+
 ### 重构（AI-generated）
 - **整体风格**：现代版 `modern.html` 参考「宝藏之地」类参考图重构为紫色毛玻璃风格——深色夜间主题 + `body.is-light` 日间主题（`styles/modern.css` 全量重写为 CSS 变量）。
 - **顶部导航栏**：粘性导航（`.m-nav`）含 Logo「YuchenSama の 宝藏之地 / YuchenSama's Treasure Land」+ 8 个板块锚点（首页/关于/项目/音游/音乐/反馈墙/成就/联系）+ 主题切换 🌙/🌸、语言切换、返回赛博版按钮；滚动时高亮当前板块（兼容音乐卡位于页顶导致的 offsetTop 非单调布局，取最大 offsetTop 项 + 130px 提前量）。
