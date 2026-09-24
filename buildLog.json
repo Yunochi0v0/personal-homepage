@@ -5,6 +5,63 @@
   "note": "构建日志：记录每次 AI 生成 / 人工修改 / 验证过程，便于课程「过程可追溯」。AI 生成片段在步骤中以 [AI-GEN] 标注，人工修改以 [MANUAL] 标注。",
   "entries": [
     {
+      "version": "v1.50.2",
+      "date": "2026-09-25",
+      "steps": [
+        {
+          "order": 1,
+          "tag": "[AI-GEN]",
+          "action": "修复交互态圆环内部黑色：SVG circle 默认 fill 为黑色 → 圆环显式 fill=none、两个 svg 根兜底 fill=none。",
+          "files": [
+            "scripts/modern.js"
+          ],
+          "verify": "jsc 语法通过"
+        },
+        {
+          "order": 2,
+          "tag": "[AI-GEN]",
+          "action": "modern.css 新增 #mCursor .m-cursor-ring svg circle { fill: none; } 三重兜底。",
+          "files": [
+            "styles/modern.css"
+          ],
+          "verify": "computedFill=none"
+        },
+        {
+          "order": 3,
+          "tag": "[MANUAL]",
+          "action": "版本号 → 1.50.2 三处同步。",
+          "files": [
+            "modern.html"
+          ],
+          "verify": "一致"
+        },
+        {
+          "order": 4,
+          "tag": "[AI-GEN]",
+          "action": "开发日志同步：history.js 追加 v1.50.2；modern.js DEV_LOG_STAGES 同源重新提取（62 条）。",
+          "files": [
+            "scripts/history.js",
+            "scripts/modern.js"
+          ],
+          "verify": "语法通过"
+        },
+        {
+          "order": 5,
+          "tag": "[AI-GEN]",
+          "action": "CHANGELOG.md 追加 v1.50.2 条目；buildLog 追加本记录。",
+          "files": [
+            "CHANGELOG.md",
+            "buildLog.json"
+          ],
+          "verify": "文档齐全"
+        }
+      ],
+      "verify": "CDP 全 PASS：交互态圆环 attrFill/svgFill/computedFill 均为 none（完全透明），三瓣 mCursorOrbit 持续旋转正常。",
+      "issues": [
+        "用户反馈圆内仍为黑色 → 定位 SVG circle 默认 fill=black，三重 fill=none 修复"
+      ]
+    },
+    {
       "version": "v1.50.1",
       "date": "2026-09-25",
       "steps": [

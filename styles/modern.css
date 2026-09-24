@@ -1309,6 +1309,8 @@ body.m-immersive .m-bg-carousel {
   animation: mCursorOrbit 8s linear infinite;
   transform-origin: 0px 0px;
 }
+/* 圆环内部必须透明（SVG circle 默认 fill 为黑色，显式置空） */
+#mCursor .m-cursor-ring svg circle { fill: none; }
 @keyframes mCursorOrbit {
   from { transform: rotate(0deg); }
   to { transform: rotate(360deg); }

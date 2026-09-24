@@ -680,7 +680,7 @@
           '<g transform="translate(0,-13) scale(0.52)">' + petalPath() + "</g></g>";
       }
       return (
-        '<svg class="m-cursor-ring-svg" width="40" height="40" viewBox="-20 -20 40 40" aria-hidden="true">' +
+        '<svg class="m-cursor-ring-svg" width="40" height="40" viewBox="-20 -20 40 40" fill="none" aria-hidden="true">' +
         petalDefs() +
         bloom +
         '<circle r="2.8" fill="#ffb7d5" opacity="0.9"/>' +
@@ -697,9 +697,9 @@
           "</g></g>";
       }
       return (
-        '<svg class="m-cursor-ring-svg" width="56" height="56" viewBox="-28 -28 56 56" aria-hidden="true">' +
+        '<svg class="m-cursor-ring-svg" width="56" height="56" viewBox="-28 -28 56 56" fill="none" aria-hidden="true">' +
         petalDefs() +
-        '<circle r="20" stroke="#c084fc" stroke-width="2"/>' +
+        '<circle r="20" stroke="#c084fc" stroke-width="2" fill="none"/>' +
         '<g class="m-cursor-orbit">' + petals + "</g>" +
         "</svg>"
       );
@@ -1035,6 +1035,7 @@
           { v: "v1.49.0", date: "2026-09-25", text: "现代版新增开发历程 LOG：MISSION_01 卡片 📜 LOG 按钮打开紫色毛玻璃弹窗，数据与本页面 history.js 同源（3 阶段 55 条版本记录），乱码口令与彩蛋解密共享同一 localStorage 记录" },
           { v: "v1.50.0", date: "2026-09-25", text: "现代版新增樱花光标：默认=单片樱花花瓣（V 形缺口同背景图），移动时花瓣散落轨迹；悬浮可交互元素时整体旋转一圈，变为圆心+圆环+三片花瓣环绕（呼应本页面霓虹光标），原生光标首次移动后隐藏" },
           { v: "v1.50.1", date: "2026-09-25", text: "樱花光标形态优化：常态改为完整樱花花朵（5 片花瓣 + 中央花蕊），交互态圆内部透明（去掉实心圆心），三片环绕花瓣沿圆环持续缓慢旋转（8s 无限循环，进入时仍先旋转一圈）" },
+          { v: "v1.50.2", date: "2026-09-25", text: "修复交互态圆环内部显示为黑色：SVG circle 默认 fill 为黑色，显式设置 fill=none（含 svg 根 + CSS 兜底），圆内部恢复完全透明" },
         ]
       }
   ];

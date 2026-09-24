@@ -10,6 +10,32 @@
 
 ---
 
+## [v1.50.2] 修复：交互态圆环内部黑色 → 完全透明
+
+- **日期**：2026-09-25
+- **作者**：katzegott
+- **类型**：`修复`（AI-generated）
+
+### 修复（AI-generated）
+- **圆内黑色问题**：SVG `<circle>` 的默认 `fill` 为**黑色**，此前圆环只设置了 `stroke` 未设 `fill`，导致交互态圆内部显示为黑。修复：圆环显式 `fill="none"`，两个光标 SVG 根节点兜底 `fill="none"`，另加 CSS 规则 `#mCursor .m-cursor-ring svg circle { fill: none; }` 三重保险——圆内部恢复**完全透明**，仅保留紫色圆环轮廓。
+- **版本号** → 1.50.2：`data-version`、`styles/modern.css?v=`、`scripts/modern.js?v=` 更新。
+
+### 涉及文件
+| 文件 | 类型 | 说明 |
+| --- | --- | --- |
+| `scripts/modern.js` | 修改 | `interactiveSvg` 圆环 `fill="none"`；idle/interactive 两个 svg 根加 `fill="none"` |
+| `styles/modern.css` | 修改 | 新增 `.m-cursor-ring svg circle { fill: none; }` 兜底 |
+| `modern.html` | 修改 | 版本号 → 1.50.2（三处） |
+| `scripts/history.js` | 修改 | 开发日志 `STAGES` 追加 v1.50.2 记录 |
+| `scripts/modern.js` | 修改 | `DEV_LOG_STAGES` 同源重新提取（61 → 62 版本记录） |
+| `CHANGELOG.md` | 修改 | 追加本条目 |
+
+### 验证
+- jsc：语法通过。
+- CDP（modern.html?v=1.50.2）：交互态圆环 `fill=none`（属性 + svg 根 + computed 均为 none，透明）、三瓣 `mCursorOrbit` 持续旋转正常、无回归。
+
+---
+
 ## [v1.50.1] 修改：樱花光标形态优化（完整花朵常态 / 透明圆环 + 三瓣持续旋转）
 
 - **日期**：2026-09-25
