@@ -75,8 +75,8 @@
     "技术栈": "Stack",
     "方式": "Method",
     "成长史": "History",
-    "V3.22 上线 GitHub Pages → 反馈墙 / 音游展示区 / 开发历程 LOG → v1.44.0 移动端菜单 → v1.44.1 LOG 修复；点击 LOG 查看全部版本":
-      "V3.22 live on GitHub Pages → feedback wall / game showcase / dev LOG → v1.44.0 mobile menu → v1.44.1 LOG fix · Click LOG for all versions",
+    "V3.22 上线 GitHub Pages → 音游展示区 / 开发历程 LOG / 反馈墙 → v1.44.0 移动端菜单 → v1.44.1 LOG 修复；点击 LOG 查看全部版本":
+      "V3.22 live on GitHub Pages → game showcase / dev LOG / feedback wall → v1.44.0 mobile menu → v1.44.1 LOG fix · Click LOG for all versions",
     "课程项目": "Course Projects",
     "待填充": "TBD",
     "课程里的真实项目，会在这里记录目标、过程与收获。目前尚未开工，欢迎回来查看更新。":
