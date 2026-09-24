@@ -148,6 +148,17 @@
     "已收到，谢谢你的反馈！": "Got it — thanks for your feedback!",
     "知道了": "OK",
 
+    /* 反馈墙（v1.43.0） */
+    "公开展示到反馈墙（可被点赞和评论）": "Share on the feedback wall (likeable & commentable)",
+    "反馈墙": "Feedback Wall",
+    "反馈墙 · 大家的声音": "Feedback Wall · Voices of Visitors",
+    "主人管理": "Owner Mode",
+    "主人邮箱": "Owner Email",
+    "密码": "Password",
+    "登录": "Sign in",
+    "退出登录": "Sign out",
+    "还没有公开的反馈，来留一条吧？": "No public feedback yet — leave one?",
+
     /* 开发历程弹窗 */
     "// DEV HISTORY · 本个人主页开发历程": "// DEV HISTORY · Personal Homepage"
   };

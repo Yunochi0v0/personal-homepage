@@ -10,7 +10,41 @@
 
 ---
 
-## [v1.42.10] 修复：LOG 开启动画期间弹窗面板仍可滚动（当前）
+## [v1.43.0] 新增：反馈墙（公开反馈展示 + 点赞 + 评论 + 主人下架）（当前）
+
+- **日期**：2026-09-24
+- **作者**：katzegott
+- **类型**：`新增`
+
+### 新增
+- 反馈提交：表单新增「公开展示到反馈墙（可被点赞和评论）」勾选框，默认不展示（未勾选仍只有主人能看到）；提交数据新增 `listed` 字段（[AI-GEN]）。
+- 反馈墙：右下角操作台新增「反馈墙」徽章按钮，点击弹出弹层，列出所有已公开展示的反馈（昵称 / 关系 / 设备 / 内容 / 时间），支持：
+  - **点赞**：每位访客通过 `localStorage` 匿名标识（user_key）对每条反馈点一个赞（可取消），`unique(feedback_id, user_key)` 数据库层防重复（[AI-GEN]）。
+  - **评论**：展开卡片评论区，昵称可选、内容 ≤300 字，只允许评论已展示的反馈（[AI-GEN]）。
+  - **主人下架**：右下角「主人管理」输入 Supabase Auth 邮箱 + 密码登录后，每条卡片出现「下架」按钮——软下架（`listed=false`），数据保留在表里，主人仍可在控制台查看/恢复（[AI-GEN]）。
+- 数据库脚本 `supabase/feedback-wall.sql`：`feedback` 表新增 `listed` 列；新建 `feedback_likes`、`feedback_comments` 表；RLS 策略——anon 只能读 `listed=true` 的行及行下评论、可点赞/评论；authenticated（主人登录态）可软下架（仅 UPDATE `listed` 列）；幂等可重复执行（[AI-GEN]）。
+- **版本**：主页版本号 → 1.43.0；`style.css` / `main.js` / `stickman.js` / `history.js` / `feedback.js` / `i18n.js` 引用 `?v=1.43.0`；新增 `scripts/feedback-wall.js` 引用 `?v=1.43.0`；`main.js` BIOS → v1.43.0；`history.js` 新增 V3.43.0 条目。
+
+### 涉及文件
+| 文件 | 类型 | 说明 |
+| --- | --- | --- |
+| `supabase/feedback-wall.sql` | 新增 | 反馈墙数据库脚本：listed 列 + 点赞/评论表 + RLS 策略 + 授权（需在 Supabase 控制台执行） |
+| `scripts/feedback-wall.js` | 新增 | 反馈墙前端：列表渲染 / 点赞 / 评论 / 主人登录下架（防注入，textContent 渲染） |
+| `scripts/feedback.js` | 修改 | 提交数据附带 `listed`；打开表单时默认不勾选展示 |
+| `index.html` | 修改 | 表单勾选框；操作台反馈墙按钮；反馈墙弹层；引用与版本号 → 1.43.0 |
+| `styles/style.css` | 修改 | 反馈墙徽章 / 弹层 / 卡片 / 点赞 / 评论 / 主人管理样式（黄黑像素风） |
+| `scripts/i18n.js` | 修改 | 新增反馈墙相关双语翻译 |
+| `scripts/main.js` | 修改 | BIOS → v1.43.0 |
+| `scripts/history.js` | 修改 | 新增 V3.43.0 条目 |
+
+### 验证方式
+- `feedback.js` / `feedback-wall.js` / `history.js` / `main.js` / `i18n.js` V8 `--check` 语法通过；页面与脚本 HTTP 200。
+- CDP 浏览器实测：反馈墙弹层开关正常；表单勾选框存在且默认不勾选；弹层只读查询可正常渲染（需先在 Supabase 执行 `feedback-wall.sql`）。
+- 注意：本版需先在 Supabase 控制台 SQL Editor 执行 `supabase/feedback-wall.sql`，并在 Authentication → Users 添加主人账号（邮箱+密码），反馈墙的公开读 / 点赞 / 评论 / 下架才会生效。
+
+---
+
+## [v1.42.10] 修复：LOG 开启动画期间弹窗面板仍可滚动（历史）
 
 - **日期**：2026-09-24
 - **作者**：katzegott

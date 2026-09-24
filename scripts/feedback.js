@@ -16,7 +16,7 @@
   var MAX_MESSAGE = 1000;
 
   var overlay, modal, badge, closeBtn, form, successBox, submitBtn, errorBox, counterEl;
-  var nameEl, relationEl, deviceEl, messageEl, doneBtn;
+  var nameEl, relationEl, deviceEl, messageEl, doneBtn, listEl;
 
   var client = null;   // 惰性创建
   var sending = false; // 防重复提交标志
@@ -44,6 +44,7 @@
     deviceEl = $("fbDevice");
     messageEl = $("fbMessage");
     doneBtn = $("fbDone");
+    listEl = $("fbList");
 
     // 结构缺失时静默退出，不影响页面其他功能
     if (!overlay || !badge || !form || !messageEl) return;
@@ -119,6 +120,7 @@
       submitBtn.disabled = false;
       submitBtn.textContent = "提交反馈";
     }
+    if (listEl) listEl.checked = false; // 默认不公开展示（v1.43.0）
     sending = false;
     if (errorBox) errorBox.hidden = true;
     updateCounter();
@@ -154,7 +156,8 @@
         relation: relation,
         device: device,
         message: message,
-        version: version
+        version: version,
+        listed: !!(listEl && listEl.checked) // v1.43.0：勾选后公开展示到反馈墙
       })
       .then(function (res) {
         sending = false;
