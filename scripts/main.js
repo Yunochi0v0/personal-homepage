@@ -1075,7 +1075,7 @@ document.querySelectorAll(".is-placeholder").forEach((link) => {
   }
 
   const LINES = [
-    "DEEPWORKS BIOS v1.44.0",
+    "DEEPWORKS BIOS v1.44.1",
     "MEMTEST 640K ............... <OK>",
     "NEON SHADER LOAD ........... <OK>",
     "SINE WAVE ENGINE ........... <OK>",

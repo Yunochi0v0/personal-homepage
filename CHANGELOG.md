@@ -10,7 +10,33 @@
 
 ---
 
-## [v1.44.0] 新增：移动端功能菜单（音乐 / 反馈 / 反馈墙 收进一枚主按钮）（当前）
+## [v1.44.1] 修复：手机端 LOG 按钮被全息投影面板遮挡（当前）
+
+- **日期**：2026-09-24
+- **作者**：katzegott
+- **类型**：`修复`
+
+### 修复
+- 用户反馈：手机端项目板块中 LOG 按钮会被「全息投影」显示方式遮挡。
+- CDP 实测诊断（移动视口 390×844）：全息面板 `.mission-holo` 在窄屏 / 触屏下应内联常显（`position: static` 独占一行，位于 LOG 按钮下方），该媒体查询正常生效；但**触屏触摸任务行任意位置会触发 `:hover` / `:focus-within`**，上方悬停规则残留的 `transform: translateY(-50%)`（桌面悬浮定位用）特异度更高，覆盖了媒体查询的 `transform: none`，面板因此上移约半个自身高度（≈153px）盖住任务行——`elementFromPoint` 命中测试落入面板内容 `.holo-desc`，LOG 按钮点击被拦截、弹窗无法打开（[AI-GEN] 诊断记录）。
+- 修复：在 `(max-width: 1139px), (hover: none)` 分支内追加 `.mission:hover .mission-holo, .mission:focus-within .mission-holo { transform: none; }`，置于 reduced-motion 块之后保证层叠后声明覆盖；桌面悬停浮出行为不受影响。
+- **版本**：主页版本号 → 1.44.1；`style.css` / `main.js` / `stickman.js` / `history.js` / `feedback.js` / `feedback-wall.js` / `i18n.js` 引用 `?v=1.44.1`；`main.js` BIOS → v1.44.1；`history.js` 新增 V3.44.1 条目。
+
+### 涉及文件
+| 文件 | 类型 | 说明 |
+| --- | --- | --- |
+| `styles/style.css` | 修改 | 移动端 / 触屏分支新增 hover/focus 状态下面板 `transform: none`（防面板上移遮挡 LOG 按钮） |
+| `index.html` | 修改 | 版本号与引用 → 1.44.1 |
+| `scripts/main.js` | 修改 | BIOS → v1.44.1 |
+| `scripts/history.js` | 修改 | 新增 V3.44.1 条目 |
+
+### 验证方式
+- CDP 浏览器实测（移动视口 390×844，iPhone UA）：悬停 / 触摸任务行后全息面板保持内联常显不动（rect 不变），LOG 按钮命中测试恢复为按钮本体；真实点击 LOG 按钮 → 开发历程弹窗正常打开（`overlay` 显示 + `.is-open`）。
+- 桌面回归（1280 视口）：未悬停面板隐藏、悬停自右侧浮出正常；LOG 按钮可点，行为与修复前一致。
+
+---
+
+## [v1.44.0] 新增：移动端功能菜单（音乐 / 反馈 / 反馈墙 收进一枚主按钮）（历史）
 
 - **日期**：2026-09-24
 - **作者**：katzegott
