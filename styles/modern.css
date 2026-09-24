@@ -1264,3 +1264,75 @@ body.m-immersive .m-bg-carousel {
   .m-statusbar { justify-content: center; text-align: center; }
   .m-card { padding: 20px; }
 }
+
+/* ============================================================
+ * v1.50.0 樱花光标（AI-generated）
+ * 默认态 = 单片樱花花瓣；可交互态 = 圆心 + 圆环 + 三片花瓣环绕
+ * （切换时整体旋转一圈）；移动轨迹 = 花瓣散落粒子。
+ * 仅桌面精确指针 + 允许动效时启用；原生光标在首次移动后隐藏。
+ * ============================================================ */
+.has-mcursor,
+.has-mcursor * { cursor: none; }
+/* 输入框聚焦恢复系统文本光标，保证打字插入点可见 */
+.has-mcursor input:focus,
+.has-mcursor textarea:focus { cursor: text; }
+
+#mCursor {
+  position: fixed;
+  inset: 0 auto auto 0;
+  z-index: 1000;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.2s ease;
+}
+#mCursor.is-on { opacity: 1; }
+
+/* 圆心：交互态显示 */
+.m-cursor-dot {
+  position: fixed;
+  inset: 0 auto auto 0;
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: #fff;
+  box-shadow: 0 0 10px rgba(192, 132, 252, 0.95), 0 0 22px rgba(168, 85, 247, 0.6);
+  transform: translate(-50%, -50%);
+  opacity: 0;
+  transition: opacity 0.18s ease;
+}
+#mCursor.interactive .m-cursor-dot { opacity: 1; }
+
+/* 光标主体：默认花瓣 / 交互圆环+花瓣，由 JS 注入 SVG */
+.m-cursor-ring {
+  position: fixed;
+  inset: 0 auto auto 0;
+  width: 40px;
+  height: 40px;
+  transform: translate(-50%, -50%);
+  filter: drop-shadow(0 0 8px rgba(192, 132, 252, 0.7));
+}
+/* 进入/退出交互态时整体旋转一圈 */
+#mCursor.interactive .m-cursor-ring svg {
+  animation: mCursorSpin 0.55s cubic-bezier(0.2, 0.7, 0.3, 1.15) 1;
+}
+@keyframes mCursorSpin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+/* 轨迹散落花瓣粒子 */
+.m-cursor-petal {
+  position: fixed;
+  z-index: 999;
+  pointer-events: none;
+  filter: drop-shadow(0 0 4px rgba(244, 114, 182, 0.55));
+  animation: mCursorScatter 0.7s ease-out forwards;
+}
+@keyframes mCursorScatter {
+  0% { opacity: 0.95; transform: translate(0, 0) rotate(0deg) scale(1); }
+  100% { opacity: 0; transform: translate(var(--dx, 0px), var(--dy, 12px)) rotate(var(--rot, 120deg)) scale(0.35); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  #mCursor, .m-cursor-petal { display: none !important; }
+}

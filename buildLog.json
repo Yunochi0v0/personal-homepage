@@ -5,6 +5,74 @@
   "note": "构建日志：记录每次 AI 生成 / 人工修改 / 验证过程，便于课程「过程可追溯」。AI 生成片段在步骤中以 [AI-GEN] 标注，人工修改以 [MANUAL] 标注。",
   "entries": [
     {
+      "version": "v1.50.0",
+      "date": "2026-09-25",
+      "steps": [
+        {
+          "order": 1,
+          "tag": "[AI-GEN]",
+          "action": "新增 #mCursor 樱花光标容器（modern.html body 尾部）：默认=单片花瓣，可交互=圆心+圆环+三瓣环绕。",
+          "files": [
+            "modern.html"
+          ],
+          "verify": "容器存在"
+        },
+        {
+          "order": 2,
+          "tag": "[AI-GEN]",
+          "action": "modern.css 追加光标样式：.has-mcursor 隐藏原生光标（输入框 :focus 恢复 text）、#mCursor/.m-cursor-dot/.m-cursor-ring 形态、mCursorSpin 旋转一圈动画、.m-cursor-petal 轨迹散落（--dx/--dy/--rot）、reduced-motion 兜底。",
+          "files": [
+            "styles/modern.css"
+          ],
+          "verify": "样式渲染"
+        },
+        {
+          "order": 3,
+          "tag": "[AI-GEN]",
+          "action": "modern.js 新增 11.8 bindCursor()：SVG 渐变花瓣注入、CURSOR_HOVER_SELECTOR 交互判定（mouseover/mouseout 委托）、切换时 ring 替换 SVG + 旋转一圈、轨迹粒子节流（14px/上限18）、lerp 0.24 平滑跟随、fine-pointer+reduced-motion 守卫、钩子 __modernCursor。",
+          "files": [
+            "scripts/modern.js"
+          ],
+          "verify": "CDP 全 PASS"
+        },
+        {
+          "order": 4,
+          "tag": "[MANUAL]",
+          "action": "版本号 → 1.50.0：data-version / css?v= / js?v=。",
+          "files": [
+            "modern.html"
+          ],
+          "verify": "版本号三处一致"
+        },
+        {
+          "order": 5,
+          "tag": "[AI-GEN]",
+          "action": "开发日志数据同步：history.js STAGES 追加 v1.50.0（V3.0 阶段末尾）；modern.js DEV_LOG_STAGES 同源重新提取（60 版本记录）。",
+          "files": [
+            "scripts/history.js",
+            "scripts/modern.js"
+          ],
+          "verify": "现代版 3 阶段/60 版本、主页面含 v1.50.0"
+        },
+        {
+          "order": 6,
+          "tag": "[AI-GEN]",
+          "action": "CHANGELOG.md 追加 v1.50.0 条目；buildLog 追加本记录。",
+          "files": [
+            "CHANGELOG.md",
+            "buildLog.json"
+          ],
+          "verify": "文档齐全"
+        }
+      ],
+      "verify": "CDP 自动化全 PASS：默认单花瓣、移动轨迹花瓣+原生光标隐藏+lerp 跟随、悬浮按钮旋转一圈变圆心+圆环+三瓣环绕（animationName=mCursorSpin）、移出恢复、无回归（孪生/粒子/背景/加载层）。",
+      "issues": [
+        "SVG defs 中重复引用了花瓣 path 导致路径计数偏差 → petalFill 拆分 petalDefs/petalPath 修复",
+        "CDP 偶发返回 None（3 次）→ 重试 + 异常捕获通过",
+        "DEV_LOG_STAGES 同源提取时残留旧数组结束符（Unexpected token ']'）→ 清理后语法通过"
+      ]
+    },
+    {
       "version": "v1.49.0",
       "date": "2026-09-25",
       "author": "katzegott",

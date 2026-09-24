@@ -635,6 +635,166 @@
     });
   }
 
+  /* ---------- 11.8 樱花光标（v1.50.0） ----------
+   * 默认态 = 单片樱花花瓣（与背景图同款 V 形缺口）；悬浮可交互元素时
+   * 整体旋转一圈，变为「圆心 + 圆环 + 三片花瓣环绕」（圆心圆环形态呼应
+   * 主页面霓虹光标）；移动轨迹 = 花瓣散落粒子。
+   * 仅桌面精确指针且允许动效时启用；原生光标在首次移动后隐藏（html.has-mcursor）。 */
+  var CURSOR_HOVER_SELECTOR = [
+    "a", "button", "input", "textarea", "select", "summary", "label",
+    "[role='button']", "[data-click]",
+    ".m-btn", ".m-chip", ".m-project", ".m-project-log", ".m-float-btn",
+    ".m-twin-suggests button", ".m-music-player", ".m-arcade-list",
+    ".m-feedback-form", ".m-wall-card", ".m-tag", ".m-nav-links a", ".m-statusbar"
+  ].join(",");
+  var CURSOR_PETAL_PATH =
+    "M0 13 C-9.5 8.5 -10.5 -1.5 -2.8 -8 L0 -5.2 L2.8 -8 C10.5 -1.5 9.5 8.5 0 13 Z";
+  var CURSOR_TRAIL_STEP = 14;   // 每移动约 14px 落一片花瓣
+  var CURSOR_MAX_TRAIL = 18;    // 同屏花瓣粒子上限
+
+  function bindCursor() {
+    var fine = window.matchMedia("(hover: hover) and (pointer: fine)").matches;
+    var reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    if (!fine || reduce) return;
+    var host = $("mCursor");
+    if (!host) return;
+    var root = document.documentElement;
+
+    var gradId = "mCursorPetalGrad" + Math.random().toString(36).slice(2, 8);
+    var petalDefs = function () {
+      return (
+        '<defs><linearGradient id="' + gradId + '" x1="0" y1="-8" x2="0" y2="13" gradientUnits="userSpaceOnUse">' +
+        '<stop offset="0" stop-color="#ffe3f4"/><stop offset="1" stop-color="#f472b6"/>' +
+        "</linearGradient></defs>"
+      );
+    };
+    var petalPath = function () {
+      return '<path d="' + CURSOR_PETAL_PATH + '" fill="url(#' + gradId + ')"/>';
+    };
+    var idleSvg = function () {
+      return (
+        '<svg class="m-cursor-ring-svg" width="40" height="40" viewBox="-20 -20 40 40" aria-hidden="true">' +
+        petalDefs() + '<g transform="translate(0,-2)">' + petalPath() + "</g></svg>"
+      );
+    };
+    var interactiveSvg = function () {
+      var petals = "";
+      for (var i = 0; i < 3; i++) {
+        petals +=
+          '<g transform="rotate(' + (i * 120) + ')">' +
+          '<g transform="translate(0,-20) scale(0.62)">' +
+          '<path d="' + CURSOR_PETAL_PATH + '" fill="url(#' + gradId + ')"/>' +
+          "</g></g>";
+      }
+      return (
+        '<svg class="m-cursor-ring-svg" width="56" height="56" viewBox="-28 -28 56 56" aria-hidden="true">' +
+        petalDefs() +
+        '<circle r="20" stroke="#c084fc" stroke-width="2"/>' +
+        '<circle r="3.5" fill="#fff" opacity="0.95"/>' +
+        petals +
+        "</svg>"
+      );
+    };
+
+    host.innerHTML =
+      '<div class="m-cursor-dot" aria-hidden="true"></div>' +
+      '<div class="m-cursor-ring" aria-hidden="true">' + idleSvg() + "</div>";
+    var dot = host.querySelector(".m-cursor-dot");
+    var ring = host.querySelector(".m-cursor-ring");
+
+    var mx = window.innerWidth / 2, my = window.innerHeight / 2;
+    var tx = mx, ty = my;      // 目标（指针位置）
+    var cx = mx, cy = my;      // 当前（环平滑跟随）
+    var lastX = mx, lastY = my;
+    var trailCount = 0;
+    var started = false;
+    var spinning = false;
+
+    var hook = (window.__modernCursor = {
+      started: false,
+      interactive: false,
+      spins: 0,
+      mode: function () { return host.classList.contains("interactive") ? "interactive" : "idle"; },
+      petals: function () { return document.querySelectorAll(".m-cursor-petal").length; }
+    });
+
+    function spawnPetal(x, y) {
+      if (trailCount >= CURSOR_MAX_TRAIL) return;
+      var p = document.createElement("span");
+      p.className = "m-cursor-petal";
+      p.setAttribute("aria-hidden", "true");
+      p.style.left = x + "px";
+      p.style.top = y + "px";
+      p.style.setProperty("--dx", (Math.random() * 30 - 15).toFixed(1) + "px");
+      p.style.setProperty("--dy", (Math.random() * 18 + 10).toFixed(1) + "px");
+      p.style.setProperty("--rot", (Math.random() * 240 + 60).toFixed(0) + "deg");
+      p.innerHTML = (
+        '<svg width="13" height="13" viewBox="-20 -20 40 40" aria-hidden="true">' +
+        '<g transform="scale(0.42)"><path d="' + CURSOR_PETAL_PATH + '" fill="' +
+        (Math.random() > 0.5 ? "#f9a8d4" : "#c084fc") + '"/></g></svg>'
+      );
+      document.body.appendChild(p);
+      trailCount += 1;
+      p.addEventListener("animationend", function () { p.remove(); trailCount -= 1; });
+    }
+
+    function setInteractive(on) {
+      var had = host.classList.contains("interactive");
+      if (on) {
+        if (!had) { hook.spins += 1; spinning = true; }
+        host.classList.add("interactive");
+        ring.innerHTML = interactiveSvg();
+      } else {
+        if (had) ring.innerHTML = idleSvg();
+        host.classList.remove("interactive");
+      }
+      hook.interactive = on;
+      // 旋转一圈动画结束后复位标记（供 CDP 观察）
+      window.setTimeout(function () { spinning = false; }, 650);
+    }
+
+    function onMove(e) {
+      tx = e.clientX; ty = e.clientY;
+      if (!started) {
+        started = true;
+        hook.started = true;
+        cx = tx; cy = ty;
+        lastX = tx; lastY = ty;
+        root.classList.add("has-mcursor");
+        host.classList.add("is-on");
+      }
+      var dx = tx - lastX, dy = ty - lastY;
+      if (dx * dx + dy * dy >= CURSOR_TRAIL_STEP * CURSOR_TRAIL_STEP) {
+        spawnPetal(tx, ty);
+        lastX = tx; lastY = ty;
+      }
+      dot.style.left = tx + "px";
+      dot.style.top = ty + "px";
+    }
+
+    function isHoverTarget(elm) {
+      return !!(elm && typeof elm.closest === "function" && elm.closest(CURSOR_HOVER_SELECTOR));
+    }
+    document.addEventListener("mousemove", onMove, { passive: true });
+    document.addEventListener("mouseover", function (e) {
+      if (!started) return;
+      if (isHoverTarget(e.target)) setInteractive(true);
+    });
+    document.addEventListener("mouseout", function (e) {
+      if (!started) return;
+      if (isHoverTarget(e.target) && !isHoverTarget(e.relatedTarget)) setInteractive(false);
+    });
+
+    function tick() {
+      cx += (tx - cx) * 0.24;
+      cy += (ty - cy) * 0.24;
+      ring.style.left = cx + "px";
+      ring.style.top = cy + "px";
+      requestAnimationFrame(tick);
+    }
+    requestAnimationFrame(tick);
+  }
+
   /* ---------- 13. v1.46.0 新增：背景轮换（手动/每 2 分钟自动）+ 樱花飘落粒子 ---------- */
 
   /* 13.1 背景轮换：assets/bg/ 下 4 张樱花背景图，交叉淡入淡出 */
@@ -869,6 +1029,7 @@
           { v: "v1.47.0", date: "2026-09-25", text: "现代版新增 4 秒衔接加载动画：赛博黄网格 / 青扫描线（衔接主页面风格）→ 紫色宝藏之地 + 樱花花瓣飘入 + 内容上浮入场" },
           { v: "v1.48.0", date: "2026-09-25", text: "现代版新增沉浸模式：🖼️ 按钮点击后只保留背景与樱花粒子特效，导航 / 内容 / 状态条淡出隐藏，0.65s 双向过渡 + 背景推近 scale(1.1)" },
           { v: "v1.49.0", date: "2026-09-25", text: "现代版新增开发历程 LOG：MISSION_01 卡片 📜 LOG 按钮打开紫色毛玻璃弹窗，数据与本页面 history.js 同源（3 阶段 55 条版本记录），乱码口令与彩蛋解密共享同一 localStorage 记录" },
+          { v: "v1.50.0", date: "2026-09-25", text: "现代版新增樱花光标：默认=单片樱花花瓣（V 形缺口同背景图），移动时花瓣散落轨迹；悬浮可交互元素时整体旋转一圈，变为圆心+圆环+三片花瓣环绕（呼应本页面霓虹光标），原生光标首次移动后隐藏" },
         ]
       }
     ];
@@ -1070,6 +1231,7 @@
     bindLoader();
     bindFocus();
     bindDevLog();
+    bindCursor();
 
     // 个人资料卡统计数字（真实数据：项目 3 / 音游 8）
     var stProj = $("mStatProjects");

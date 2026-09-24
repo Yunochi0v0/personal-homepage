@@ -10,6 +10,39 @@
 
 ---
 
+## [v1.50.0] 新增：现代版樱花光标（花瓣轨迹 / 交互圆环 + 三瓣环绕）
+
+- **日期**：2026-09-25
+- **作者**：katzegott
+- **类型**：`新增`（AI-generated）
+
+### 新增（AI-generated）
+- **樱花光标形态**：现代版新增 `#mCursor` 自定义光标——默认态为**单片樱花花瓣**（SVG，V 形缺口同背景樱花图，粉→淡紫渐变，紫色辉光）；悬浮于任何可交互元素（按钮/卡片/标签/导航/表单等，`CURSOR_HOVER_SELECTOR` 覆盖现代版全部交互类）时，光标**整体旋转一圈**（`mCursorSpin` 0.55s）后变为**圆心 + 圆环 + 三片花瓣环绕**形态——圆环与圆心呼应主页面霓虹光标（dot+ring）的常规状态，最外圈三片花瓣 `rotate(0/120/240)` 环绕；移出后恢复单片花瓣。
+- **花瓣轨迹粒子**：指针移动约每 14px 落一片 13px 小花瓣（`--dx/--dy/--rot` CSS 变量随机下落 + 旋转 + 淡出，0.7s，同屏上限 18 片），轨迹与主页面霓虹拖尾同理。
+- **交互细节**：圆心随指针即时定位；圆环 `lerp 0.24` 平滑跟随；首次鼠标移动才挂载 `html.has-mcursor` 隐藏原生光标（`cursor:none`），输入框 `:focus` 恢复系统文本光标；仅 `(hover:hover) and (pointer:fine)` 且非 `prefers-reduced-motion` 时启用（reduced-motion 下整组隐藏）。
+- **测试钩子**：`window.__modernCursor = { mode(), petals(), spins, started, interactive }`。
+- **版本号** → 1.50.0：`data-version`、`styles/modern.css?v=`、`scripts/modern.js?v=` 更新。
+
+### 涉及文件
+| 文件 | 类型 | 说明 |
+| --- | --- | --- |
+| `modern.html` | 修改 | 新增 `#mCursor` 光标容器（body 尾部、脚本前）；版本号 → 1.50.0 |
+| `styles/modern.css` | 修改 | `.has-mcursor` 隐藏原生光标、`#mCursor/.m-cursor-dot/.m-cursor-ring` 形态、`mCursorSpin` 旋转一圈、`.m-cursor-petal` 轨迹散落动画、reduced-motion 兜底 |
+| `scripts/modern.js` | 修改 | 新增 11.8 `bindCursor()` 模块（SVG 注入 / 交互态切换 / 轨迹粒子 / lerp 跟随 / 钩子）+ init 注册 |
+| `scripts/history.js` | 修改 | 开发日志 `STAGES` 追加 v1.50.0 记录（V3.0 阶段末尾） |
+| `scripts/modern.js` | 修改 | `DEV_LOG_STAGES` 与 history.js 同源重新提取（55 → 60 版本记录） |
+| `CHANGELOG.md` | 修改 | 追加本条目 |
+
+### 验证
+- jsc：`modern.js` / `history.js` 语法通过。
+- CDP（127.0.0.1:8123/modern.html?v=1.50.0）：
+  - 默认态 1 片花瓣、`__modernCursor.mode()==='idle'`；首次移动后 `html.has-mcursor` 生效、`body cursor:none`、轨迹花瓣 ≥2、dot 跟随指针、圆环 lerp 接近。
+  - 悬浮 `#mDevLogTrigger`：`mode==='interactive'`、SVG 3 花瓣 + 2 圆（圆环+圆心）、`animationName==='mCursorSpin'`、`spins` 递增；移出恢复 1 花瓣、圆心隐藏。
+  - 无回归：数字孪生问答、樱花粒子、背景 4 图、加载层已移除。
+  - 开发日志同步：现代版弹窗 60 条（3 阶段/60 版本）、末行 v1.50.0；主页面 LOG 含 v1.50.0 且 V3.44.3 保留。
+
+---
+
 ## [v1.49.0] 新增：现代版开发历程弹窗（与主页面 history.js 同源数据）
 
 - **日期**：2026-09-25
