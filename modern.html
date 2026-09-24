@@ -3,46 +3,158 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <meta name="description" content="刘聿宸的个人主页 - 现代版（Bento Grid）" />
-  <title>刘聿宸 · 现代版主页</title>
+  <meta name="description" content="刘聿宸的个人主页 - 现代版（宝藏之地风格）" />
+  <title>YuchenSama の 宝藏之地</title>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@400;500;700;900&family=Inter:wght@400;500;700;900&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="styles/modern.css?v=1.45.0" />
+  <link rel="stylesheet" href="styles/modern.css?v=1.45.1" />
 </head>
-<body data-version="1.45.0">
+<body data-version="1.45.1">
 
-  <!-- 顶部工具栏（v1.45.0 · AI-GEN）：右侧两个悬浮按钮 ——
-       语言切换（Bento 风格，data-lang 双语）+ 返回赛博版 -->
-  <header class="m-topbar">
-    <button id="mLangSwitch" class="m-btn m-lang" type="button" aria-label="切换语言 / Switch language">EN</button>
-    <button id="mBackToCyber" class="m-btn m-back" type="button" data-lang-aria="返回赛博版" aria-label="返回赛博版">
-      <span data-lang="返回赛博版">返回赛博版</span>
-    </button>
-  </header>
+  <!-- ===== 顶部导航栏（v1.45.1 · AI-GEN，参考「宝藏之地」风格） ===== -->
+  <nav class="m-nav">
+    <a class="m-nav-logo" href="#m-hero">
+      <span class="m-nav-logo-badge" aria-hidden="true">✦</span>
+      <span data-lang="YuchenSama の 宝藏之地">YuchenSama の 宝藏之地</span>
+    </a>
+    <ul class="m-nav-links" id="mNavLinks">
+      <li><a href="#m-hero" class="is-active" data-lang="首页">首页</a></li>
+      <li><a href="#m-about" data-lang="关于">关于</a></li>
+      <li><a href="#m-projects" data-lang="项目">项目</a></li>
+      <li><a href="#m-arcade" data-lang="音游">音游</a></li>
+      <li><a href="#m-music" data-lang="音乐">音乐</a></li>
+      <li><a href="#m-wall" data-lang="反馈墙">反馈墙</a></li>
+      <li><a href="#m-achievements" data-lang="成就">成就</a></li>
+      <li><a href="#m-contact" data-lang="联系">联系</a></li>
+    </ul>
+    <div class="m-nav-actions">
+      <button id="mThemeToggle" class="m-nav-btn" type="button" data-lang-aria="切换日间模式 / 夜间模式" aria-label="切换日间模式 / 夜间模式">🌙</button>
+      <button id="mLangSwitch" class="m-nav-btn m-lang" type="button" aria-label="切换语言 / Switch language">EN</button>
+      <button id="mBackToCyber" class="m-nav-btn m-back" type="button" data-lang-aria="返回赛博版" aria-label="返回赛博版">
+        <span data-lang="返回赛博版">返回赛博版</span>
+      </button>
+    </div>
+  </nav>
+
+  <!-- ===== 搜索条 ===== -->
+  <div class="m-search-wrap">
+    <input id="mSearch" class="m-search" type="search"
+           data-lang-ph="搜寻标题、描述或标签…" placeholder="搜寻标题、描述或标签…" autocomplete="off" />
+  </div>
 
   <main class="m-main">
 
-    <!-- 1. Hero -->
-    <section id="m-hero" class="m-bento m-hero">
-      <div class="m-hero-avatar"><img src="assets/avatar.jpg" alt="刘聿宸头像" /></div>
-      <div>
-        <p class="m-hero-kicker" data-lang="// MODERN EDITION · 现代版主页">// MODERN EDITION · 现代版主页</p>
-        <h1 class="m-hero-name"><span data-lang="你好，我是 ">你好，我是 </span><strong>刘聿宸</strong><span data-lang=" · 18 岁"> · 18 岁</span></h1>
-        <p class="m-hero-slogan" data-lang="梦想即力量">梦想即力量</p>
-        <p class="m-hero-sub" data-lang="大一新生 · 编程与人工智能初学者 · 正在用 AI 辅助开发记录我的成长">大一新生 · 编程与人工智能初学者 · 正在用 AI 辅助开发记录我的成长</p>
-        <p class="m-hero-status">
+    <!-- ===== 双卡片行：个人资料卡 + 音乐播放器卡 ===== -->
+    <div class="m-row m-row-2">
+
+      <!-- 1. 个人资料卡（Hero） -->
+      <section id="m-hero" class="m-card m-profile">
+        <img class="m-profile-avatar" src="assets/avatar.jpg" alt="刘聿宸头像" />
+        <h2 class="m-profile-name">YuchenSama</h2>
+        <p class="m-profile-bio" data-lang="大一新生 · 编程与人工智能初学者 · 用 AI 辅助开发记录我的成长">
+          大一新生 · 编程与人工智能初学者 · 用 AI 辅助开发记录我的成长
+        </p>
+        <div class="m-profile-stats">
+          <div class="m-profile-stat"><b id="mStatProjects">3</b><em data-lang="项目">项目</em></div>
+          <div class="m-profile-stat"><b id="mStatArcade">8</b><em data-lang="音游全连">音游全连</em></div>
+          <div class="m-profile-stat"><b id="mStatAch">0</b><em data-lang="成就">成就</em></div>
+        </div>
+        <div class="m-profile-social">
+          <a href="mailto:319008328@qq.com" aria-label="邮箱 / Email" title="邮箱 / Email">
+            <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="m22 7-10 6L2 7"/></svg>
+          </a>
+          <a href="https://github.com/Yunochi0v0" target="_blank" rel="noopener noreferrer" aria-label="GitHub" title="GitHub">
+            <svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor" aria-hidden="true"><path d="M12 .5A11.5 11.5 0 0 0 .5 12a11.5 11.5 0 0 0 7.86 10.92c.58.1.79-.25.79-.56v-2.23c-3.2.7-3.87-1.36-3.87-1.36-.53-1.32-1.28-1.68-1.28-1.68-1.05-.71.08-.7.08-.7 1.16.08 1.77 1.19 1.77 1.19 1.03 1.76 2.7 1.25 3.36.96.1-.75.4-1.25.73-1.54-2.55-.29-5.23-1.28-5.23-5.68 0-1.26.45-2.29 1.19-3.09-.12-.29-.52-1.46.11-3.05 0 0 .97-.31 3.18 1.18a11.1 11.1 0 0 1 5.8 0c2.2-1.49 3.17-1.18 3.17-1.18.63 1.59.23 2.76.11 3.05.74.8 1.19 1.83 1.19 3.09 0 4.41-2.69 5.38-5.25 5.67.41.35.77 1.05.77 2.12v3.15c0 .31.21.67.8.56A11.5 11.5 0 0 0 23.5 12 11.5 11.5 0 0 0 12 .5Z"/></svg>
+          </a>
+          <a href="https://music.163.com" target="_blank" rel="noopener noreferrer" aria-label="网易云音乐 / NetEase Music" title="网易云音乐 / NetEase Music">
+            <svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor" aria-hidden="true"><path d="M12 2a10 10 0 1 0 0 20 10 10 0 0 0 0-20Zm2.7 6.2a1 1 0 1 1-1-1.7 3.2 3.2 0 0 0-3.1 5.6 5.3 5.3 0 1 0 8.4-6.1 1 1 0 1 1 1.6-1.2A7.3 7.3 0 1 1 9.6 6.6a5.2 5.2 0 0 0-3 4.7 1 1 0 0 1-2 0 7.3 7.3 0 0 1 3.1-5.8 1 1 0 0 1 .6-.2c2.1-.1 3.6.5 4.9 2.1a1 1 0 0 1-1.5 1.2 2.1 2.1 0 0 0-3-1.1 3.2 3.2 0 0 0-.4 4.5 3.3 3.3 0 0 0 4.5.7l.1-.1a3.2 3.2 0 0 0 1.3-2.5 1 1 0 0 1 2 0 5.2 5.2 0 0 1-2.1 4.1 5.2 5.2 0 1 1-7-8Z"/></svg>
+          </a>
+        </div>
+        <p class="m-profile-status">
           <span class="m-dot" aria-hidden="true"></span>
           <span data-lang="当前位于 深圳 · 持续迭代中">当前位于 深圳 · 持续迭代中</span>
         </p>
-        <div class="m-hero-actions">
-          <a class="m-btn m-btn-primary" href="#m-contact" data-lang="联系我">联系我</a>
-          <a class="m-btn m-btn-ghost" href="#m-about" data-lang="了解我">了解我</a>
-        </div>
-      </div>
-    </section>
+      </section>
 
-    <!-- 2. 个人简介 About -->
-    <section id="m-about" class="m-bento">
+      <!-- 8. 音乐播放器卡 -->
+      <section id="m-music" class="m-card m-player">
+        <span class="m-player-badge">CLOUD MUSIC</span>
+        <h3 class="m-player-title" data-lang="🎧 现代随身听">🎧 现代随身听</h3>
+        <p class="m-player-sub" data-lang="J-ROCK & J-POP · 点击播放（网易云外链）">J-ROCK & J-POP · 点击播放（网易云外链）</p>
+        <!-- [MANUAL] 网易云外链 iframe（单曲 1935705479）：懒加载，点击按钮才注入。
+             换歌只需替换歌曲 ID；与赛博版 music.js 同一首曲目。 -->
+        <div class="m-music-player" id="mMusicPlayer"></div>
+        <div class="m-player-controls">
+          <button class="m-player-btn" id="mMusicBtn" type="button" data-lang="播放 / 切换">播放 / 切换</button>
+        </div>
+      </section>
+    </div>
+
+    <!-- ===== 歌词横幅 ===== -->
+    <div class="m-lyric-bar" aria-hidden="true">
+      <span class="m-lyric-wave"><i></i><i></i><i></i><i></i><i></i></span>
+      <p data-lang="♪ 梦想即力量 · Dreams Are Power">♪ 梦想即力量 · Dreams Are Power</p>
+      <span class="m-lyric-note">♪</span>
+    </div>
+
+    <!-- ===== 内容网格区（左上大卡 / 右上 · 右下） ===== -->
+    <div class="m-grid m-grid-top">
+
+      <!-- 左大卡：最新动态 -->
+      <article class="m-card m-feature">
+        <span class="m-tag m-tag-purple" data-lang="最新动态">最新动态</span>
+        <p class="m-feature-date">2026.09.25</p>
+        <h3 class="m-feature-title" data-lang="v1.45.1 宝藏之地风格上线">v1.45.1 宝藏之地风格上线</h3>
+        <p class="m-feature-sub" data-lang="紫色毛玻璃 + 顶部导航 + 播放器卡 + 歌词横幅 + 日间模式，双页面中英同步">
+          紫色毛玻璃 + 顶部导航 + 播放器卡 + 歌词横幅 + 日间模式，双页面中英同步
+        </p>
+      </article>
+
+      <!-- 右上卡：数字孪生 -->
+      <article id="m-twin" class="m-card m-twin-card">
+        <div class="m-twin-head">
+          <img class="m-twin-avatar" src="assets/avatar.jpg" alt="数字孪生头像" />
+          <div class="m-twin-id">
+            <span class="m-twin-name">AI · YuchenSama</span>
+            <span class="m-twin-status"><span class="m-dot" aria-hidden="true"></span><span data-lang="在线 · 数字孪生">在线 · 数字孪生</span></span>
+          </div>
+          <span class="m-chip">BETA</span>
+        </div>
+        <div class="m-twin-body" id="mTwinBody" role="log" aria-live="polite"></div>
+        <div class="m-twin-suggests" id="mTwinSuggests">
+          <button type="button" data-q="你是谁？" data-lang="你是谁？">你是谁？</button>
+          <button type="button" data-q="你的 slogan 是什么？" data-lang="你的 slogan 是什么？">你的 slogan 是什么？</button>
+          <button type="button" data-q="你有什么爱好？" data-lang="你有什么爱好？">你有什么爱好？</button>
+        </div>
+        <form class="m-twin-input" id="mTwinForm" autocomplete="off">
+          <input id="mTwinInput" type="text" maxlength="80" data-lang-ph="向我提问，比如：你会什么技能？" placeholder="向我提问，比如：你会什么技能？" />
+          <button type="submit" data-lang-aria="发送" aria-label="发送">➤</button>
+        </form>
+      </article>
+
+      <!-- 右下左卡：开发历程归档 -->
+      <article class="m-card m-records">
+        <span class="m-tag" data-lang="开发历程">开发历程</span>
+        <p class="m-records-date">2026.09.25</p>
+        <h3 class="m-records-title" data-lang="归档：版本记录">归档：版本记录</h3>
+        <ul class="m-records-list">
+          <li><b>v1.45.1</b><span data-lang="宝藏之地风格重构">宝藏之地风格重构</span></li>
+          <li><b>v1.45.0</b><span data-lang="现代版主页上线">现代版主页上线</span></li>
+          <li><b>v1.44.3</b><span data-lang="迭代记录时间重排">迭代记录时间重排</span></li>
+          <li><b>v1.44.2</b><span data-lang="项目板块写入迭代历史">项目板块写入迭代历史</span></li>
+        </ul>
+      </article>
+
+      <!-- 右下右卡：日间模式切换 -->
+      <article class="m-card m-theme-card" id="mThemeCard" role="button" tabindex="0" data-lang-aria="点击切换日间模式 / 夜间模式" aria-label="点击切换日间模式 / 夜间模式">
+        <span class="m-theme-icon" id="mThemeIcon" aria-hidden="true">🌸</span>
+        <h3 class="m-theme-title" data-lang="日间模式">日间模式</h3>
+        <p class="m-theme-sub" data-lang="点击切换明暗主题">点击切换明暗主题</p>
+      </article>
+    </div>
+
+    <!-- ===== 2. 个人简介 ===== -->
+    <section id="m-about" class="m-card m-block">
       <h2 class="m-title" data-lang="个人简介">个人简介</h2>
       <p class="m-sub" data-lang="一点关于我的介绍">一点关于我的介绍</p>
       <div class="m-stack">
@@ -52,8 +164,8 @@
       </div>
     </section>
 
-    <!-- 3. 技能栏 Skills -->
-    <section id="m-skills" class="m-bento">
+    <!-- ===== 3. 技能栏 ===== -->
+    <section id="m-skills" class="m-card m-block">
       <h2 class="m-title" data-lang="技能">技能</h2>
       <p class="m-sub" data-lang="我掌握与正在学习的内容">我掌握与正在学习的内容</p>
       <div class="m-skill-list">
@@ -76,24 +188,24 @@
       </div>
     </section>
 
-    <!-- 4. 项目栏 Projects -->
-    <section id="m-projects" class="m-bento">
+    <!-- ===== 4. 项目栏 ===== -->
+    <section id="m-projects" class="m-card m-block">
       <h2 class="m-title" data-lang="项目">项目</h2>
       <p class="m-sub" data-lang="正在完成与计划中的作品">正在完成与计划中的作品</p>
       <div class="m-project-grid">
-        <article class="m-project">
+        <article class="m-project" data-search="本个人主页">
           <span class="m-project-id">[MISSION_01]</span>
           <h3 data-lang="本个人主页">本个人主页</h3>
           <p data-lang="记录学习与成长的个人主页 MVP。纯 HTML / CSS / JavaScript 手写，持续加入反馈墙、音游展示区、开发历程 LOG 与移动端适配。">记录学习与成长的个人主页 MVP。纯 HTML / CSS / JavaScript 手写，持续加入反馈墙、音游展示区、开发历程 LOG 与移动端适配。</p>
           <span class="m-chip m-chip-active" data-lang="进行中">进行中</span>
         </article>
-        <article class="m-project">
+        <article class="m-project" data-search="课程项目">
           <span class="m-project-id">[MISSION_02]</span>
           <h3 data-lang="课程项目">课程项目</h3>
           <p data-lang="课程里的真实项目，会在这里记录目标、过程与收获。目前尚未开工。">课程里的真实项目，会在这里记录目标、过程与收获。目前尚未开工。</p>
           <span class="m-chip" data-lang="待填充">待填充</span>
         </article>
-        <article class="m-project">
+        <article class="m-project" data-search="下一个想法">
           <span class="m-project-id">[MISSION_03]</span>
           <h3 data-lang="我的下一个想法">我的下一个想法</h3>
           <p data-lang="正在酝酿中的小点子，等它成型后我会写下完整的设计与实现。">正在酝酿中的小点子，等它成型后我会写下完整的设计与实现。</p>
@@ -102,17 +214,17 @@
       </div>
     </section>
 
-    <!-- 5. 音游栏 Arcade -->
-    <section id="m-arcade" class="m-bento">
+    <!-- ===== 5. 音游栏 ===== -->
+    <section id="m-arcade" class="m-card m-block">
       <h2 class="m-title" data-lang="音游">音游</h2>
       <p class="m-sub" data-lang="世界计划 缤纷舞台 · MASTER 全连记录">世界计划 缤纷舞台 · MASTER 全连记录</p>
       <ul class="m-arcade-list" id="mArcadeList">
-        <!-- modern.js 读取 arcade.json 渲染 -->
+        <!-- modern.js 渲染 -->
       </ul>
     </section>
 
-    <!-- 6. 联系方式 Contact -->
-    <section id="m-contact" class="m-bento">
+    <!-- ===== 6. 联系方式 ===== -->
+    <section id="m-contact" class="m-card m-block">
       <h2 class="m-title" data-lang="联系我">联系我</h2>
       <p class="m-sub" data-lang="欢迎交流，期待认识你">欢迎交流，期待认识你</p>
       <div class="m-contact-grid">
@@ -127,48 +239,8 @@
       </div>
     </section>
 
-    <!-- 7. 数字孪生 Twin -->
-    <section id="m-twin" class="m-bento">
-      <h2 class="m-title" data-lang="数字孪生">数字孪生</h2>
-      <p class="m-sub" data-lang="虚拟的我 · 基于个人简介与你对话">虚拟的我 · 基于个人简介与你对话</p>
-      <div class="m-twin-card">
-        <div class="m-twin-head">
-          <div class="m-twin-avatar"><img src="assets/avatar.jpg" alt="数字孪生头像" /></div>
-          <div>
-            <span class="m-twin-name">AI · 刘聿宸</span>
-            <span class="m-twin-status"><span class="m-dot" aria-hidden="true"></span><span data-lang="在线 · 数字孪生">在线 · 数字孪生</span></span>
-          </div>
-          <span class="m-chip">BETA</span>
-        </div>
-        <div class="m-twin-body" id="mTwinBody" role="log" aria-live="polite"></div>
-        <div class="m-twin-suggests" id="mTwinSuggests">
-          <button type="button" data-q="你是谁？" data-lang="你是谁？">你是谁？</button>
-          <button type="button" data-q="你的 slogan 是什么？" data-lang="你的 slogan 是什么？">你的 slogan 是什么？</button>
-          <button type="button" data-q="你在哪个学校？" data-lang="你在哪个学校？">你在哪个学校？</button>
-          <button type="button" data-q="你有什么爱好？" data-lang="你有什么爱好？">你有什么爱好？</button>
-        </div>
-        <form class="m-twin-input" id="mTwinForm" autocomplete="off">
-          <input id="mTwinInput" type="text" maxlength="80" data-lang-ph="向我提问，比如：你会什么技能？" placeholder="向我提问，比如：你会什么技能？" />
-          <button type="submit" data-lang-aria="发送" aria-label="发送">➤</button>
-        </form>
-      </div>
-    </section>
-
-    <!-- 8. 音乐播放器 Music -->
-    <section id="m-music" class="m-bento">
-      <h2 class="m-title" data-lang="音乐播放器">音乐播放器</h2>
-      <p class="m-sub" data-lang="点击播放一首歌（网易云外链）">点击播放一首歌（网易云外链）</p>
-      <div class="m-music-card">
-        <p class="m-music-title" data-lang="🎧 现代随身听">🎧 现代随身听</p>
-        <!-- [MANUAL] 网易云外链 iframe（单曲 1935705479，v1.45.0）：懒加载，点击按钮才注入。
-             换歌只需替换歌曲 ID；与赛博版 music.js 同一首曲目。 -->
-        <div class="m-music-player" id="mMusicPlayer"></div>
-        <button class="m-btn m-btn-primary" id="mMusicBtn" type="button" data-lang="播放 / 切换">播放 / 切换</button>
-      </div>
-    </section>
-
-    <!-- 9. 反馈栏 Feedback -->
-    <section id="m-feedback" class="m-bento">
+    <!-- ===== 9. 反馈栏 ===== -->
+    <section id="m-feedback" class="m-card m-block">
       <h2 class="m-title" data-lang="留个反馈">留个反馈</h2>
       <p class="m-sub" data-lang="反馈不会公开，只有我能看到。">反馈不会公开，只有我能看到。</p>
       <form class="m-feedback-form" id="mFeedbackForm" novalidate>
@@ -213,8 +285,8 @@
       <p class="m-form-success" id="mFbSuccess" hidden data-lang="已收到，谢谢你的反馈！">已收到，谢谢你的反馈！</p>
     </section>
 
-    <!-- 10. 反馈展示栏 Feedback Wall -->
-    <section id="m-wall" class="m-bento">
+    <!-- ===== 10. 反馈墙 ===== -->
+    <section id="m-wall" class="m-card m-block">
       <h2 class="m-title" data-lang="反馈墙 · 大家的声音">反馈墙 · 大家的声音</h2>
       <p class="m-sub" data-lang="公开发布的访客反馈（只读版）">公开发布的访客反馈（只读版）</p>
       <div class="m-wall-list" id="mWallList">
@@ -222,23 +294,32 @@
       </div>
     </section>
 
-    <!-- 11. 成就栏 Achievements -->
-    <section id="m-achievements" class="m-bento">
+    <!-- ===== 11. 成就栏 ===== -->
+    <section id="m-achievements" class="m-card m-block">
       <h2 class="m-title" data-lang="成就">成就</h2>
       <p class="m-sub"><span data-lang="探索本站，解锁成就 · 已解锁">探索本站，解锁成就 · 已解锁</span> <span id="mAchievementCounter">0 / 0</span></p>
       <div class="m-ach-grid" id="mAchievementGrid">
-        <!-- modern.js 渲染成就卡片 -->
+        <!-- modern.js 渲染 -->
       </div>
     </section>
 
   </main>
 
-  <footer class="m-footer">
-    <p>© <span id="mYear"></span> <span data-lang="刘聿宸 · 梦想即力量">刘聿宸 · 梦想即力量</span></p>
-    <p class="m-footer-note">Powered by Vibe Coding · Modern Edition</p>
+  <!-- ===== 底部状态条 ===== -->
+  <footer class="m-statusbar">
+    <span class="m-status-clock" id="mClock">--:--:--</span>
+    <span class="m-status-uptime"><span data-lang="系统已稳定运行 ">系统已稳定运行 </span><span id="mUptime">--</span></span>
+    <span class="m-status-stack">HTML 5 · CSS 3 · JavaScript · Vibe Coding</span>
+    <span class="m-status-copy">© <span id="mYear"></span> <span data-lang="YuchenSama · 梦想即力量">YuchenSama · 梦想即力量</span></span>
   </footer>
 
-  <script src="scripts/modern.js?v=1.45.0"></script>
+  <!-- ===== 悬浮按钮 ===== -->
+  <div class="m-float">
+    <button class="m-float-btn" id="mBackTop" type="button" data-lang-aria="回到顶部" aria-label="回到顶部">↑</button>
+    <span class="m-pixel-cat" aria-hidden="true">🐱</span>
+  </div>
+
+  <script src="scripts/modern.js?v=1.45.1"></script>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.49.4/dist/umd/supabase.min.js"></script>
 </body>
 </html>

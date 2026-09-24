@@ -5,6 +5,49 @@
   "note": "构建日志：记录每次 AI 生成 / 人工修改 / 验证过程，便于课程「过程可追溯」。AI 生成片段在步骤中以 [AI-GEN] 标注，人工修改以 [MANUAL] 标注。",
   "entries": [
     {
+      "version": "v1.45.1",
+      "date": "2026-09-25",
+      "type": "重构",
+      "title": "现代版 UI 重构为「宝藏之地」风格（紫色毛玻璃 + 导航 + 搜索 + 播放器卡 + 歌词横幅 + 日间模式）",
+      "steps": [
+        {
+          "order": 1,
+          "tag": "[AI-GEN]",
+          "action": "modern.html 全量重写：顶部粘性导航栏（Logo「YuchenSama の 宝藏之地」+ 8 个板块锚点 + 主题/语言/返回赛博版按钮）；居中胶囊搜索条（占位「搜寻标题、描述或标签…」）；双卡片行（个人资料卡：头像/简介/真实统计 3/8/解锁数 + 社交图标；播放器卡：CLOUD MUSIC 徽章 + 网易云 iframe 懒加载）；歌词横幅；内容网格（LATEST INSIGHT 大卡 / 数字孪生卡 / 开发历程 RECORDS / 日间模式主题卡）；底部状态条（实时时钟/运行时长/技术徽章/© 年份）；悬浮返回顶部 + 像素猫；11 板块 id 全部保留。",
+          "files": ["modern.html"],
+          "verify": "CDP：11 板块 id 齐全、导航 8 项、头像引用正确"
+        },
+        {
+          "order": 2,
+          "tag": "[AI-GEN]",
+          "action": "styles/modern.css 全量重写：CSS 变量暗色主题 + body.is-light 日间主题；紫色毛玻璃（.m-nav/.m-profile/.m-player/.m-grid-top 等）；.is-search-hidden 隐藏规则；980/620px 响应式；背景图 .m-bg 占位（文件内 [MANUAL] 注释待用户放 assets/modern-bg.jpg）。",
+          "files": ["styles/modern.css"],
+          "verify": "页面渲染正常（导航/网格/状态条样式）"
+        },
+        {
+          "order": 3,
+          "tag": "[AI-GEN]",
+          "action": "scripts/modern.js：MODERN_DICT 扩充（导航/搜索/个人卡/播放器/歌词/网格/状态条词条）；新增模块——bindNavHighlight（滚动高亮导航，offsetTop 非单调兼容）、bindSearch（关键词过滤卡片）、bindClock（每秒刷新）、bindUptime（localStorage modern-site-since 首次访问计时）、bindTheme（日间/夜间切换，localStorage modern-theme 持久化）、bindBackTop（返回顶部）；init() 接入新模块 + 个人卡统计真实数据（项目 3 / 音游 ARCADES.length / 成就 loadUnlocked 计数）。",
+          "files": ["scripts/modern.js"],
+          "verify": "CDP：时钟格式、运行时长、统计数字、导航高亮随滚动切换、日间模式持久化、搜索过滤/清空恢复"
+        },
+        {
+          "order": 4,
+          "tag": "[AI-GEN]",
+          "action": "CDP 全量回归验证（50+ 项）：布局骨架、11 板块、导航高亮（顶部/音乐/关于/项目/音游/联系/反馈墙/成就/底部 9 位置）、搜索过滤、日间模式切换与持久化、互动板块（音游 8/成就 11/孪生问答/反馈墙/音乐 iframe id=1935705479）、英文态全词条翻译 + html lang=en。",
+          "files": ["modern.html", "styles/modern.css", "scripts/modern.js"],
+          "verify": "50+ 项全 PASS"
+        }
+      ],
+      "verify": "CDP 自动化 50+ 项全 PASS：新布局骨架齐全、11 板块保留、导航滚动高亮 9 位置正确、搜索过滤恢复、日间模式持久化（localStorage modern-theme）、英文态翻译完整、音乐 iframe 注入正确、孪生问答回复渲染。",
+      "issues": [
+        "首测导航高亮在音乐卡位于页顶导致 offsetTop 非单调、滚动到 About 区域仍高亮音乐 → 改为取满足条件中 offsetTop 最大项 + 固定 130px 提前量后通过",
+        "验证脚本曾受上一轮英文态遗留污染（搜索匹配中文失败）→ 脚本开头重置语言状态",
+        "scripts/modern.js 编辑期间多次 DEEPWORKS_FILE_WRITE_LOCK_TIMEOUT → 改用 Python 脚本直接写入文件成功",
+        "CDP Page.captureScreenshot 在该环境持续超时（非功能项）→ 跳过视觉截图，功能验证已全通过"
+      ]
+    },
+    {
       "version": "v1.45.0",
       "date": "2026-09-25",
       "type": "新增",

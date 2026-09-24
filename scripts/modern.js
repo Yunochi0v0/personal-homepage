@@ -1,5 +1,5 @@
 /* ============================================================
- * 现代版主页脚本（v1.45.0 · AI-GEN）
+ * 现代版主页脚本（v1.45.1 · AI-GEN）
  * ------------------------------------------------------------
  * 功能：
  *   1. data-lang 双语切换（现代版独立实现，与赛博版 i18n.js 平行）：
@@ -13,6 +13,12 @@
  *      读取时前者优先，回退旧键 → 两页互跳时语言自动同步。
  *   3. 互动板块：音游列表 / 数字孪生问答 / 网易云播放 / 反馈提交 /
  *      反馈墙读取 / 成就展示（读取赛博版同一 localStorage 解锁状态）。
+ *   4. v1.45.1 新增（宝藏之地风格）：
+ *      - 导航栏滚动高亮（IntersectionObserver）
+ *      - 搜索条过滤（标题/描述/标签，支持中英文）
+ *      - 底部状态条实时时钟 + 本站运行时长
+ *      - 日间模式主题切换（localStorage 持久化）
+ *      - 返回顶部悬浮按钮
  * ============================================================ */
 (function () {
   "use strict";
@@ -33,6 +39,47 @@
     /* 导航 */
     "返回赛博版": "Back to Cyberpunk UI",
     "切换现代模式": "Switch to Modern UI",
+    "YuchenSama の 宝藏之地": "YuchenSama's Treasure Land",
+    "首页": "Home",
+    "关于": "About",
+    "项目": "Projects",
+    "音游": "Arcade",
+    "音乐": "Music",
+    "反馈墙": "Wall",
+    "成就": "Achievements",
+    "联系": "Contact",
+
+    /* 搜索 */
+    "搜寻标题、描述或标签…": "Search title, description or tags…",
+
+    /* 个人资料卡 */
+    "大一新生 · 编程与人工智能初学者 · 用 AI 辅助开发记录我的成长":
+      "Freshman · Beginner in programming & AI · Documenting my growth with AI-assisted development",
+    "音游全连": "FC Records",
+    "当前位于 深圳 · 持续迭代中": "Currently in Shenzhen · Constantly iterating",
+
+    /* 音乐播放器卡 */
+    "🎧 现代随身听": "🎧 Modern Walkman",
+    "J-ROCK & J-POP · 点击播放（网易云外链）": "J-ROCK & J-POP · Click to play (NetEase Cloud embed)",
+    "播放 / 切换": "Play / Switch",
+
+    /* 歌词横幅 */
+    "♪ 梦想即力量 · Dreams Are Power": "♪ Dreams Are Power · 梦想即力量",
+
+    /* 内容网格 */
+    "最新动态": "LATEST INSIGHT",
+    "v1.45.1 宝藏之地风格上线": "v1.45.1 Treasure-Land UI is Live",
+    "紫色毛玻璃 + 顶部导航 + 播放器卡 + 歌词横幅 + 日间模式，双页面中英同步":
+      "Purple glassmorphism + top nav + player card + lyric banner + day mode, bilingual across both pages",
+    "开发历程": "RECORDS",
+    "归档：版本记录": "Archive: Version Log",
+    "宝藏之地风格重构": "Treasure-Land UI redesign",
+    "现代版主页上线": "Modern homepage launched",
+    "迭代记录时间重排": "Changelog reordered by time",
+    "项目板块写入迭代历史": "Project section got its iteration history",
+    "日间模式": "Day Mode",
+    "点击切换明暗主题": "Click to switch light/dark theme",
+    "切换日间模式 / 夜间模式": "Toggle day / night mode",
 
     /* Hero */
     "// MODERN EDITION · 现代版主页": "// MODERN EDITION",
@@ -43,7 +90,6 @@
       "Freshman · Beginner in programming & AI · Documenting my growth with AI-assisted development",
     "联系我": "Contact Me",
     "了解我": "About Me",
-    "当前位于 深圳 · 持续迭代中": "Currently in Shenzhen · Constantly iterating",
 
     /* About */
     "个人简介": "About",
@@ -136,6 +182,9 @@
     "探索本站，解锁成就 · 已解锁": "Explore to unlock achievements · Unlocked",
 
     /* Footer */
+    "系统已稳定运行 ": "System stable for ",
+    "YuchenSama · 梦想即力量": "YuchenSama · Dreams Are Power",
+    "回到顶部": "Back to top",
     "刘聿宸 · 梦想即力量": "Liu Yuchen · Dreams Are Power"
   };
 
@@ -495,7 +544,141 @@
     if (counter) counter.textContent = count + " / " + ACH.length;
   }
 
-  /* ---------- 11. 初始化 ---------- */
+  /* ---------- 11. v1.45.1 新增：导航高亮 / 搜索 / 时钟 / 运行时长 / 主题 / 返回顶部 ---------- */
+
+  /* 11.1 导航滚动高亮 */
+  function bindNavHighlight() {
+    var links = document.querySelectorAll("#mNavLinks a");
+    if (!links.length) return;
+    var sections = [];
+    links.forEach(function (a) {
+      var id = (a.getAttribute("href") || "").replace("#", "");
+      var sec = id ? document.getElementById(id) : null;
+      if (sec) sections.push({ link: a, sec: sec });
+    });
+    var onScroll = function () {
+      var pos = window.scrollY + 130;
+      var currentId = "";
+      var bestTop = -1;
+      for (var i = 0; i < sections.length; i++) {
+        var top = sections[i].sec.offsetTop;
+        if (top <= pos && top >= bestTop) {
+          bestTop = top;
+          currentId = sections[i].sec.id;
+        }
+      }
+      // 未命中任何板块（如页首 hero 尚未滚过阈值）→ 默认高亮第一项
+      if (!currentId && sections.length) currentId = sections[0].sec.id;
+      // 页面底部时高亮最后一个
+      if (window.innerHeight + window.scrollY >= document.body.offsetHeight - 40 && sections.length) {
+        currentId = sections[sections.length - 1].sec.id;
+      }
+      links.forEach(function (a) {
+        a.classList.toggle("is-active", (a.getAttribute("href") || "") === "#" + currentId);
+      });
+    };
+    window.addEventListener("scroll", onScroll, { passive: true });
+    onScroll();
+  }
+
+  /* 11.2 搜索过滤（标题 / 描述 / 标签，支持中英文） */
+  function bindSearch() {
+    var input = $("mSearch");
+    if (!input) return;
+    input.addEventListener("input", function () {
+      var q = (input.value || "").trim().toLowerCase();
+      // 可搜索卡片：项目 / 音游 / 反馈墙 / 板块标题
+      var targets = document.querySelectorAll(
+        ".m-project, .m-arcade-item, .m-wall-card, .m-block, .m-twin-card, .m-records, .m-theme-card"
+      );
+      for (var i = 0; i < targets.length; i++) {
+        var el = targets[i];
+        if (!q) { el.classList.remove("is-search-hidden"); continue; }
+        var hay = (el.textContent || "").toLowerCase();
+        el.classList.toggle("is-search-hidden", hay.indexOf(q) === -1);
+      }
+    });
+  }
+
+  /* 11.3 底部状态条：实时时钟 */
+  function bindClock() {
+    var clock = $("mClock");
+    if (!clock) return;
+    var pad = function (n) { return n < 10 ? "0" + n : "" + n; };
+    var tick = function () {
+      var d = new Date();
+      clock.textContent = pad(d.getHours()) + ":" + pad(d.getMinutes()) + ":" + pad(d.getSeconds());
+    };
+    tick();
+    setInterval(tick, 1000);
+  }
+
+  /* 11.4 运行时长：基于首次访问时间（localStorage） */
+  function bindUptime() {
+    var el = $("mUptime");
+    if (!el) return;
+    var KEY = "modern-site-since";
+    var since = 0;
+    try {
+      since = parseInt(localStorage.getItem(KEY), 10) || 0;
+      if (!since) {
+        since = Date.now();
+        localStorage.setItem(KEY, String(since));
+      }
+    } catch (e) { since = Date.now(); }
+    var fmt = function (ms) {
+      var days = Math.floor(ms / 86400000);
+      var hours = Math.floor((ms % 86400000) / 3600000);
+      var mins = Math.floor((ms % 3600000) / 60000);
+      return isEn()
+        ? days + "d " + hours + "h " + mins + "m"
+        : days + " 天 " + hours + " 小时 " + mins + " 分钟";
+    };
+    var update = function () {
+      el.textContent = fmt(Date.now() - since);
+    };
+    update();
+    setInterval(update, 60000);
+  }
+
+  /* 11.5 日间模式主题切换（localStorage 持久化） */
+  function bindTheme() {
+    var KEY = "modern-theme";
+    var card = $("mThemeCard");
+    var btn = $("mThemeToggle");
+    var icon = $("mThemeIcon");
+    var applyTheme = function (light) {
+      document.body.classList.toggle("is-light", light);
+      try { localStorage.setItem(KEY, light ? "light" : "dark"); } catch (e) { /* 忽略 */ }
+      if (icon) icon.textContent = light ? "🌙" : "🌸";
+    };
+    // 初始化：读取已保存主题
+    var saved = "dark";
+    try { saved = localStorage.getItem(KEY) || "dark"; } catch (e) { /* 忽略 */ }
+    applyTheme(saved === "light");
+
+    var toggle = function () {
+      applyTheme(!document.body.classList.contains("is-light"));
+    };
+    if (card) {
+      card.addEventListener("click", toggle);
+      card.addEventListener("keydown", function (e) {
+        if (e.key === "Enter" || e.key === " ") { e.preventDefault(); toggle(); }
+      });
+    }
+    if (btn) btn.addEventListener("click", toggle);
+  }
+
+  /* 11.6 返回顶部 */
+  function bindBackTop() {
+    var btn = $("mBackTop");
+    if (!btn) return;
+    btn.addEventListener("click", function () {
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    });
+  }
+
+  /* ---------- 12. 初始化 ---------- */
   function init() {
     bindTopbar();
     renderArcade();
@@ -504,6 +687,25 @@
     bindFeedback();
     loadWall();
     renderAchievements();
+    bindNavHighlight();
+    bindSearch();
+    bindClock();
+    bindUptime();
+    bindTheme();
+    bindBackTop();
+
+    // 个人资料卡统计数字（真实数据：项目 3 / 音游 8 / 成就解锁数）
+    var stProj = $("mStatProjects");
+    if (stProj) stProj.textContent = "3";
+    var stArc = $("mStatArcade");
+    if (stArc) stArc.textContent = String(ARCADES.length);
+    var stAch = $("mStatAch");
+    if (stAch) {
+      var unlockedCount = 0;
+      var unlockedMap = loadUnlocked();
+      for (var i = 0; i < ACH.length; i++) if (unlockedMap[ACH[i].id]) unlockedCount++;
+      stAch.textContent = String(unlockedCount);
+    }
 
     var year = $("mYear");
     if (year) year.textContent = String(new Date().getFullYear());

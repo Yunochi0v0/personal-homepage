@@ -10,6 +10,36 @@
 
 ---
 
+## [v1.45.1] 重构：现代版 UI 改为「宝藏之地」风格（紫色毛玻璃 + 导航 + 搜索 + 播放器卡 + 歌词横幅 + 日间模式）
+
+- **日期**：2026-09-25
+- **作者**：katzegott
+- **类型**：`重构`
+
+### 重构（AI-generated）
+- **整体风格**：现代版 `modern.html` 参考「宝藏之地」类参考图重构为紫色毛玻璃风格——深色夜间主题 + `body.is-light` 日间主题（`styles/modern.css` 全量重写为 CSS 变量）。
+- **顶部导航栏**：粘性导航（`.m-nav`）含 Logo「YuchenSama の 宝藏之地 / YuchenSama's Treasure Land」+ 8 个板块锚点（首页/关于/项目/音游/音乐/反馈墙/成就/联系）+ 主题切换 🌙/🌸、语言切换、返回赛博版按钮；滚动时高亮当前板块（兼容音乐卡位于页顶导致的 offsetTop 非单调布局，取最大 offsetTop 项 + 130px 提前量）。
+- **搜索条**：居中胶囊搜索「搜寻标题、描述或标签…」，输入即过滤项目/音游/反馈墙/孪生/记录/主题卡（`.is-search-hidden`）。
+- **双卡片行**：个人资料卡（头像 `assets/avatar.jpg`、简介、真实统计——项目 3 / 音游 8 / 成就解锁数动态计算、邮箱/GitHub/网易云图标）+ 播放器卡（CLOUD MUSIC 徽章、网易云 iframe 懒加载，外链 id=1935705479）。
+- **歌词横幅**：波形 + 「♪ 梦想即力量 · Dreams Are Power」data-lang 双语。
+- **内容网格**：LATEST INSIGHT 大卡（v1.45.1 宝藏之地风格上线）、数字孪生卡、开发历程 RECORDS、日间模式主题卡（点击切换 + 持久化 `localStorage modern-theme`）。
+- **底部状态条**：实时时钟（每秒刷新）、运行时长（`modern-site-since` 首次访问计时，X 天 X 小时 X 分钟 / Xd Xh Xm）、技术徽章（HTML5 · CSS3 · JavaScript · Vibe Coding）、© 年份自动更新。
+- **悬浮元素**：返回顶部按钮（`.m-float`）+ 像素猫 🐱。
+- **版本号** → 1.45.1：`modern.html` 的 `data-version` 与 `?v=` 引用更新。
+
+### 验证方式
+- CDP（Chrome DevTools Protocol）自动化验证 50+ 项全 PASS：布局骨架（导航 8 项/搜索/个人卡/播放器卡/歌词横幅/内容网格/状态条/悬浮按钮）、11 板块 id 保留、导航滚动高亮 9 个位置正确（顶部→首页、双卡行→音乐、About→关于、Projects→项目、Arcade→音游、Contact→联系、Wall→反馈墙、成就、底部→联系）、搜索过滤与清空恢复、日间模式切换 + localStorage 持久化、互动板块（音游 8 / 成就 11 / 孪生问答回复 / 反馈墙 / 音乐 iframe id=1935705479）、英文态全词条翻译 + `html lang="en"`。
+
+### 涉及文件
+| 文件 | 类型 | 说明 |
+| --- | --- | --- |
+| `modern.html` | 重构 | 宝藏之地风格新布局（11 板块 id 保留） |
+| `styles/modern.css` | 重构 | 紫色毛玻璃 + 日间主题 CSS 变量 |
+| `scripts/modern.js` | 修改 | DICT 扩充 + 6 个新模块 + init 接入统计 |
+| `buildLog.json` | 修改 | 追加 v1.45.1 构建日志 |
+
+---
+
 ## [v1.45.0] 新增：现代版主页（Bento Grid，双页面中英同步）
 
 - **日期**：2026-09-25
