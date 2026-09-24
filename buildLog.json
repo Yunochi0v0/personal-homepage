@@ -37,6 +37,16 @@
             "scripts/modern.js"
           ],
           "verify": "jsc 语法 OK（曾因 var 重复语法错误，修正为纯数组字面量后通过）"
+        },
+        {
+          "order": 4,
+          "tag": "[MANUAL]",
+          "action": "开发日志数据同步：现代版 v1.46.0 ~ v1.49.0 四轮改动追加写入 history.js 的 STAGES（V3.0 阶段末尾，2026-09-25）；modern.js 的 DEV_LOG_STAGES 同步重新提取（同源一致，55→59 条）。",
+          "files": [
+            "scripts/history.js",
+            "scripts/modern.js"
+          ],
+          "verify": "jsc 双文件语法 OK；CDP 双页 PASS：主页面 LOG 弹窗含 v1.46~v1.49 且 V3.44.3 旧记录仍在；现代版弹窗 59 条末行 v1.49.0"
         }
       ],
       "verify": "CDP 14 项全 PASS：版本 1.49.0；LOG 按钮存在；3 阶段 / 55 版本（与主页面一致）；打开 aria=false + 锁滚动 + 6 处乱码 + 首行 v1.0 末行 V3.44.3；模拟主页面彩蛋记录 → 弹窗批量解密（金色）；Esc/遮罩/✕ 三种关闭生效、关闭后解锁 + 弹窗隐藏；点击弹窗内部不关闭；英文 aria View Dev Log；彩蛋记录测试后还原；孪生/背景/花瓣/沉浸无回归"
