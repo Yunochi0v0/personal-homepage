@@ -46,9 +46,18 @@
             "scripts/modern.js"
           ],
           "verify": "jsc 语法 OK"
+        },
+        {
+          "order": 5,
+          "tag": "[AI-GEN]",
+          "action": "用户反馈：粒子由五瓣花朵改为背景图中那样的单片樱花花瓣。drawPetal() 重写为单片花瓣轮廓（moveTo + 2 段 bezierCurveTo 左右瓣缘 + 2 段 quadraticCurveTo 先端 V 形凹陷），去掉五瓣循环与花心。",
+          "files": [
+            "scripts/modern.js"
+          ],
+          "verify": "jsc 语法 OK；CDP：粒子系统运行、canvas 花瓣像素 11373>0、源码确认单片花瓣逻辑生效且无五瓣/花心残留"
         }
       ],
-      "verify": "CDP 自动化 17 项全 PASS：版本号 1.46.0；4 张背景 slide、点击切换 active 0→1、钩子 interval=120000ms；花瓣 canvas 尺寸正常、数量 14~32、rAF 运行、pointer-events:none；z-index -1/1；4 张背景图可加载；孪生交互正常；日间 filter=none；英文 aria 正确。",
+      "verify": "CDP 自动化 17 项全 PASS：版本号 1.46.0；4 张背景 slide、点击切换 active 0→1、钩子 interval=120000ms；花瓣 canvas 尺寸正常、数量 14~32、rAF 运行、pointer-events:none；z-index -1/1；4 张背景图可加载；孪生交互正常；日间 filter=none；英文 aria 正确。；粒子形状改为单片樱花花瓣（V 形缺口），canvas 像素验证通过",
       "issues": []
     },
     {

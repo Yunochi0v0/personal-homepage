@@ -722,25 +722,21 @@
     var i, p;
     for (i = 0; i < COUNT; i++) petals.push(makePetal());
 
-    // 五瓣樱花：5 个椭圆花瓣绕中心旋转排布
+    // 单片樱花花瓣（同背景图中的飘落花瓣）：底部圆润，先端中央 V 形凹陷
     function drawPetal(p) {
       ctx.save();
       ctx.translate(p.x, p.y);
       ctx.rotate(p.rot);
       ctx.globalAlpha = p.alpha;
-      ctx.fillStyle = "rgba(" + p.color + ",0.85)";
-      var r = p.size / 2;
-      var k;
-      for (k = 0; k < 5; k++) {
-        ctx.save();
-        ctx.rotate((k * Math.PI * 2) / 5);
-        ctx.beginPath();
-        ctx.ellipse(0, -r * 0.85, r * 0.42, r * 0.62, 0, 0, Math.PI * 2);
-        ctx.fill();
-        ctx.restore();
-      }
+      ctx.fillStyle = "rgba(" + p.color + ",0.9)";
+      var r = p.size;
       ctx.beginPath();
-      ctx.arc(0, 0, r * 0.12, 0, Math.PI * 2);   // 花心
+      ctx.moveTo(0, r * 0.92);                                    // 花瓣基部
+      ctx.bezierCurveTo(-r * 0.78, r * 0.35, -r * 0.55, -r * 0.45, -r * 0.26, -r * 0.6);  // 左瓣缘
+      ctx.quadraticCurveTo(-r * 0.1, -r * 0.74, 0, -r * 0.58);    // 缺口左凸起
+      ctx.quadraticCurveTo(r * 0.1, -r * 0.74, r * 0.26, -r * 0.6); // 缺口右凸起
+      ctx.bezierCurveTo(r * 0.55, -r * 0.45, r * 0.78, r * 0.35, 0, r * 0.92);  // 右瓣缘
+      ctx.closePath();
       ctx.fill();
       ctx.restore();
     }
