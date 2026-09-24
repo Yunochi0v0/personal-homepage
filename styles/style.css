@@ -3477,7 +3477,8 @@ html::after {
 .side-btns .back-top:hover,
 .side-btns .feedback-badge:hover,
 .side-btns .music-badge:hover,
-.side-btns .wall-badge:hover {
+.side-btns .wall-badge:hover,
+.side-btns .menu-badge:hover {
   background: var(--primary);
   color: #000;
   box-shadow: var(--neon);
@@ -3486,8 +3487,52 @@ html::after {
 .side-btns .back-top:active,
 .side-btns .feedback-badge:active,
 .side-btns .music-badge:active,
-.side-btns .wall-badge:active {
+.side-btns .wall-badge:active,
+.side-btns .menu-badge:active {
   transform: translate(2px, 2px);
+}
+
+/* 移动端功能菜单主按钮（v1.44.0 · AI-GEN）：桌面端隐藏；移动端显示，
+   点击后 .side-btns 加 .expanded，三枚板块按钮在按钮上方展开。 */
+.menu-badge {
+  display: none; /* 桌面端隐藏（移动端媒体查询中改为 grid 显示） */
+  width: 48px;
+  height: 48px;
+  place-items: center;
+  border: 1px solid rgba(255, 232, 26, 0.55);
+  background:
+    linear-gradient(160deg, rgba(255, 255, 255, 0.28) 0%, rgba(255, 255, 255, 0.06) 40%, rgba(255, 255, 255, 0) 62%),
+    rgba(255, 232, 26, 0.1);
+  backdrop-filter: blur(14px) saturate(170%);
+  -webkit-backdrop-filter: blur(14px) saturate(170%);
+  color: var(--primary);
+  cursor: pointer;
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.4),
+    inset 0 -3px 8px rgba(0, 0, 0, 0.35);
+  clip-path: polygon(8px 0, 100% 0, 100% calc(100% - 8px), calc(100% - 8px) 100%, 0 100%, 0 8px);
+  transition: background 0.15s, color 0.15s, box-shadow 0.15s, transform 0.15s;
+}
+
+/* 展开 / 收起时主按钮 "+" 旋转 45° 变 "×" */
+.menu-badge .side-icon {
+  transition: transform 0.2s;
+}
+
+.side-btns.expanded .menu-badge .side-icon {
+  transform: rotate(45deg);
+}
+
+/* 板块按钮展开动画（自按钮位向上依次弹出） */
+@keyframes sideBtnPop {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
 }
 
 /* 音乐浮窗背景遮罩（v1.23.1 · AI-GEN）：打开浮窗时全屏极淡暗色覆盖，突出浮窗；
@@ -3550,7 +3595,8 @@ html::after {
   transform: translate(2px, 2px);
 }
 
-/* 移动端：操作台随容器一起上移，避开底部 Dock */
+/* 移动端：操作台随容器一起上移，避开底部 Dock；音乐 / 反馈 / 反馈墙
+   三枚板块按钮收进主按钮（.menu-badge），点击展开（.expanded 时显示） */
 @media (max-width: 640px) {
   .side-btns {
     right: 14px;
@@ -3560,9 +3606,38 @@ html::after {
   .side-btns .back-top,
   .side-btns .feedback-badge,
   .side-btns .music-badge,
-  .side-btns .wall-badge {
+  .side-btns .wall-badge,
+  .side-btns .menu-badge {
     width: 44px;
     height: 44px;
+  }
+
+  /* 主按钮常显；三枚板块按钮默认收起 */
+  .side-btns .menu-badge {
+    display: grid;
+  }
+
+  .side-btns .music-badge,
+  .side-btns .feedback-badge,
+  .side-btns .wall-badge {
+    display: none;
+  }
+
+  /* 展开：板块按钮显示并排到主按钮上方（order:-1），依次弹出 */
+  .side-btns.expanded .music-badge,
+  .side-btns.expanded .feedback-badge,
+  .side-btns.expanded .wall-badge {
+    display: grid;
+    order: -1;
+    animation: sideBtnPop 0.18s ease-out both;
+  }
+
+  .side-btns.expanded .feedback-badge {
+    animation-delay: 0.05s;
+  }
+
+  .side-btns.expanded .wall-badge {
+    animation-delay: 0.1s;
   }
 }
 

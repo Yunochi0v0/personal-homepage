@@ -74,6 +74,34 @@ backTop.addEventListener("click", () => {
   window.scrollTo({ top: 0, behavior: "smooth" });
 });
 
+/* ---------- 3b. 移动端功能菜单（v1.44.0）：主按钮展开 音乐 / 反馈 / 反馈墙 ---------- */
+const sideBtns = document.getElementById("sideBtns");
+const menuBadge = document.getElementById("menuBadge");
+
+if (sideBtns && menuBadge) {
+  menuBadge.addEventListener("click", (e) => {
+    e.stopPropagation(); // 避免冒泡到 document 立即收起
+    const open = sideBtns.classList.toggle("expanded");
+    menuBadge.setAttribute("aria-expanded", String(open));
+  });
+
+  // 点任一板块按钮触发其功能后自动收起菜单
+  sideBtns.querySelectorAll(".music-badge, .feedback-badge, .wall-badge").forEach((b) => {
+    b.addEventListener("click", () => {
+      sideBtns.classList.remove("expanded");
+      menuBadge.setAttribute("aria-expanded", "false");
+    });
+  });
+
+  // 点击菜单外部任意区域收起
+  document.addEventListener("click", (e) => {
+    if (sideBtns.classList.contains("expanded") && !sideBtns.contains(e.target)) {
+      sideBtns.classList.remove("expanded");
+      menuBadge.setAttribute("aria-expanded", "false");
+    }
+  });
+}
+
 /* ---------- 4. 打字机 slogan ---------- */
 /* v1.42.5：token 防叠——语言切换触发重打时，取消进行中的旧打字序列；
    slogan 文案由 i18n.js 的 data-i18n 标注更新，这里只负责"打字"效果。 */
@@ -1047,7 +1075,7 @@ document.querySelectorAll(".is-placeholder").forEach((link) => {
   }
 
   const LINES = [
-    "DEEPWORKS BIOS v1.43.0",
+    "DEEPWORKS BIOS v1.44.0",
     "MEMTEST 640K ............... <OK>",
     "NEON SHADER LOAD ........... <OK>",
     "SINE WAVE ENGINE ........... <OK>",

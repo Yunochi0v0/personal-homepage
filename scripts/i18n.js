@@ -114,6 +114,7 @@
     "向下滚动": "Scroll down",
     "返回顶部": "Back to top",
     "打开音乐播放器": "Open music player",
+    "打开功能菜单": "Open menu",
 
     /* Footer */
     "刘聿宸 · 梦想即力量": "Liu Yuchen · Dreams Are Power",

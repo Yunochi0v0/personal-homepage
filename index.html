@@ -7,7 +7,7 @@
   <title>刘聿宸 · 个人主页</title>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@700;900&family=Press+Start+2P&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="styles/style.css?v=1.43.0" />
+  <link rel="stylesheet" href="styles/style.css?v=1.44.0" />
   <!-- 开启动画：提前锁定页面滚动，避免动画播放期间背景被滚动。
        若脚本异常或未执行，则由 CSS 兜底动画与 <noscript> 保证页面仍可正常显示。 -->
   <script>
@@ -29,7 +29,7 @@
   </script>
   <noscript><style>.boot { display: none !important; }</style></noscript>
 </head>
-<body data-version="1.43.0">
+<body data-version="1.44.0">
 
   <!-- 多语言切换按钮（v1.42.5 · AI-GEN）：左上角悬浮，点击中英切换 -->
   <button id="langSwitch" class="lang-switch" type="button" aria-label="切换语言 / Switch language">EN</button>
@@ -442,6 +442,12 @@
        统一收进 .side-btns 容器（fixed 右下角，flex 纵向 gap:16px 拉开间距防误触），
        图标统一为黄色细线线性 SVG（stroke 跟随 currentColor，hover 点亮为纯黄底黑字）。 -->
   <div class="side-btns" id="sideBtns">
+    <!-- 移动端功能菜单主按钮（v1.44.0 · AI-GEN）：桌面端隐藏；
+         移动端点击展开 音乐 / 反馈 / 反馈墙 三枚板块按钮（再点收起） -->
+    <button class="menu-badge" id="menuBadge" type="button" aria-label="打开功能菜单" data-i18n-aria="打开功能菜单" aria-expanded="false" aria-haspopup="menu">
+      <svg class="side-icon" viewBox="0 0 24 24" width="22" height="22" aria-hidden="true" focusable="false"><path d="M12 5v14"/><path d="M5 12h14"/></svg>
+    </button>
+
     <!-- 音乐播放器徽章（v1.23 · AI-GEN）：点击弹出「赛博随身听」浮窗 -->
     <button class="music-badge" id="musicBadge" type="button" aria-label="打开音乐播放器" data-i18n-aria="打开音乐播放器" aria-expanded="false" aria-haspopup="dialog">
       <svg class="side-icon" viewBox="0 0 24 24" width="22" height="22" aria-hidden="true" focusable="false"><path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/></svg>
@@ -730,16 +736,16 @@
   <!-- 成就提示容器（右下角 Steam 风格，achievements.js 注入） -->
   <div class="achievement-toasts" id="achievementToasts" aria-live="polite"></div>
 
-  <script src="scripts/i18n.js?v=1.43.0"></script>
-  <script src="scripts/main.js?v=1.43.0"></script>
+  <script src="scripts/i18n.js?v=1.44.0"></script>
+  <script src="scripts/main.js?v=1.44.0"></script>
   <script src="scripts/shiyun.js?v=1.44.3"></script>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.49.4/dist/umd/supabase.min.js"></script>
-  <script src="scripts/feedback.js?v=1.43.0"></script>
-  <script src="scripts/feedback-wall.js?v=1.43.0"></script>
+  <script src="scripts/feedback.js?v=1.44.0"></script>
+  <script src="scripts/feedback-wall.js?v=1.44.0"></script>
   <script src="scripts/music.js?v=1.42.6"></script>
-  <script src="scripts/stickman.js?v=1.43.0"></script>
+  <script src="scripts/stickman.js?v=1.44.0"></script>
   <script src="scripts/arcade.js?v=1.42.6"></script>
-  <script src="scripts/history.js?v=1.43.0"></script>
+  <script src="scripts/history.js?v=1.44.0"></script>
   <script src="scripts/achievements.js?v=1.42.6"></script>
 </body>
 </html>
