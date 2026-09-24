@@ -92,6 +92,7 @@
         { v: "V3.42.2", date: "2026-09-20", text: "页脚新增「了解更多」按钮：点击跳转 B 站视频（BV1UT42167xb），新标签页打开" },
         { v: "V3.42.3", date: "2026-09-20", text: "成就简介保密：未解锁的成就一律以「???」代替简介，不再展示达成条件" },
         { v: "V3.42.4", date: "2026-09-20", text: "新增成就「你被骗了」：点击页脚「了解更多」按钮解锁" },
+        { v: "V3.42.10", date: "2026-09-24", text: "LOG 弹窗锁页加固：开启动画期间弹窗面板与背景一并锁定不可滚动（含触屏），动画结束显示内容后恢复面板内部滚动" },
         { v: "V3.42.9", date: "2026-09-24", text: "LOG 弹窗锁页：开发历程弹窗打开期间（含开启动画）锁定页面滚动，背景不可下滑，面板内滚动不受影响，关闭即恢复" },
         { v: "V3.42.8", date: "2026-09-20", text: "彩蛋行解密：触发全站对应彩蛋（页脚暗号 / lycnb / 待机 / 火柴人 / copy）后，开发历程弹窗中对应乱码口令自动解密为真实版本日志" },
         { v: "V3.42.7", date: "2026-09-20", text: "修复：开发历程弹窗打不开（history.js 上一版本多出一对闭合括号导致语法错误）" },
@@ -225,6 +226,12 @@
   var bootRunning = false;
   var finishBoot = null;
 
+  // 动画期间锁触屏滚动：阻止 touchmove 默认行为（防 iOS / 触屏穿透），
+  // 动画结束（finish）与弹窗关闭（close→finish）时移除
+  function onTouchLock(e) {
+    e.preventDefault();
+  }
+
   function playHistoryBoot() {
     var boot = document.getElementById("historyBoot");
     var log = document.getElementById("historyBootLog");
@@ -241,6 +248,9 @@
       startGarble();
       return;
     }
+
+    // 动画期间禁止触屏滚动（背景与面板均已锁，防触屏穿透）
+    document.addEventListener("touchmove", onTouchLock, { passive: false });
 
     // 复位（重复打开时重新播放）
     boot.classList.remove("is-done", "is-sweeping");
@@ -288,6 +298,7 @@
       }
       window.removeEventListener("keydown", onBootKey);
       boot.removeEventListener("pointerdown", finish);
+      document.removeEventListener("touchmove", onTouchLock);
 
       boot.classList.add("is-done");
       if (overlay) overlay.classList.add("history-ready");

@@ -10,7 +10,34 @@
 
 ---
 
-## [v1.42.9] 修复：LOG 弹窗开启动画期间页面可下滑（当前）
+## [v1.42.10] 修复：LOG 开启动画期间弹窗面板仍可滚动（当前）
+
+- **日期**：2026-09-24
+- **作者**：katzegott
+- **类型**：`修复`
+
+### 修复
+- 问题反馈：v1.42.9 已锁定背景页面滚动，但开启动画播放时**弹窗面板本身**仍可滑动（乱码终端内容撑高面板，`.history-modal` 的 `overflow-y: auto` 使其可滚）。
+- 实现（[AI-GEN]）：
+  - `style.css` 新增 `.history-overlay:not(.history-ready) .history-modal { overflow: hidden; }`：动画期间锁定面板滚动，乱码终端内容固定居中；动画结束（`history-ready`）后恢复面板内部纵向滚动。
+  - `history.js` 动画期间挂 `touchmove` 锁（`passive: false` 阻止默认行为），防 iOS / 触屏滚动穿透；动画结束 `finish()` 与弹窗关闭时移除。
+- **版本**：主页版本号 → 1.42.10；`style.css` / `main.js` / `stickman.js` / `history.js` 引用 `?v=1.42.10`；`main.js` BIOS → v1.42.10；`history.js` 新增 V3.42.10 条目。
+
+### 涉及文件
+| 文件 | 类型 | 说明 |
+| --- | --- | --- |
+| `styles/style.css` | 修改 | 动画期间锁 `.history-modal` 面板滚动（`:not(.history-ready)`） |
+| `scripts/history.js` | 修改 | 动画期间 touchmove 锁 + finish/close 移除；V3.42.10 条目 |
+| `index.html` | 修改 | 版本号 → 1.42.10；相关引用 `?v=1.42.10` |
+| `scripts/main.js` | 修改 | BIOS → v1.42.10 |
+
+### 验证方式
+- `history.js` / `main.js` V8 `--check` 语法通过；页面与脚本 HTTP 200。
+- CDP 浏览器实测：动画期间背景与面板均不可滚动（真实滚轮事件无效）；动画结束后面板内部滚动恢复；关闭弹窗后页面滚动恢复。
+
+---
+
+## [v1.42.9] 修复：LOG 弹窗开启动画期间页面可下滑(历史)
 
 - **日期**：2026-09-24
 - **作者**：katzegott

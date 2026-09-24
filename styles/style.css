@@ -4582,6 +4582,12 @@ textarea.feedback-message {
   animation: historyPop 0.24s ease-out both;
 }
 
+/* 开启动画期间锁定弹窗面板滚动：乱码终端内容固定居中显示，
+   动画结束（history-ready 显示真实内容）后恢复面板内部纵向滚动 */
+.history-overlay:not(.history-ready) .history-modal {
+  overflow: hidden;
+}
+
 @keyframes historyPop {
   from { opacity: 0; transform: translateY(14px) scale(0.97); }
   to { opacity: 1; transform: none; }
